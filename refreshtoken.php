@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,27 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A token refreshing helper for EnglishCentral
- *
- *
  * @package    mod_englishcentral
- * @copyright  Justin Hunt (justin@poodll.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-use \mod_englishcentral\cloudpoodllauth;
-
 require_login(0, false);
-$systemcontext = context_system::instance();
-
-if (has_capability('moodle/site:config', $systemcontext)) {
-    $apiuser = get_config(cloudpoodllauth::M_COMPONENT, 'poodllapiuser');
-    $apisecret = get_config(cloudpoodllauth::M_COMPONENT, 'poodllapisecret');
-    $force = true;
-    if ($apiuser && $apisecret) {
-        cloudpoodllauth::fetch_token($apiuser, $apisecret, $force);
-    }
-}
 redirect($CFG->wwwroot . '/admin/settings.php?section=modsettingenglishcentral');

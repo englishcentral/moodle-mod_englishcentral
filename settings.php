@@ -32,88 +32,34 @@ defined('MOODLE_INTERNAL') || die;
 if ($ADMIN->fulltree) {
     $plugin = 'mod_englishcentral';
 
-    $name = 'poodllapiuser';
+    // EnglishCentral API credentials.
+    $name = 'partnerid';
     $label = get_string($name, $plugin);
-    $details = get_string($name . '_details', $plugin);
-    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $details, '', PARAM_TEXT));
+    $explain = get_string($name . 'explain', $plugin);
+    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, '', PARAM_TEXT));
 
-    $cloudpoodll_apiuser = get_config(constants::M_COMPONENT, 'poodllapiuser');
-    $cloudpoodll_apisecret = get_config(constants::M_COMPONENT, 'poodllapisecret');
-    $show_below_apisecret = '';
-    // If we have an API user and secret we fetch token.
-    if (!empty($cloudpoodll_apiuser) && !empty($cloudpoodll_apisecret)) {
-        $tokeninfo = mod_englishcentral\cloudpoodllauth::fetch_token_for_display(
-            $cloudpoodll_apiuser,
-            $cloudpoodll_apisecret
-        );
-
-        $show_below_apisecret = $tokeninfo;
-        // If we have no API user and secret we show a "fetch from elsewhere on site" or "take a free trial" link.
-    } else {
-        $amddata = ['apppath' => $CFG->wwwroot . '/' . constants::M_URL];
-        $cp_components = [
-            'filter_poodll',
-            'qtype_cloudpoodll',
-            'mod_readaloud',
-            'mod_wordcards',
-            'mod_solo',
-            'mod_minilesson',
-            'mod_pchat',
-            'atto_cloudpoodll',
-            'tiny_poodll',
-            'tinymce_cloudpoodll',
-            'assignfeedback_cloudpoodll',
-            'assignsubmission_cloudpoodll'
-        ];
-        foreach ($cp_components as $cp_component) {
-            switch ($cp_component) {
-                case 'filter_poodll':
-                    $apiusersetting = 'cpapiuser';
-                    $apisecretsetting = 'cpapisecret';
-                    break;
-                case 'mod_englishcentral':
-                    $apiusersetting = 'poodllapiuser';
-                    $apisecretsetting = 'poodllapisecret';
-                    break;
-                default:
-                    $apiusersetting = 'apiuser';
-                    $apisecretsetting = 'apisecret';
-            }
-            $cloudpoodll_apiuser = get_config($cp_component, $apiusersetting);
-            if (!empty($cloudpoodll_apiuser)) {
-                $cloudpoodll_apisecret = get_config($cp_component, $apisecretsetting);
-                if (!empty($cloudpoodll_apisecret)) {
-                    $amddata['apiuser'] = $cloudpoodll_apiuser;
-                    $amddata['apisecret'] = $cloudpoodll_apisecret;
-                    break;
-                }
-            }
-        }
-        $show_below_apisecret = $OUTPUT->render_from_template(constants::M_COMPONENT . '/managecreds', $amddata);
-    }
-
-    $name = 'poodllapisecret';
+    $name = 'consumerkey';
     $label = get_string($name, $plugin);
-    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $show_below_apisecret, '', PARAM_TEXT));
+    $explain = get_string($name . 'explain', $plugin);
+    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, '', PARAM_TEXT));
 
-    // Cloud Poodll Server.
-    $settings->add(new admin_setting_configtext(
-        constants::M_COMPONENT . '/cloudpoodllserver',
-        get_string('cloudpoodllserver', constants::M_COMPONENT),
-        get_string('cloudpoodllserver_details', constants::M_COMPONENT),
-        constants::M_DEFAULT_CLOUDPOODLL,
-        PARAM_URL
-    ));
+    $name = 'consumersecret';
+    $label = get_string($name, $plugin);
+    $explain = get_string($name . 'explain', $plugin);
+    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, '', PARAM_TEXT));
 
+    $name = 'encryptedsecret';
+    $label = get_string($name, $plugin);
+    $explain = get_string($name . 'explain', $plugin);
+    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, '', PARAM_TEXT));
 
-    // Progress dials options
+    // Progress dials options.
     $name = 'progressdials';
     $label = get_string($name, constants::M_COMPONENT);
     $details = get_string($name . '_details', constants::M_COMPONENT);
     $default = constants::M_PROGRESSDIALS_TOP;
     $options = [constants::M_PROGRESSDIALS_BOTTOM => get_string('progressdials_bottom', constants::M_COMPONENT),
         constants::M_PROGRESSDIALS_TOP => get_string('progressdials_top', constants::M_COMPONENT)];
-    ;
     $settings->add(new admin_setting_configselect(
         constants::M_COMPONENT . "/$name",
         $label,
@@ -122,19 +68,18 @@ if ($ADMIN->fulltree) {
         $options
     ));
 
-    // Chat Mode
+    // Chat Mode.
     $name = 'chatmode';
     $label = get_string($name, constants::M_COMPONENT);
     $details = get_string($name . '_details', constants::M_COMPONENT);
-    $default = true;
     $settings->add(new admin_setting_configcheckbox(
         constants::M_COMPONENT . "/$name",
         $label,
         $details,
-        $default
+        true
     ));
 
-    // Reports Table
+    // Reports Table.
     $name = 'reportstable';
     $label = get_string($name, constants::M_COMPONENT);
     $details = get_string($name . '_details', constants::M_COMPONENT);
@@ -148,41 +93,11 @@ if ($ADMIN->fulltree) {
         $options
     ));
 
+    // Advanced section.
     $name = 'advancedsection';
     $label = get_string($name, $plugin);
     $details = get_string($name . '_details', $plugin);
     $settings->add(new admin_setting_heading("$plugin/$name", $label, $details));
-
-    // $link = new moodle_url('/mod/englishcentral/support.php');
-    // $link = html_writer::tag('a', 'Poodll.com (EnglishCentral demo request)', array('href' => $link, 'target' => 'EC'));
-    // whenever possible, the support URL will display a form in the browser's preferred language
-    $link = new moodle_url('https://poodll.com/contact');
-    $link = html_writer::tag('a', 'Poodll.com', array('href' => $link, 'target' => 'EC'));
-
-
-    $name = 'partnerid';
-    $label = get_string($name, $plugin);
-    $explain = get_string($name . 'explain', $plugin, $link);
-    $default = ''; // get_string($name.'default', $plugin);
-    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, $default, PARAM_TEXT));
-
-    $name = 'consumerkey';
-    $label = get_string($name, $plugin);
-    $explain = get_string($name . 'explain', $plugin, $link);
-    $default = ''; // get_string($name.'default', $plugin);
-    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, $default, PARAM_TEXT));
-
-    $name = 'consumersecret';
-    $label = get_string($name, $plugin);
-    $explain = get_string($name . 'explain', $plugin, $link);
-    $default = ''; // get_string($name.'default', $plugin);
-    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, $default, PARAM_TEXT));
-
-    $name = 'encryptedsecret';
-    $label = get_string($name, $plugin);
-    $explain = get_string($name . 'explain', $plugin, $link);
-    $default = ''; // get_string($name.'default', $plugin);
-    $settings->add(new admin_setting_configtext("$plugin/$name", $label, $explain, $default, PARAM_TEXT));
 
     $name = 'developmentmode';
     $label = get_string($name, $plugin);
@@ -192,7 +107,7 @@ if ($ADMIN->fulltree) {
 
     $name = 'playerversion';
     $label = get_string($name, $plugin);
-    $explain = get_string($name . 'explain', $plugin, $link);
+    $explain = get_string($name . 'explain', $plugin);
     $default = get_string($name . 'default', $plugin);
     $options = array('JSDK2' => 'JSDK2', 'JSDK3' => 'JSDK3');
     $settings->add(new admin_setting_configselect("$plugin/$name", $label, $explain, $default, $options));
@@ -203,6 +118,5 @@ if ($ADMIN->fulltree) {
         get_string('enablesetuptab_details', $plugin),
         0
     ));
-
 
 }

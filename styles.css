@@ -1957,9 +1957,7 @@ Layers affected:
 #page-mod-englishcentral-view .page-mod-englishcentral-hide {
     display: none;
 }
-body.poodll-ec-embed #page {
-    margin-top: 5px;
-}
+
 
 #page-mod-englishcentral-view .activity-topics {
     display: flex;

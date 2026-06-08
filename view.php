@@ -77,9 +77,6 @@ $event->trigger();
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-// log usage
-\mod_englishcentral\cloudpoodllauth::stage_remote_process_job($cm->id);
-
 /// Set up the page header
 $PAGE->set_url('/mod/englishcentral/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
@@ -87,7 +84,6 @@ $PAGE->set_context($context);
 $config = get_config(constants::M_COMPONENT);
 if($config->enablesetuptab|| $embed == 2){
     $PAGE->set_pagelayout('popup');
-    $PAGE->add_body_class('poodll-ec-embed');
     $hidetabs = true;
 } else {
     $PAGE->set_pagelayout('incourse');
@@ -105,17 +101,9 @@ $renderer->attach_activity_and_auth($ec, $auth);
 
 echo $renderer->header($ec->get_string('view'), $hidetabs);
 
-// Check that either EC config exists
-// or Poodll config exists and is valid
 if ($msg = $auth->missing_config()) {
-    if ($msg = $auth->missing_poodllapi_config()) {
-        echo $renderer->show_missingconfig($msg);
-        die;
-    }
-    if ($msg = $auth->invalid_poodllapi_config()) {
-        echo $renderer->show_invalidconfig($msg);
-        die;
-    }
+    echo $renderer->show_missingconfig($msg);
+    die;
 }
 
 if ($msg = $auth->invalid_config()) {

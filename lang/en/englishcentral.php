@@ -28,8 +28,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 // required plugin strings
-$string['modulename'] = 'Poodll EnglishCentral';
-$string['modulenameplural'] = 'Poodll EnglishCentral Activities';
+$string['modulename'] = 'EnglishCentral';
+$string['modulenameplural'] = 'EnglishCentral Activities';
 $string['modulename_help'] = 'Give students vocabulary, listening and speaking practice with authentic English language videos. Features include:
 
 * Over 14,000 ready made video lessons
@@ -40,7 +40,7 @@ $string['modulename_help'] = 'Give students vocabulary, listening and speaking p
 
 * Audio chat with Mimi about the video lesson ';
 $string['pluginadministration'] = 'EnglishCentral Administration';
-$string['pluginname'] = 'Poodll EnglishCentral';
+$string['pluginname'] = 'EnglishCentral';
 
 // capabilities
 $string['englishcentral:addinstance'] = 'Add a new EnglishCentral activity';
@@ -62,18 +62,18 @@ $string['completiondetail:goals'] = 'Complete the watch,learn and speak goals';
 // Activity settings
 $string['consumerkey'] = 'Consumer Key';
 $string['consumerkeydefault'] = 'YOUR CONSUMER KEY';
-$string['consumerkeyexplain'] = 'Your consumer key is available from {$a}';
+$string['consumerkeyexplain'] = 'Your consumer key is provided by EnglishCentral.';
 $string['consumersecret'] = 'Consumer Secret';
 $string['consumersecretdefault'] = 'YOUR CONSUMER SECRET';
-$string['consumersecretexplain'] = 'Your consumer secret is available from {$a}';
+$string['consumersecretexplain'] = 'Your consumer secret is provided by EnglishCentral.';
 $string['developmentmode'] = 'Development mode';
 $string['developmentmodeexplain'] = 'On development sites, this setting should be enabled. On production sites, it should be disabled.';
 $string['encryptedsecret'] = 'Encrypted Secret';
 $string['encryptedsecretdefault'] = 'YOUR ENCRYPTED SECRET';
-$string['encryptedsecretexplain'] = 'Your encrypted secret is available from {$a}';
+$string['encryptedsecretexplain'] = 'Your encrypted secret is provided by EnglishCentral.';
 $string['partnerid'] = 'Partner ID';
 $string['partneriddefault'] = 'YOUR PARTNER ID';
-$string['partneridexplain'] = 'Your partnerid is available from {$a}';
+$string['partneridexplain'] = 'Your partner ID is provided by EnglishCentral.';
 
 $string['achieved'] = 'achieved';
 $string['chatgoal_help'] = 'The target number of chat questions to discuss.';
@@ -188,7 +188,7 @@ $string['duration2'] = '<b>Medium</b> (1 to 3 minutes)';
 $string['duration3'] = '<b>Long</b> (over 3 minutes)';
 
 $string['supporttitle'] = 'Request partnerID from EnglishCentral.com';
-$string['supportconfirm'] = 'The following information will be sent to Poodll.com (English Central demo request) to request a partner ID and access keys:';
+$string['supportconfirm'] = 'The following information will be sent to EnglishCentral.com to request a partner ID and access keys:';
 $string['supportsubject'] = 'Request for access to EC module for Moodle';
 $string['supportmessage'] = 'Please could you contact me regarding a partner ID and keys to use the EC module on my Moodle site.';
 
@@ -346,27 +346,9 @@ $string['lookupinstructions'] = 'Select a user and press "Search" to see that us
 $string['lookupresults'] = 'The EnglishCentral account id for {$a->fullname} is: <big><b>{$a->accountid}</b></big>';
 $string['lookupemptyresult'] = 'No EnglishCentral account id was found for user: {$a->fullname}.';
 
-// CloudPoodll auth related strings
-$string['displaysubs'] = '{$a->subscriptionname} : expires {$a->expiredate}';
-$string['noapiuser'] = 'No Poodll API user entered. Please subscribe or take a free trial at <a href="https://poodll.com/plugin-poodll-englishcentral" target="EC">https://poodll.com</a>';
-$string['noapisecret'] = 'No Poodll API secret entered. Please subscribe or take a free trial at <a href="https://poodll.com/plugin-poodll-englishcentral" target="EC">https://poodll.com</a>';
-$string['credentialsinvalid'] = 'The Poodll API user and secret entered could not be used to get access. Please check them.  Contact <a href="https://poodll.com/contact" target="EC">Poodll support </a>if there is a problem.';
-$string['appauthorised'] = 'Poodll EnglishCentral is authorised for this site.';
-$string['appnotauthorised'] = 'Poodll EnglishCentral is NOT authorised for this site. Is your site URL registered and your subscription current?';
-$string['refreshtoken'] = 'Refresh license information';
-$string['notokenincache'] = 'Refresh to see license information. Contact <a href="https://poodll.com/contact" target="EC">Poodll support </a>if there is a problem.';
-$string['poodllapiuser'] = 'Poodll API user';
-$string['poodllapiuser_details'] = '';
-$string['poodllapisecret'] = 'Poodll API Secret';
-
-// These errors are displayed on activity page
-$string['nocredentials'] = 'Poodll API user and secret not entered. Please enter them on <a href="{$a}">the settings page.</a> You can get them from <a href="https://poodll.com/member" target="EC">Poodll.com.</a>';
-$string['novalidcredentials'] = 'Poodll API user and secret were rejected and could not gain access. Please check them on <a href="{$a}">the settings page.</a> You can get them from <a href="https://poodll.com/member" target="EC">Poodll.com.</a>';
-$string['nosubscriptions'] = 'There is no current subscription for this site/plugin.';
-$string['subscriptionhasnocreds'] = 'The Poodll EnglishCentral subscription is expired or not yet set up. Contact <a href="https://poodll.com/contact" target="EC">Poodll support</a>';
 
 $string['advancedsection'] = 'Advanced Settings';
-$string['advancedsection_details'] = 'The settings from here should usually be left untouched. You may be directed by Poodll support to use them in some cases.';
+$string['advancedsection_details'] = 'The settings from here should usually be left untouched.';
 
 $string['forceembedlayout'] = 'Force embedded layout';
 $string['forceembedlayout_details'] = 'Force embedded window.';
@@ -379,11 +361,6 @@ $string['view'] = 'View';
 $string['reports'] = 'Reports';
 $string['report'] = 'Reports';
 
-$string['freetrial'] = 'Get Cloud Poodll API Credentials and a Free Trial';
-$string['freetrial_desc'] = 'A dialog should appear that allows you to register for a free trial with Poodll. After registering you should login to the members dashboard to get your API user and secret. And to register your site URL.';
-$string['memberdashboard'] = 'Member Dashboard';
-$string['memberdashboard_desc'] = "";
-$string['fillcredentials'] = 'Set API user and secret with existing credentials';
 $string['progressdials'] = 'Progress Dials Location';
 $string['progressdials_details'] = '';
 $string['progressdials_top'] = 'Top (above player)';
@@ -395,7 +372,7 @@ $string['progressupdated'] = 'Progress Updated Event';
 $string['noitemsfound'] = 'No videos found. Please try a different search.';
 $string['developertools'] = "Developer Tools";
 /* Reports */
-$string['reportsmenutoptext'] = "Review attempts on Poodll EnglishCentral activities using the reports below.";
+$string['reportsmenutoptext'] = "Review attempts on EnglishCentral activities using the reports below.";
 $string['showingattempt'] = 'Showing attempt for: {$a}';
 $string['basicreport'] = 'Basic Report';
 $string['returntoreports'] = 'Return to Reports Menu';
@@ -511,6 +488,4 @@ $string['reportstable_details'] = "Ajax tables are faster to use and can sort da
 $string['reporttableajax'] = "Ajax Tables";
 $string['reporttablepaged'] = "Paged Tables";
 $string['difficulty'] = "Video Level";
-$string['cloudpoodllserver'] = 'Cloud Poodll Server';
-$string['cloudpoodllserver_details'] = 'The server to use for Cloud Poodll. Only change this if Poodll has provided a different one.';
 

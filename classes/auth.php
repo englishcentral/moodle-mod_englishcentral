@@ -73,11 +73,7 @@ class auth {
     protected $uniqueid = null; // user's unique ID on this Moodle site
     protected $accountid = null; // the EC accountid of the current user
 
-    public $poodllapiuser = null; // Poodll API user
-
-    public $poodllapisecret = null; // Poodll API secret
-
-    public $partnerid = null; // EC partner ID   
+    public $partnerid = null; // EC partner ID
 
     public $consumerkey = null; // EC consumer key
 
@@ -103,35 +99,14 @@ class auth {
 
 
         // Specify names of EC config fields.
-        $fields = array('poodllapiuser',
-                        'poodllapisecret',
-                        'partnerid',
+        $fields = array('partnerid',
                         'consumerkey',
                         'consumersecret',
                         'encryptedsecret',
                         'mimichat');
 
-        // Fetch the Cloud Poodll token (which contains EC credentials).
-        if (empty($ec->config->poodllapiuser) || empty($ec->config->poodllapisecret)) {
-            $tokenobject = false;
-        } else {
-            $tokenobject = cloudpoodllauth::fetch_token($ec->config->poodllapiuser, $ec->config->poodllapisecret);
-        }
-
         foreach ($fields as $field) {
-            if (empty($ec->config->$field)) {
-                $this->$field = '';
-                // If the Cloud Poodll token is available, use it to set this $field value.
-                if ($tokenobject) {
-                    $tokendata = cloudpoodllauth::fetch_token_customproperty($tokenobject, "mod_englishcentral_$field");
-                    if ($tokendata && !empty($tokendata)) {
-                        $this->$field = $tokendata;
-                    }
-                }
-            } else {
-                // A value for this $field already exists, so use that.
-                $this->$field = $ec->config->$field;
-            }
+            $this->$field = empty($ec->config->$field) ? '' : $ec->config->$field;
         }
 
         //set mimi chat enabled or disabled
@@ -169,18 +144,7 @@ class auth {
             return true;
         }
 
-        // Normal Moodle users are verified via Poodll API
-        if ($apiuser = $ec->config->poodllapiuser) {
-            if ($apisecret = $ec->config->poodllapisecret) {
-                $token = cloudpoodllauth::fetch_token($apiuser, $apisecret);
-                $field = 'mod_englishcentral_mimichat';
-                $value = cloudpoodllauth::fetch_token_customproperty($token, $field);
-                $this->mimichat = ($value === 'enabled');
-                return true;
-            }
-        }
-
-        // Developers may be registered directly with EC using a partnerid.
+        // Check if mimichat is enabled via direct EC credentials.
         if ($partnerid = $ec->config->partnerid) {
             if ($consumerkey = $ec->config->consumerkey) {
                 if ($consumersecret = $ec->config->consumersecret) {
@@ -535,28 +499,6 @@ class auth {
         $url = "https://$subdomain.$this->domain/$endpoint";
         $url = new \moodle_url($url, $fields);
         return $url->out(false); // join with "&" not "&amp;"
-    }
-
-    public function missing_poodllapi_config() {
-        $missing = array('poodllapiuser' => '/^[0-9a-zA-Z\/\.@+=_-]+$/',
-                         'poodllapisecret' => '/^[0-9a-zA-Z\/+=-]+$/');
-        foreach ($missing as $name => $pattern) {
-            // The patterns don't match what might actually be in the secret, so commented for now. Justin 20212/01/23
-            // if (isset($this->ec->config->$name) && preg_match($pattern, $this->ec->config->$name)) {
-            if (isset($this->ec->config->$name) && !empty($this->ec->config->$name)) {
-                unset($missing[$name]);
-            } else {
-                $missing[$name] = $this->ec->get_string($name);
-            }
-        }
-        return (empty($missing) ? '' : $missing);
-    }
-
-    public function invalid_poodllapi_config() {
-        $apiuser = $this->ec->config->poodllapiuser;
-        $apisecret = $this->ec->config->poodllapisecret;
-        $token = \mod_englishcentral\cloudpoodllauth::fetch_token($apiuser, $apisecret);
-        return \mod_englishcentral\cloudpoodllauth::fetch_token_error($token);
     }
 
     public function missing_config() {
