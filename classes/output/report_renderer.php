@@ -27,44 +27,53 @@ use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
 class report_renderer extends \plugin_renderer_base {
-
     public function render_reportmenu($moduleinstance, $cm, $dayslimit, $format) {
         $reports = [];
-        $theurl = new \moodle_url(constants::M_URL . '/reports.php',
-        ['id' => $cm->id, 'n' => $moduleinstance->id, 'dayslimit' => $dayslimit, 'format' => $format]);
-/*
+        $theurl = new \moodle_url(
+            constants::M_URL . '/reports.php',
+            ['id' => $cm->id, 'n' => $moduleinstance->id, 'dayslimit' => $dayslimit, 'format' => $format]
+        );
+        /*
         $basic = new \single_button(
                 new \moodle_url(constants::M_URL . '/reports.php',
                         ['report' => 'basic', 'id' => $cm->id, 'n' => $moduleinstance->id]),
                 get_string('basicreport', constants::M_COMPONENT), 'get');
         $reports[] = ['button' => $this->render($basic),
         'text' => get_string('attemptssummary_explanation', constants::M_COMPONENT)];
-*/
+        */
         $theurl->param('report', 'attemptssummary');
         $graphicalattempts = new \single_button(
             $theurl,
-            get_string('attemptssummaryreport', constants::M_COMPONENT), 'get');
+            get_string('attemptssummaryreport', constants::M_COMPONENT),
+            'get'
+        );
         $reports[] = ['button' => $this->render($graphicalattempts),
         'text' => get_string('attemptssummaryreport_explanation', constants::M_COMPONENT)];
 
         $theurl->param('report', 'attempts');
         $attempts = new \single_button(
-                $theurl,
-                get_string('attemptsreport', constants::M_COMPONENT), 'get');
+            $theurl,
+            get_string('attemptsreport', constants::M_COMPONENT),
+            'get'
+        );
         $reports[] = ['button' => $this->render($attempts),
             'text' => get_string('attempts_explanation', constants::M_COMPONENT)];
 
         $theurl->param('report', 'videoperformance');
         $videoperformance = new \single_button(
             $theurl,
-            get_string('videoperformancereport', constants::M_COMPONENT), 'get');
+            get_string('videoperformancereport', constants::M_COMPONENT),
+            'get'
+        );
         $reports[] = ['button' => $this->render($videoperformance),
             'text' => get_string('videoperformance_explanation', constants::M_COMPONENT)];
 
         $theurl->param('report', 'courseattempts');
         $courseattempts = new \single_button(
             $theurl,
-            get_string('courseattemptsreport', constants::M_COMPONENT), 'get');
+            get_string('courseattemptsreport', constants::M_COMPONENT),
+            'get'
+        );
         $reports[] = ['button' => $this->render($courseattempts),
             'text' => get_string('courseattempts_explanation', constants::M_COMPONENT)];
 
@@ -76,8 +85,10 @@ class report_renderer extends \plugin_renderer_base {
 
     public function render_delete_allattempts($cm) {
         $deleteallbutton = new \single_button(
-                new \moodle_url(constants::M_URL . '/manageattempts.php', ['id' => $cm->id, 'action' => 'confirmdeleteall']),
-                get_string('deleteallattempts', constants::M_COMPONENT), 'get');
+            new \moodle_url(constants::M_URL . '/manageattempts.php', ['id' => $cm->id, 'action' => 'confirmdeleteall']),
+            get_string('deleteallattempts', constants::M_COMPONENT),
+            'get'
+        );
         $ret = \html_writer::div($this->render($deleteallbutton), constants::M_CLASS . '_actionbuttons');
         return $ret;
     }
@@ -100,8 +111,10 @@ class report_renderer extends \plugin_renderer_base {
         $formdata['report'] = $showreport;
         $formdata['format'] = 'csv';
         $excel = new \single_button(
-                new \moodle_url(constants::M_URL . '/reports.php', $formdata),
-                get_string('exportexcel', constants::M_COMPONENT), 'get');
+            new \moodle_url(constants::M_URL . '/reports.php', $formdata),
+            get_string('exportexcel', constants::M_COMPONENT),
+            'get'
+        );
 
         return \html_writer::div($this->render($excel), constants::M_CLASS . '_actionbuttons');
     }
@@ -113,8 +126,10 @@ class report_renderer extends \plugin_renderer_base {
         $formdata['action'] = $action;
         $formdata['format'] = 'csv';
         $excel = new \single_button(
-                new \moodle_url(constants::M_URL . '/grading.php', $formdata),
-                get_string('exportexcel', constants::M_COMPONENT), 'get');
+            new \moodle_url(constants::M_URL . '/grading.php', $formdata),
+            get_string('exportexcel', constants::M_COMPONENT),
+            'get'
+        );
 
         return \html_writer::div($this->render($excel), constants::M_CLASS . '_actionbuttons');
     }
@@ -186,7 +201,7 @@ class report_renderer extends \plugin_renderer_base {
 
         // if datatables set up datatables
         $config = get_config(constants::M_COMPONENT);
-        if($config->reportstable == constants::M_USE_DATATABLES) {
+        if ($config->reportstable == constants::M_USE_DATATABLES) {
             $dtlang = [];
             $dtlang['search'] = get_string('datatables_search', constants::M_COMPONENT);
             $dtlang['emptyTable'] = get_string('datatables_emptytable', constants::M_COMPONENT);
@@ -213,14 +228,15 @@ class report_renderer extends \plugin_renderer_base {
             $this->page->requires->js_call_amd(constants::M_COMPONENT . "/datatables", 'init', [$opts]);
         }
         return $html;
-
     }
 
     function show_reports_footer($moduleinstance, $cm, $formdata, $showreport) {
         // a return to reports top link
-        $link = new \moodle_url(constants::M_URL . '/reports.php',
-                ['report' => 'menu', 'id' => $cm->id, 'n' => $moduleinstance->id, 'dayslimit' => $formdata->dayslimit, 'format' => $formdata->format]);
-        $ret = \html_writer::link($link, get_string('returntoreports', constants::M_COMPONENT),['class'=>'mod_ec_returntoreports']);
+        $link = new \moodle_url(
+            constants::M_URL . '/reports.php',
+            ['report' => 'menu', 'id' => $cm->id, 'n' => $moduleinstance->id, 'dayslimit' => $formdata->dayslimit, 'format' => $formdata->format]
+        );
+        $ret = \html_writer::link($link, get_string('returntoreports', constants::M_COMPONENT), ['class' => 'mod_ec_returntoreports']);
         $ret .= $this->render_exportbuttons_html($cm, $formdata, $showreport);
         return $ret;
     }
@@ -235,7 +251,7 @@ class report_renderer extends \plugin_renderer_base {
     function show_user_report_options($url, $currentdayslimit, $currentformat) {
         $dayslimitselector = $this->fetch_dayslimit_selector($url, $currentdayslimit);
         $formatselector = $this->fetch_format_selector($url, $currentformat);
-        return \html_writer::div($formatselector . $dayslimitselector  , 'mod_ec_user_report_opts float-right');
+        return \html_writer::div($formatselector . $dayslimitselector, 'mod_ec_user_report_opts float-right');
     }
 
     function fetch_dayslimit_selector($url, $currentselection) {
@@ -266,7 +282,7 @@ class report_renderer extends \plugin_renderer_base {
         $theurl->param('format', 'combined');
         $params['combiurl'] = $theurl->out();
 
-        switch($currentselection){
+        switch ($currentselection) {
             case "tabular":
                 $params['istable'] = true;
                 break;
@@ -275,7 +291,8 @@ class report_renderer extends \plugin_renderer_base {
                 break;
             case "combined":
             default:
-                $params['iscombi'] = true; break;
+                $params['iscombi'] = true;
+                break;
         }
 
         return  $this->render_from_template('mod_englishcentral/reportformatselector', $params);
@@ -304,5 +321,4 @@ class report_renderer extends \plugin_renderer_base {
                 return $this->render_exportbuttons_html($cm, $formdata, $showreport);
         }
     }
-
 }

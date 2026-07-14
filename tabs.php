@@ -54,19 +54,19 @@ $url = "$CFG->wwwroot/mod/englishcentral/view.php?id=$cm->id";
 $label = get_string('view', constants::M_COMPONENT);
 $row[] = new tabobject('view', $url, $label, $label);
 
-if(has_capability('mod/englishcentral:manage', $context) && $config->enablesetuptab) {
+if (has_capability('mod/englishcentral:manage', $context) && $config->enablesetuptab) {
     $url = "$CFG->wwwroot/mod/englishcentral/setup.php?id=$cm->id";
     $label = get_string('setup', constants::M_COMPONENT);
     $row[] = new tabobject('setup', $url, $label, $label);
 }
 
-if(has_capability('mod/englishcentral:viewreports', $context) ) {
+if (has_capability('mod/englishcentral:viewreports', $context)) {
     $url = "$CFG->wwwroot/mod/englishcentral/reports.php?id=$cm->id";
     $label = get_string('reports', constants::M_COMPONENT);
     $row[] = new tabobject('reports', $url, $label, $label);
 }
 
-if(has_capability('mod/englishcentral:viewdevelopertools', $context) ) {
+if (has_capability('mod/englishcentral:viewdevelopertools', $context)) {
     $url = "$CFG->wwwroot/mod/englishcentral/developer.php?id=$cm->id";
     $label = get_string('developertools', constants::M_COMPONENT);
     $row[] = new tabobject('developer', $url, $label, $label);

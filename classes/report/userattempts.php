@@ -27,7 +27,6 @@ use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
 class userattempts extends basereport {
-
     protected $report = "userattempts";
     protected $fields = ['videoid', 'videoname', 'difficulty', 'learn', 'speak', 'chat', 'timecreated'];
     protected $formdata = null;
@@ -47,7 +46,6 @@ class userattempts extends basereport {
         $a->activityname = $ec->name;
 
         return get_string('userattemptsheading', constants::M_COMPONENT, $a);
-
     }
 
     public function fetch_formatted_field($field, $record, $withlinks) {
@@ -60,9 +58,13 @@ class userattempts extends basereport {
 
             case 'videoname':
                 if ($withlinks && !empty($record->videoname)) {
-                    $link = new \moodle_url(constants::M_URL . '/reports.php',
-                            ['format' => $this->formdata->format, 'report' => 'videoperformance',
-                            'id' => $this->cm->id, 'videoid' => $record->videoid, 'dayslimit' => $this->formdata->dayslimit]);
+                    $link = new \moodle_url(
+                        constants::M_URL . '/reports.php',
+                        ['format' => $this->formdata->format, 'report' => 'videoperformance',
+                        'id' => $this->cm->id,
+                        'videoid' => $record->videoid,
+                        'dayslimit' => $this->formdata->dayslimit]
+                    );
                     $ret = \html_writer::link($link, $record->videoname);
                     if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
                         $details = json_decode($record->detailsjson);
@@ -81,13 +83,13 @@ class userattempts extends basereport {
 
             case 'difficulty':
                     $ret = '-';
-                    if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
-                        $details = json_decode($record->detailsjson);
-                        if (isset($details->difficulty)) {
-                            $ret = $details->difficulty;
-                        }
+                if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
+                    $details = json_decode($record->detailsjson);
+                    if (isset($details->difficulty)) {
+                        $ret = $details->difficulty;
                     }
-                    break;
+                }
+                break;
 
             case 'watch':
                 $ret = $record->watchcount;
@@ -102,8 +104,10 @@ class userattempts extends basereport {
                 break;
 
             case 'chat':
-                if (get_config(constants::M_COMPONENT, 'chatmode') ||
-                intval($record->chatcount) > 0) {
+                if (
+                    get_config(constants::M_COMPONENT, 'chatmode') ||
+                    intval($record->chatcount) > 0
+                ) {
                     $ret = $record->chatcount;
                 } else {
                     $ret = '-';
@@ -134,7 +138,6 @@ class userattempts extends basereport {
                 }
         }
         return $ret;
-
     } //end of function
 
     public function fetch_chart($renderer, $showdatasource = true) {
@@ -162,14 +165,17 @@ class userattempts extends basereport {
         $chart->set_stacked(false);
         $chart->add_series(new \core\chart_series(
             get_string('learn', constants::M_COMPONENT),
-             $learnseries));
+            $learnseries
+        ));
         $chart->add_series(new \core\chart_series(
             get_string('speak', constants::M_COMPONENT),
-             $speakseries));
-        if (get_config(constants::M_COMPONENT, 'chatmode')){
+            $speakseries
+        ));
+        if (get_config(constants::M_COMPONENT, 'chatmode')) {
             $chart->add_series(new \core\chart_series(
                 get_string('chat', constants::M_COMPONENT),
-                $chatseries));
+                $chatseries
+            ));
         }
         $chart->set_labels($videonames);
         $thechart = $renderer->render_chart($chart, $showdatasource);

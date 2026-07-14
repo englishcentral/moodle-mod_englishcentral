@@ -26,7 +26,7 @@
  */
 
 require_once('../../config.php');
-require_once($CFG->dirroot.'/mod/englishcentral/lib.php');
+require_once($CFG->dirroot . '/mod/englishcentral/lib.php');
 
 use mod_englishcentral\constants;
 use mod_englishcentral\mobile_auth;
@@ -39,7 +39,7 @@ $embed = optional_param('embed', 0, PARAM_INT); // course_module ID, or
 $userid = optional_param('user_id', null, PARAM_ALPHANUMEXT);
 $secret  = optional_param('secret', null, PARAM_RAW);
 // Formerly had !isloggedin() check, but we want tologin afresh on each embedded access.
-if (!empty($userid) && !empty($secret) ) {
+if (!empty($userid) && !empty($secret)) {
     if (mobile_auth::has_valid_token($userid, $secret)) {
         $user = get_complete_user_data('id', $userid);
         complete_user_login($user);
@@ -82,7 +82,7 @@ $PAGE->set_url('/mod/englishcentral/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 
 $config = get_config(constants::M_COMPONENT);
-if($config->enablesetuptab|| $embed == 2){
+if ($config->enablesetuptab || $embed == 2) {
     $PAGE->set_pagelayout('popup');
     $hidetabs = true;
 } else {
@@ -116,7 +116,7 @@ if ($ec->not_available()) {
     die;
 }
 // instructions /intro if less then Moodle 4.0 show
-if($CFG->version < 2022041900) {
+if ($CFG->version < 2022041900) {
     echo $renderer->show_intro();
 }
 
@@ -132,7 +132,7 @@ $opts = ['cmid'          => $ec->cm->id,
 $PAGE->requires->js_call_amd("$ec->plugin/view", 'init', [$opts]);
 
 // Displays the student's learning progress charts
-if($config->progressdials == constants::M_PROGRESSDIALS_TOP && !$ismobile) {
+if ($config->progressdials == constants::M_PROGRESSDIALS_TOP && !$ismobile) {
     echo $renderer->show_progress();
 }
 
@@ -141,14 +141,14 @@ if ($ec->viewable) {
     $firstthumbnail = 'https://cdna.englishcentral.com/dialogs/12320/thumb_99214_20120928134621.jpg';
     echo $renderer->show_player($firstthumbnail);
     */
-    if($ec->get_videoids()){
+    if ($ec->get_videoids()) {
         $hidden = false;
-    } else{
+    } else {
         $hidden = true;
     }
-    if($auth->mimichat_enabled()){
+    if ($auth->mimichat_enabled()) {
         $mimichat = true;
-    }else{
+    } else {
         $mimichat = false;
     }
     echo $renderer->show_player($hidden, $mimichat);
@@ -159,7 +159,7 @@ if ($ec->viewable) {
 }
 
 // Displays the student's learning progress charts
-if($config->progressdials == constants::M_PROGRESSDIALS_BOTTOM || $ismobile) {
+if ($config->progressdials == constants::M_PROGRESSDIALS_BOTTOM || $ismobile) {
     echo $renderer->show_progress();
 }
 echo $renderer->footer();

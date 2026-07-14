@@ -1,4 +1,4 @@
-English Central Activity for Moodle >= 2.9
+English Central Activity for Moodle >= 4.1
 
 ===============================================
 OVERVIEW
@@ -9,13 +9,52 @@ This module allows you to embed videos from EnglishCentral.com within activities
 In an EnglishCentral activity, students interact with a selected set of videos and work toward the [Watch, Learn, Speak, Chat] goals set by the teacher.
 
 ===============================================
+REQUIRED EXTERNAL SERVICE
+===============================================
+
+This plugin integrates with EnglishCentral.com, a third-party subscription service that
+hosts all video content and the learning player (JS SDK). The plugin will not function
+without EnglishCentral API credentials.
+
+  * What it is: EnglishCentral.com provides the videos, the interactive Watch/Learn/Speak/Chat
+    player, and the scoring/progress data that this activity records in Moodle.
+  * What depends on it: all activity functionality. Without valid credentials, videos cannot
+    be loaded and no progress can be recorded.
+  * How to obtain credentials: contact EnglishCentral to arrange access. The plugin
+    configuration requires a Partner ID, Consumer Key and Consumer Secret, entered under
+    Site administration -> Plugins -> Activity modules -> English Central.
+
+===============================================
+PRIVACY
+===============================================
+
+This plugin stores per-user activity progress in Moodle and transmits a learner account
+identifier to EnglishCentral.com in order to load videos and record scores. Personal data
+handling is declared via Moodle's Privacy API (see classes/privacy/provider.php).
+
+===============================================
+THIRD-PARTY LIBRARIES
+===============================================
+
+Bundled third-party libraries are declared in thirdpartylibs.xml.
+
+===============================================
 LICENSE
 ===============================================
 
-This plugin is distributed under the terms of the General Public License
-(see http://www.gnu.org/licenses/gpl.txt for details)
+This plugin is distributed under the terms of the GNU General Public License v3 or later
+(see the LICENSE file, or http://www.gnu.org/licenses/gpl.txt for details).
 
 This software is provided "AS IS" without a warranty of any kind.
+
+===============================================
+BUGS AND SUPPORT
+===============================================
+
+Source code:   https://github.com/englishcentral/moodle-mod_englishcentral
+Bug tracker:   https://github.com/englishcentral/moodle-mod_englishcentral/issues
+
+Please report bugs and feature requests via the GitHub issue tracker above.
 
 ===============================================
 CREDITS
@@ -34,7 +73,7 @@ To INSTALL the EnglishCentral module
     1. Clone this plugin to your server
 
        cd /PATH/TO/MOODLE/PUBLIC 
-       git clone -q https://github.com/gbateson/moodle-mod_englishcentral mod/englishcentral
+       git clone -q https://github.com/englishcentral/moodle-mod_englishcentral mod/englishcentral
 
     2. Add this plugin to the GIT exclude file
 
@@ -49,11 +88,11 @@ To INSTALL the EnglishCentral module
 
     1. download the zip file from:
 
-        * https://github.com/justinhunt/moodle-mod_englishcentral/archive/refs/heads/master.zip
+        * https://github.com/englishcentral/moodle-mod_englishcentral/archive/refs/heads/master.zip
 
     2. Unzip the zip file - if necessary renaming the resulting folder to "englishcentral".
        Then upload, or move, the "englishcentral" folder into the "mod" folder on
-       your Moodle >= 3.9 site, to create a new folder at "mod/englishcentral"
+       your Moodle >= 4.1 site, to create a new folder at "mod/englishcentral"
 
        (continue with step 3 below)
 
@@ -126,9 +165,8 @@ The settings for the EnglishCentral module can be found at:
 
     [Moodle Site]/Site Administration -> Plugins -> Activity Modules -> English Central
 
-These values for these settings can be obtained from EnglishCentral by filling out the form on the following page:
-
-    https://poodll.com/englishcentral-demo-request/
+These credentials (Partner ID, Consumer Key, Consumer Secret) are provided by
+EnglishCentral. Contact EnglishCentral to arrange access.
 
 =================================================
 to Add an EnglishCentral Activity to a Course

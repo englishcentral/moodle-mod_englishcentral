@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 
 /**
  * Defines the version of englishcentral
@@ -31,6 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_englishcentral';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->requires  = 2015051100; // Moodle 2.9 (because we want to use AMD)
-$plugin->version   = 2025080148;
-$plugin->release   = '2025-10-05 (48)';
+$plugin->requires  = 2022112800; // Moodle 4.1 LTS (privacy API requires 4.0+; 4.1 is the oldest maintained LTS).
+$plugin->version   = 2025080149;
+$plugin->release   = '2025-10-05 (49)';

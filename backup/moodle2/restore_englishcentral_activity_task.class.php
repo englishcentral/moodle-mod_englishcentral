@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,7 +29,6 @@ require_once($CFG->dirroot . '/mod/englishcentral/backup/moodle2/restore_english
  * complete restore of the activity
  */
 class restore_englishcentral_activity_task extends restore_activity_task {
-
     /**
      * Define (add) particular settings this activity can have
      */
@@ -49,21 +47,21 @@ class restore_englishcentral_activity_task extends restore_activity_task {
      * Define the contents in the activity that must be
      * processed by the link decoder
      */
-    static public function define_decode_contents() {
-        return array(
-            new restore_decode_content('englishcentral', array('intro'), 'englishcentral')
-        );
+    public static function define_decode_contents() {
+        return [
+            new restore_decode_content('englishcentral', ['intro'], 'englishcentral'),
+        ];
     }
 
     /**
      * Define the decoding rules for links belonging
      * to the activity to be executed by the link decoder
      */
-    static public function define_decode_rules() {
-        return array (
+    public static function define_decode_rules() {
+        return  [
             new restore_decode_rule('ENGLISHCENTRALVIEWBYID', '/mod/englishcentral/view.php?id=$1', 'course_module'),
-            new restore_decode_rule('ENGLISHCENTRALINDEX', '/mod/englishcentral/index.php?id=$1', 'course')
-        );
+            new restore_decode_rule('ENGLISHCENTRALINDEX', '/mod/englishcentral/index.php?id=$1', 'course'),
+        ];
     }
 
     /**
@@ -72,12 +70,12 @@ class restore_englishcentral_activity_task extends restore_activity_task {
      * englishcentral logs. It must return one array
      * of {@link restore_log_rule} objects
      */
-    static public function define_restore_log_rules() {
-        return array(
+    public static function define_restore_log_rules() {
+        return [
             new restore_log_rule('englishcentral', 'add', 'view.php?id={course_module}', '{englishcentral}'),
             new restore_log_rule('englishcentral', 'update', 'view.php?id={course_module}', '{englishcentral}'),
-            new restore_log_rule('englishcentral', 'view', 'view.php?id={course_module}', '{englishcentral}')
-        );
+            new restore_log_rule('englishcentral', 'view', 'view.php?id={course_module}', '{englishcentral}'),
+        ];
     }
 
     /**
@@ -90,9 +88,9 @@ class restore_englishcentral_activity_task extends restore_activity_task {
      * by the restore final task, but are defined here at
      * activity level. All them are rules not linked to any module instance (cmid = 0)
      */
-    static public function define_restore_log_rules_for_course() {
-        return array(
-            new restore_log_rule('englishcentral', 'view all', 'index.php?id={course}', null)
-        );
+    public static function define_restore_log_rules_for_course() {
+        return [
+            new restore_log_rule('englishcentral', 'view all', 'index.php?id={course}', null),
+        ];
     }
 }

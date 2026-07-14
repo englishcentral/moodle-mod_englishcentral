@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
  * Created by PhpStorm.
  * User: ishineguy
@@ -8,14 +23,13 @@
 
 namespace mod_englishcentral\report;
 
-use \mod_englishcentral\constants;
-use \mod_englishcentral\utils;
+use mod_englishcentral\constants;
+use mod_englishcentral\utils;
 
 class usercourseattempts extends basereport {
-
     protected $report = "usercourseattempts";
 
-    protected $fields = ['activityname', 'total_p', 'watch', 'learn', 'speak', 'chat' ,  'firstattempt'];
+    protected $fields = ['activityname', 'total_p', 'watch', 'learn', 'speak', 'chat', 'firstattempt'];
     protected $formdata = null;
     protected $qcache = [];
     protected $ucache = [];
@@ -24,14 +38,16 @@ class usercourseattempts extends basereport {
         global $DB, $CFG, $OUTPUT;
 
         switch ($field) {
-
             case 'activityname':
                 $ec = $this->fetch_cache(constants::M_TABLE, $record->ecid);
                 $ret = $record->name;
                 if ($withlinks) {
-                        $link = new \moodle_url(constants::M_URL . '/reports.php',
-                                ['format' => $this->formdata->format, 'report' => 'userattempts',
-                                 'id' => $this->cm->id, 'userid' => $this->formdata->userid]);
+                        $link = new \moodle_url(
+                            constants::M_URL . '/reports.php',
+                            ['format' => $this->formdata->format, 'report' => 'userattempts',
+                            'id' => $this->cm->id,
+                            'userid' => $this->formdata->userid]
+                        );
                         $ret = \html_writer::link($link, $ret);
                 }
                 break;
@@ -39,7 +55,7 @@ class usercourseattempts extends basereport {
             // Not necessary here . Since Watch = the same details.
             case 'attempts':
                     $ret = $record->attemptcount;
-                    break;
+                break;
 
             case 'watch':
                 $watchgoal = intval($record->watchgoal);
@@ -69,21 +85,23 @@ class usercourseattempts extends basereport {
                 break;
 
             case 'chat':
-                if (get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chat) > 0) {
+                if (
+                    get_config(constants::M_COMPONENT, 'chatmode') ||
+                    intval($record->chat) > 0
+                ) {
                         $chatgoal = intval($record->chatgoal);
-                        if ($chatgoal > 0) {
-                            $ret = $record->chat . '/' . $chatgoal;
-                        } else {
-                            $ret = $record->chat;
-                        }
+                    if ($chatgoal > 0) {
+                        $ret = $record->chat . '/' . $chatgoal;
+                    } else {
+                        $ret = $record->chat;
+                    }
                 } else {
                     $ret = '-';
                 }
                 break;
 
             case 'total_p':
-                $ret = $record->total_p . "% (" . $record->total .")";
+                $ret = $record->total_p . "% (" . $record->total . ")";
                 break;
 
             case 'firstattempt':
@@ -135,7 +153,7 @@ class usercourseattempts extends basereport {
         $chart = new \core\chart_bar();
         $chart->set_horizontal(false);
         $chart->set_stacked(false);
-    //    $yzeroaxis = $chart->get_yaxis(0, true);
+        // $yzeroaxis = $chart->get_yaxis(0, true);
         $yaxis = $chart->get_yaxis(0, true);
         $yaxis->set_stepsize(10);
         $yaxis->set_min(0);
@@ -143,17 +161,21 @@ class usercourseattempts extends basereport {
 
         $chart->add_series(new \core\chart_series(
             get_string('watch', constants::M_COMPONENT),
-             $watchseries));
+            $watchseries
+        ));
         $chart->add_series(new \core\chart_series(
             get_string('learn', constants::M_COMPONENT),
-             $learnseries));
+            $learnseries
+        ));
         $chart->add_series(new \core\chart_series(
             get_string('speak', constants::M_COMPONENT),
-             $speakseries));
+            $speakseries
+        ));
         if (get_config(constants::M_COMPONENT, 'chatmode')) {
             $chart->add_series(new \core\chart_series(
                 get_string('chat', constants::M_COMPONENT),
-                $chatseries));
+                $chatseries
+            ));
         }
         $chart->set_labels($activitynames);
 
@@ -174,10 +196,10 @@ class usercourseattempts extends basereport {
         $selectsql = 'SELECT tu.ecid , SUM(COALESCE(watchcomplete, 0)) + ' .
           'SUM(COALESCE(learncount, 0)) + ' .
           'SUM(COALESCE(speakcount, 0)) + ' .
-          'SUM(COALESCE(chatcount, 0)) AS total,'.
-          'SUM(COALESCE(watchcomplete, 0)) AS watch,'.
-          'SUM(COALESCE(learncount, 0)) AS learn,'.
-          'SUM(COALESCE(speakcount, 0)) AS speak,'.
+          'SUM(COALESCE(chatcount, 0)) AS total,' .
+          'SUM(COALESCE(watchcomplete, 0)) AS watch,' .
+          'SUM(COALESCE(learncount, 0)) AS learn,' .
+          'SUM(COALESCE(speakcount, 0)) AS speak,' .
           'SUM(COALESCE(chatcount, 0)) AS chat,' .
           'MIN(tu.timecreated) AS firstattempt, ' .
           'ec.name, ' .
@@ -185,7 +207,7 @@ class usercourseattempts extends basereport {
           'ec.learngoal, ' .
           'ec.speakgoal, ' .
           'ec.chatgoal ' .
-          'FROM {' . constants::M_ATTEMPTSTABLE . '} tu '.
+          'FROM {' . constants::M_ATTEMPTSTABLE . '} tu ' .
           'INNER JOIN {' . constants::M_TABLE . '} ec ' .
           'ON ec.id = tu.ecid ';
 
@@ -211,13 +233,14 @@ class usercourseattempts extends basereport {
         // Here we manually tweak the data, in this case to use points and goals to create percents.
         if ($alldata) {
             foreach ($alldata as $thedata) {
-
                 // Get the goals for each ec activity returned.
                 $goals = ['watch' => 0, 'learn' => 0, 'speak' => 0, 'chat' => 0, 'total' => 0];
-                if ($thedata->watchgoal +
-                $thedata->learngoal +
-                $thedata->speakgoal +
-                $thedata->chatgoal) {
+                if (
+                    $thedata->watchgoal +
+                    $thedata->learngoal +
+                    $thedata->speakgoal +
+                    $thedata->chatgoal
+                ) {
                     $goals['watch'] = intval($thedata->watchgoal);
                     $goals['learn'] = intval($thedata->learngoal);
                     $goals['speak'] = intval($thedata->speakgoal);
@@ -226,19 +249,23 @@ class usercourseattempts extends basereport {
                 $goals['total'] = $goals['watch'] + $goals['learn'] + $goals['speak'] + $goals['chat'];
 
                 // Add a percentage field for each pointfield and add the goal to the display
-                //eg learn = 6 becomes learn = 6/8  learn_p = 75%
+                // eg learn = 6 becomes learn = 6/8  learn_p = 75%
                 $totalpoints = 0;
                 foreach ($goals as $goalfield => $goalvalue) {
-                    if ($goalfield == 'total') { continue; }
+                    if ($goalfield == 'total') {
+                        continue;
+                    }
                     $pointsvalue = $thedata->{$goalfield};
                     // We need to adjust the pointvalue so its not higher than goalvalue (eg they spoke 6 lines, but goal was 2).
-                    if ($pointsvalue > $goalvalue && $goalvalue > 0) {$pointsvalue = $goalvalue;}
-                    $thedata->{$goalfield . '_p'} = $goalvalue > 0 ? round($pointsvalue / $goalvalue * 100 , 0) : '-';
+                    if ($pointsvalue > $goalvalue && $goalvalue > 0) {
+                        $pointsvalue = $goalvalue;
+                    }
+                    $thedata->{$goalfield . '_p'} = $goalvalue > 0 ? round($pointsvalue / $goalvalue * 100, 0) : '-';
                     // We recalc the total, using the goal adjusted points value
                     $totalpoints += $pointsvalue;
                 }
                 $thedata->total = $totalpoints;
-                $thedata->total_p = $goals['total'] > 0 ? round($totalpoints / $goals['total'] * 100 , 0) : '-';
+                $thedata->total_p = $goals['total'] > 0 ? round($totalpoints / $goals['total'] * 100, 0) : '-';
                 $this->rawdata[] = $thedata;
             }
         } else {

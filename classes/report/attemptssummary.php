@@ -28,7 +28,6 @@ use mod_englishcentral\utils;
 
 class attemptssummary extends basereport
 {
-
     protected $report = "attemptssummary";
     protected $fields = ['firstname', 'lastname', 'total_p', 'watch', 'learn', 'speak', 'chat'];
     protected $formdata = null;
@@ -40,12 +39,10 @@ class attemptssummary extends basereport
 
     protected $ec = null;
 
-    public function fetch_formatted_field($field, $record, $withlinks)
-    {
+    public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB, $CFG, $OUTPUT;
 
         switch ($field) {
-
             case 'firstname':
             case 'lastname':
                 if ($withlinks) {
@@ -56,7 +53,7 @@ class attemptssummary extends basereport
                             'report' => 'userattempts',
                             'id' => $this->cm->id,
                             'userid' => $record->userid,
-                            'dayslimit' => $this->formdata->dayslimit
+                            'dayslimit' => $this->formdata->dayslimit,
                         ]
                     );
                     $ret = \html_writer::link($link, $record->{$field});
@@ -98,8 +95,7 @@ class attemptssummary extends basereport
         return $ret;
     }
 
-    public function fetch_formatted_heading()
-    {
+    public function fetch_formatted_heading() {
         $record = $this->formdata;
         $ret = '';
         if (!$record) {
@@ -109,8 +105,7 @@ class attemptssummary extends basereport
         return get_string('attemptssummaryheading', constants::M_COMPONENT, $ec->name);
     }
 
-    public function fetch_chart($renderer, $showdatasource = true)
-    {
+    public function fetch_chart($renderer, $showdatasource = true) {
         global $PAGE, $CFG;
         $PAGE->requires->js_call_amd($this->ec->plugin . "/report", 'init');
         $items = $this->rawdata;
@@ -125,32 +120,32 @@ class attemptssummary extends basereport
         $type = 'lastname';
         $fullname .= get_string('lastname', 'moodle');
         $fullname .= $this->get_sort_icon($url, $type);
-        $fullname = \html_writer::tag('span', $fullname, array('class' => 'fullname'));
+        $fullname = \html_writer::tag('span', $fullname, ['class' => 'fullname']);
 
         $type = 'percent';
         $percent = '%'; // get_string($type, 'grades');
         $percent .= $this->get_sort_icon($url, $type);
-        $percent = \html_writer::tag('span', $percent, array('class' => 'percent'));
+        $percent = \html_writer::tag('span', $percent, ['class' => 'percent']);
 
-        $output .= \html_writer::tag('dt', $fullname . $percent, array('class' => 'user title'));
+        $output .= \html_writer::tag('dt', $fullname . $percent, ['class' => 'user title']);
 
         $title = '';
         $left = 0;
-        foreach (array('watch', 'learn', 'speak', 'chat') as $type) {
+        foreach (['watch', 'learn', 'speak', 'chat'] as $type) {
             if ($this->goals->$type) {
                 $text = $this->ec->get_string($type . 'goal');
                 $sort = $this->get_sort_icon($url, $type);
                 $percent = (100 * min(1, $this->goals->$type / $this->goals->total));
                 $style = "margin-left: $left%; width: $percent%;";
-                $params = array('class' => $type, 'style' => $style);
+                $params = ['class' => $type, 'style' => $style];
                 $title .= \html_writer::tag('span', $text . ' ' . $sort, $params);
                 $left += $percent;
             }
         }
-        $output .= \html_writer::tag('dd', $title, array('class' => 'bars title'));
+        $output .= \html_writer::tag('dd', $title, ['class' => 'bars title']);
 
         if ($this->sort == 'percent') {
-            uasort($items, array($this, 'uasort_percent'));
+            uasort($items, [$this, 'uasort_percent']);
         }
 
         foreach ($items as $userid => $item) {
@@ -158,21 +153,19 @@ class attemptssummary extends basereport
         }
 
         if (count($items)) {
-            $output = \html_writer::tag('dl', $output, array('class' => 'userbars'));
+            $output = \html_writer::tag('dl', $output, ['class' => 'userbars']);
         } else {
             $output = \html_writer::tag('p', $this->ec->get_string('noprogressreport'));
         }
 
          // We need it to be under page-mod-englishcentral-report for the css styles to apply.
          return \html_writer::div($output, 'page-mod-englishcentral-report', ['id' => 'page-mod-englishcentral-report']);
-
     }
 
     /**
      * Set the sort item/order
      */
-    protected function setup_sort()
-    {
+    protected function setup_sort() {
         global $SESSION;
 
         // initialize session info
@@ -185,7 +178,6 @@ class attemptssummary extends basereport
         // override sort item/order with incoming data
         $sort = optional_param('sort', '', PARAM_ALPHA);
         switch (true) {
-
             case ($sort == ''):
                 $sort = $SESSION->englishcentral->sort;
                 $order = $SESSION->englishcentral->order;
@@ -217,8 +209,7 @@ class attemptssummary extends basereport
         $this->order = $SESSION->englishcentral->order = $order;
     }
 
-    protected function get_sort_icon($url, $sort)
-    {
+    protected function get_sort_icon($url, $sort) {
         global $OUTPUT;
 
         if ($sort == $this->sort) {
@@ -268,8 +259,7 @@ class attemptssummary extends basereport
         return \html_writer::link($url, $icon, ['title' => $text]);
     }
 
-    protected function uasort_percent($a, $b)
-    {
+    protected function uasort_percent($a, $b) {
         $anum = intval($a->percent);
         $bnum = intval($b->percent);
         if ($anum > $bnum) {
@@ -281,24 +271,21 @@ class attemptssummary extends basereport
         return 0;
     }
 
-    protected function show_progress_report_item($item, $goals)
-    {
+    protected function show_progress_report_item($item, $goals) {
         $output = '';
-        $output .= \html_writer::tag('dt', $this->show_progress_report_user($item, $goals), array('class' => 'user'));
-        $output .= \html_writer::tag('dd', $this->show_progress_report_bars($item, $goals), array('class' => 'bars'));
+        $output .= \html_writer::tag('dt', $this->show_progress_report_user($item, $goals), ['class' => 'user']);
+        $output .= \html_writer::tag('dd', $this->show_progress_report_bars($item, $goals), ['class' => 'bars']);
         return $output;
     }
 
-    protected function show_progress_report_user($item, $goals)
-    {
+    protected function show_progress_report_user($item, $goals) {
         $output = '';
-        $output .= \html_writer::tag('span', fullname($item), array('class' => 'fullname'));
-        $output .= \html_writer::tag('span', $item->percent . '%', array('class' => 'percent'));
+        $output .= \html_writer::tag('span', fullname($item), ['class' => 'fullname']);
+        $output .= \html_writer::tag('span', $item->percent . '%', ['class' => 'percent']);
         return $output;
     }
 
-    protected function show_progress_report_bars($item, $goals)
-    {
+    protected function show_progress_report_bars($item, $goals) {
         $output = '';
         $output .= $this->show_progress_report_bar($item, $goals, 'watch');
         $output .= $this->show_progress_report_bar($item, $goals, 'learn');
@@ -307,8 +294,7 @@ class attemptssummary extends basereport
         return $output;
     }
 
-    protected function show_progress_report_bar($item, $goals, $type)
-    {
+    protected function show_progress_report_bar($item, $goals, $type) {
         if (empty($this->goals->$type)) {
             return '';
         }
@@ -328,25 +314,24 @@ class attemptssummary extends basereport
                 $title = $this->ec->get_string('chatquestions', $text);
                 break;
         }
-        $text = \html_writer::tag('span', $text, array('class' => 'text', 'title' => $title));
+        $text = \html_writer::tag('span', $text, ['class' => 'text', 'title' => $title]);
 
         if (empty($item->$type)) {
             $bar = '';
         } else {
             $value = min($item->$type, $this->goals->$type);
             $width = (100 * min(1, $value / $this->goals->$type)) . '%;';
-            $params = array('class' => 'bar', 'style' => 'width: ' . $width);
+            $params = ['class' => 'bar', 'style' => 'width: ' . $width];
             $bar = \html_writer::tag('span', '', $params);
         }
 
         $width = (100 * min(1, $this->goals->$type / $this->goals->total)) . '%';
-        $params = array('class' => $type, 'style' => 'width: ' . $width);
+        $params = ['class' => $type, 'style' => 'width: ' . $width];
 
         return \html_writer::tag('span', $bar . $text, $params);
     }
 
-    public function process_raw_data($formdata)
-    {
+    public function process_raw_data($formdata) {
         global $CFG, $DB, $USER;
 
         // Save form data for later.
@@ -367,12 +352,12 @@ class attemptssummary extends basereport
         $this->ec = $ec;
 
         // initialize study goals
-        $goals = (object) array(
+        $goals = (object) [
             'watch' => 0,
             'learn' => 0,
             'speak' => 0,
-            'chat' => 0
-        );
+            'chat' => 0,
+        ];
 
         // Create SQL to fetch aggregate items from the EC attempts table.
         $select = 'userid,' .
@@ -472,5 +457,4 @@ class attemptssummary extends basereport
         }
         return true;
     }
-
 }

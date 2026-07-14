@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -20,7 +19,7 @@
  * @copyright 2014 Justin Hunt poodllsupport@gmail.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 /**
  * Define all the restore steps that will be used by the restore_englishcentral_activity_task
  */
@@ -29,13 +28,12 @@
  * Structure step to restore one englishcentral activity
  */
 class restore_englishcentral_activity_structure_step extends restore_activity_structure_step {
-
     protected function define_structure() {
 
         // fetch the $userinfo flag
         $userinfo = $this->get_setting_value('userinfo');
 
-        $paths = array();
+        $paths = [];
 
         ////////////////////////////////////////////////////////////////////////
         // XML interesting paths - non-user data
@@ -45,7 +43,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         $paths[] = new restore_path_element('englishcentral', $path);
 
         $path = '/activity/englishcentral/videos/video';
-        $paths[]= new restore_path_element('englishcentral_videos', $path);
+        $paths[] = new restore_path_element('englishcentral_videos', $path);
 
         ////////////////////////////////////////////////////////////////////////
         // XML interesting paths - user data
@@ -117,12 +115,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
     protected function process_englishcentral_accountids($data) {
         global $DB;
 
-        // we should only restore the accountids if the backup 
+        // we should only restore the accountids if the backup
         // and restore sites have the same partnerID
         static $partnerid = null;
 
         // fetch $partnerid of restore site (first time only)
-        if ($partnerid===null) {
+        if ($partnerid === null) {
             // only site admin has access to the partnerid on the Moodle site
             if (has_capability('moodle/site:config', context_system::instance())) {
                 $partnerid = get_config('mod_englishcentral', 'partnerid');
@@ -134,7 +132,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
             }
         }
 
-        if ($partnerid==0) {
+        if ($partnerid == 0) {
             return false; // current user does have access to partnerID
         }
 
@@ -157,7 +155,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         }
 
         // add new record, if necessary
-        if (! $DB->record_exists('englishcentral_accountids', array('userid' => $data->userid))) {
+        if (! $DB->record_exists('englishcentral_accountids', ['userid' => $data->userid])) {
             if (! $newid = $DB->insert_record('englishcentral_accountids', $data)) {
                 return false; // could not add new record - shouldn't happen !!
             }
@@ -184,7 +182,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         // store mapping from $oldid to $newid
         $this->set_mapping('englishcentral_attempts', $oldid, $newid, false);
     }
-    
+
     protected function process_englishcentral_phonemes($data) {
         global $DB;
 
@@ -206,7 +204,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         // store mapping from $oldid to $newid
         $this->set_mapping('englishcentral_phonemes', $oldid, $newid);
     }
-    
+
     protected function after_execute() {
         // Add englishcentral related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_englishcentral', 'intro', null);

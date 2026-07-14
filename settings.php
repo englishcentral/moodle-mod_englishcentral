@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -109,7 +108,7 @@ if ($ADMIN->fulltree) {
     $label = get_string($name, $plugin);
     $explain = get_string($name . 'explain', $plugin);
     $default = get_string($name . 'default', $plugin);
-    $options = array('JSDK2' => 'JSDK2', 'JSDK3' => 'JSDK3');
+    $options = ['JSDK2' => 'JSDK2', 'JSDK3' => 'JSDK3'];
     $settings->add(new admin_setting_configselect("$plugin/$name", $label, $explain, $default, $options));
 
     $settings->add(new admin_setting_configcheckbox(
@@ -118,5 +117,4 @@ if ($ADMIN->fulltree) {
         get_string('enablesetuptab_details', $plugin),
         0
     ));
-
 }

@@ -26,7 +26,7 @@
  */
 
 require_once('../../config.php');
-require_once($CFG->dirroot.'/mod/englishcentral/lib.php');
+require_once($CFG->dirroot . '/mod/englishcentral/lib.php');
 
 use mod_englishcentral\constants;
 

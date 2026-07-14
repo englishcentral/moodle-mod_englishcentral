@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
  * Created by PhpStorm.
  * User: ishineguy
@@ -13,18 +28,16 @@ use mod_englishcentral\utils;
 
 
 class videoperformance extends basereport {
-
     protected $report = "videoperformance";
     protected $fields = ['videoid', 'videoname', 'difficulty', 'totalwatches', 'averagelearn', 'averagespeak', 'averagechat'];
     protected $formdata = null;
-    protected $qcache = array();
-    protected $ucache = array();
+    protected $qcache = [];
+    protected $ucache = [];
 
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB, $CFG, $OUTPUT;
 
         switch ($field) {
-
             case 'videoid':
                 $ret = $record->videoid;
                 break;
@@ -59,11 +72,13 @@ class videoperformance extends basereport {
 
             case 'averagespeak':
                     $ret = $record->averagespeak;
-                    break;
+                break;
 
             case 'averagechat':
-                if (get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->averagechat) > 0) {
+                if (
+                    get_config(constants::M_COMPONENT, 'chatmode') ||
+                    intval($record->averagechat) > 0
+                ) {
                     $ret = $record->averagechat;
                 } else {
                     $ret = '-';
@@ -106,7 +121,7 @@ class videoperformance extends basereport {
         // Display the chart
         $chart = new \core\chart_pie();
         $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
-        $chart->add_series( new \core\chart_series('My series title', $videoseries));
+        $chart->add_series(new \core\chart_series('My series title', $videoseries));
         $chart->set_labels($videonames);
         $thechart = $renderer->render_chart($chart, $showdatasource);
         return $thechart;
@@ -121,9 +136,9 @@ class videoperformance extends basereport {
         $this->rawdata = [];
         $emptydata = [];
 
-        $selectsql = 'SELECT vid.videoid as videoid, vid.name as videoname, vid.detailsjson, COUNT(watchcomplete) as totalwatches,'.
-        'ROUND(AVG(COALESCE(learncount, 0)),1) AS averagelearn,'.
-        'ROUND(AVG(COALESCE(speakcount, 0)),1) AS averagespeak,'.
+        $selectsql = 'SELECT vid.videoid as videoid, vid.name as videoname, vid.detailsjson, COUNT(watchcomplete) as totalwatches,' .
+        'ROUND(AVG(COALESCE(learncount, 0)),1) AS averagelearn,' .
+        'ROUND(AVG(COALESCE(speakcount, 0)),1) AS averagespeak,' .
         'ROUND(AVG(COALESCE(chatcount, 0)),1) AS averagechat ' .
         ' FROM {' . constants::M_ATTEMPTSTABLE . '} tu ';
 
@@ -158,5 +173,4 @@ class videoperformance extends basereport {
         }
         return true;
     }
-
 }

@@ -42,7 +42,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_viewed extends \core\event\base {
-
     /**
      * Init method.
      *
@@ -69,7 +68,7 @@ class report_viewed extends \core\event\base {
      */
     public function get_description() {
         $mode = s($this->other['mode']);
-        return "The user with id '$this->userid' viewed the report '$mode' ".
+        return "The user with id '$this->userid' viewed the report '$mode' " .
                "for the EC activity with course module id '$this->contextinstanceid'.";
     }
 
@@ -79,8 +78,8 @@ class report_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        $params = array('id' => $this->contextinstanceid,
-                        'mode' => $this->other['mode']);
+        $params = ['id' => $this->contextinstanceid,
+                        'mode' => $this->other['mode']];
         return new \moodle_url('/mod/englishcentral/report.php', $params);
     }
 
@@ -101,8 +100,8 @@ class report_viewed extends \core\event\base {
     }
 
     public static function get_other_mapping() {
-        return array(
-            'ecid' => array('db' => 'englishcentral', 'restore' => 'englishcentral')
-        );
+        return [
+            'ecid' => ['db' => 'englishcentral', 'restore' => 'englishcentral'],
+        ];
     }
 }

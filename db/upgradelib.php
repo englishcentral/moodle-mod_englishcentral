@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -49,7 +48,7 @@ function xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname) {
     if ($dbman->table_exists($oldname)) {
         if ($records = $DB->get_records($oldname)) {
             foreach ($records as $record) {
-                if ($table_exists && $DB->record_exists($table->getName(), array('id' => $record->id))) {
+                if ($table_exists && $DB->record_exists($table->getName(), ['id' => $record->id])) {
                     continue; // record has already been transferred
                 }
                 foreach ($fields as $oldfield => $newfield) {
@@ -74,14 +73,13 @@ function xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname) {
  * @param xmldb_table   $table  The table definition.
  * @param array         $fields Optional associative array mapping old field names to new field names.
  */
-function xmldb_englishcentral_create_table($dbman, $table, $fields=array()) {
+function xmldb_englishcentral_create_table($dbman, $table, $fields = []) {
     global $DB;
     if ($dbman->table_exists($table)) {
-
         // remove all existing indexes and keys (except PRIMARY key)
         $indexes = $DB->get_indexes($table->getName());
         foreach ($indexes as $indexname => $index) {
-            if ($indexname=='primary') {
+            if ($indexname == 'primary') {
                 continue;
             }
             if (isset($index['unique']) && $index['unique']) {
@@ -116,13 +114,13 @@ function xmldb_englishcentral_create_table($dbman, $table, $fields=array()) {
 
         // (re)add indexes
         foreach ($table->getIndexes() as $index) {
-            if ($index->getName()=='primary') {
+            if ($index->getName() == 'primary') {
                 continue;
             }
             $dbman->add_index($table, $index);
         }
         foreach ($table->getKeys() as $index) {
-            if ($index->getName()=='primary') {
+            if ($index->getName() == 'primary') {
                 continue;
             }
             $index = new xmldb_index($index->getName(), $index->getType(), $index->getFields());
@@ -145,8 +143,13 @@ function xmldb_englishcentral_create_table($dbman, $table, $fields=array()) {
  * @param array $plugindir (optional, default=mod/englishcentral) the relative path to main folder for this plugin's directory
  * @return void (but may update database structure)
  */
-function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tableprefix='englishcentral',
-                                    $pluginname='mod_englishcentral', $plugindir='mod/englishcentral') {
+function xmldb_englishcentral_check_structure(
+    $dbman,
+    $tablenames = null,
+    $tableprefix = 'englishcentral',
+    $pluginname = 'mod_englishcentral',
+    $plugindir = 'mod/englishcentral'
+) {
     global $CFG, $DB;
 
     // To see what tables/fields/indexes were added/changed/dropped,
@@ -182,7 +185,7 @@ function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tablepr
 
     // Locate the XML file for this plugin, and try to read it.
     $filepath = "/$plugindir/db/install.xml";
-    $file = new xmldb_file($CFG->dirroot.$filepath);
+    $file = new xmldb_file($CFG->dirroot . $filepath);
 
     if (! $file->fileExists()) {
         // Presumably this would only happen on a development site.
@@ -197,8 +200,8 @@ function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tablepr
     // Check that the XML file could be loaded.
     if (! $file->isLoaded()) {
         if ($structure && ($error = $structure->getAllErrors())) {
-            $error = implode (', ', $error);
-            $error = "Errors found in XMLDB file ($filepath): ". $error;
+            $error = implode(', ', $error);
+            $error = "Errors found in XMLDB file ($filepath): " . $error;
         } else {
             $error = "XMLDB file not loaded ($filepath)";
         }
@@ -223,12 +226,11 @@ function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tablepr
     }
 
     // Extract only errors relating to tables for this plugin.
-    $keys = preg_grep('/^'.$tableprefix.'(_|$)/', $keys);
+    $keys = preg_grep('/^' . $tableprefix . '(_|$)/', $keys);
     $errors = array_intersect_key($errors, array_flip($keys));
 
     // Loop through $tablenames mentioned in the $errors for this plugin.
     foreach ($errors as $tablename => $messages) {
-
         // Skip tables that have already been checked.
         if (array_key_exists($tablename, $checked[$pluginname])) {
             continue;
@@ -292,9 +294,7 @@ function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tablepr
 
         // Loop through the error messages relating to this table.
         foreach ($messages as $message) {
-
             switch (true) {
-
                 // Moodle <= 2.7 uses "Table".
                 // Moodle >= 2.8 uses "table".
                 case preg_match('/[Tt]able is missing/', $message):
@@ -390,7 +390,7 @@ function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tablepr
                 case preg_match('/CREATE(.*?)INDEX(.*?)ON(.*?);/', $message, $match):
                     $DB->execute(rtrim($match[0], '; '));
                     if ($debug) {
-                        echo 'Index '.$match[1].' was added<br>';
+                        echo 'Index ' . $match[1] . ' was added<br>';
                     }
                     break;
 
@@ -405,14 +405,14 @@ function xmldb_englishcentral_check_structure($dbman, $tablenames=null, $tablepr
                         }
                         unset($indexes[$name]);
                         if ($debug) {
-                            echo 'Index '.$match[1].' was dropped<br>';
+                            echo 'Index ' . $match[1] . ' was dropped<br>';
                         }
                     }
                     break;
 
                 default:
                     if ($debug) {
-                        echo '<p>Unknown XMLDB error in '.$pluginname.':<br>'.$message.'</p>';
+                        echo '<p>Unknown XMLDB error in ' . $pluginname . ':<br>' . $message . '</p>';
                         die;
                     }
             }

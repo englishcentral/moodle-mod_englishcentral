@@ -53,9 +53,12 @@ if ($id) {
     error('You must specify a course_module ID or an instance ID');
 }
 
-$PAGE->set_url(constants::M_URL . '/reports.php',
-        ['id' => $cm->id, 'report' => $showreport, 'format' => $format,
-             'userid' => $userid, 'dayslimit' => $dayslimit]);
+$PAGE->set_url(
+    constants::M_URL . '/reports.php',
+    ['id' => $cm->id, 'report' => $showreport, 'format' => $format,
+    'userid' => $userid,
+    'dayslimit' => $dayslimit]
+);
 require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
 
@@ -68,7 +71,7 @@ $config = get_config(constants::M_COMPONENT);
 if ($config->reportstable == constants::M_USE_DATATABLES) {
     $paging = false;
 } else if ($paging->perpage == -1) {
-    $paging->perpage = 20; //$config->attemptsperpage;
+    $paging->perpage = 20; // $config->attemptsperpage;
 }
 
 
@@ -107,7 +110,6 @@ $reportrenderer = $PAGE->get_renderer(constants::M_COMPONENT, 'report');
 $mode = "reports";
 $extraheader = "";
 switch ($showreport) {
-
     // not a true report, separate implementation in renderer
     case 'menu':
         echo $renderer->header(get_string('reports', constants::M_COMPONENT));
@@ -119,8 +121,8 @@ switch ($showreport) {
 
     case 'basic':
         $report = new \mod_englishcentral\report\basic($cm);
-        //formdata should only have simple values, not objects
-        //later it gets turned into urls for the export buttons
+        // formdata should only have simple values, not objects
+        // later it gets turned into urls for the export buttons
         $formdata = new stdClass();
         break;
 
@@ -219,13 +221,18 @@ $reportdescription = $report->fetch_formatted_description();
 switch ($format) {
     case 'csv':
         $reportrows = $report->fetch_formatted_rows(false);
-        $reportrenderer->render_report_csv($reportheading, $report->fetch_name(), $report->fetch_head(), $reportrows,
-                $report->fetch_fields());
+        $reportrenderer->render_report_csv(
+            $reportheading,
+            $report->fetch_name(),
+            $report->fetch_head(),
+            $reportrows,
+            $report->fetch_fields()
+        );
         exit;
 
     case 'graphical':
         // these colors may not work as expected
-        $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8',  '#f2d7a4', '#c7d9a3'];
+        $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8', '#f2d7a4', '#c7d9a3'];
         echo $renderer->header(get_string('reports', constants::M_COMPONENT));
         echo $reportrenderer->show_user_report_options($PAGE->url, $dayslimit, $format);
         echo $extraheader;
@@ -240,13 +247,11 @@ switch ($format) {
     case 'tabular':
     case 'combined':
     default:
-
         $reportrows = $report->fetch_formatted_rows(true, $paging);
         $allrowscount = $report->fetch_all_rows_count();
         if ($config->reportstable == constants::M_USE_DATATABLES) {
-
             // css must be required before header sent out
-            $PAGE->requires->css( new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
+            $PAGE->requires->css(new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
             echo $renderer->header(get_string('reports', constants::M_COMPONENT));
             echo $reportrenderer->show_user_report_options($PAGE->url, $dayslimit, $format);
             echo $extraheader;
@@ -256,14 +261,17 @@ switch ($format) {
             // First the chart.
             if ($format == 'combined') {
                 // these colors may not work as expected
-                $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8',  '#f2d7a4', '#c7d9a3'];
+                $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8', '#f2d7a4', '#c7d9a3'];
                 echo $report->fetch_chart($reportrenderer, false);
             }
 
             // Then the table.
-            echo $reportrenderer->render_report_tabular( $report->fetch_name(), $report->fetch_head(), $reportrows,
-                $report->fetch_fields());
-
+            echo $reportrenderer->render_report_tabular(
+                $report->fetch_name(),
+                $report->fetch_head(),
+                $reportrows,
+                $report->fetch_fields()
+            );
         } else {
             $pagingbar = $reportrenderer->show_paging_bar($allrowscount, $paging, $PAGE->url);
             echo $renderer->header(get_string('reports', constants::M_COMPONENT));
@@ -275,13 +283,17 @@ switch ($format) {
             // First the chart.
             if ($format == 'combined') {
                 // these colors may not work as expected
-                $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8',  '#f2d7a4', '#c7d9a3'];
+                $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8', '#f2d7a4', '#c7d9a3'];
                 echo $report->fetch_chart($reportrenderer, false);
             }
             // Then the table.
             echo $pagingbar;
-            echo $reportrenderer->render_report_tabular( $report->fetch_name(), $report->fetch_head(), $reportrows,
-                $report->fetch_fields());
+            echo $reportrenderer->render_report_tabular(
+                $report->fetch_name(),
+                $report->fetch_head(),
+                $reportrows,
+                $report->fetch_fields()
+            );
             echo $pagingbar;
         }
         echo $reportrenderer->show_reports_footer($moduleinstance, $cm, $formdata, $showreport);

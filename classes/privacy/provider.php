@@ -28,19 +28,11 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
-use core_privacy\local\request\deletion_criteria;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
 defined('MOODLE_INTERNAL') || die();
-
-//3.3 user_provider not backported so we use this switch to avoid errors when using same codebase for 3.3 and higher
-if (interface_exists('\core_privacy\local\request\core_userlist_provider')) {
-    interface the_user_provider extends \core_privacy\local\request\core_userlist_provider{}
-} else {
-    interface the_user_provider {};
-}
 
 /**
  * Privacy Subsystem for mod_englishcentral
@@ -53,18 +45,15 @@ class provider implements
     \core_privacy\local\metadata\provider,
     // This plugin is a core_user_data_provider.
     \core_privacy\local\request\plugin\provider,
-    //user provider 3.4 and above
-    the_user_provider{
-
-    use \core_privacy\local\legacy_polyfill;
-
+    // This plugin can identify the users within a context.
+    \core_privacy\local\request\core_userlist_provider {
     /**
      * Return meta data about this plugin.
      *
      * @param  collection $collection A list of information to add to.
      * @return collection Return the collection after adding to it.
      */
-    public static function _get_metadata(collection $collection) {
+    public static function get_metadata(collection $collection): collection {
 
         $userdetail = [
             'id' => 'privacy:metadata:attemptid',
@@ -89,13 +78,12 @@ class provider implements
             'totaltime' => 'privacy:metadata:totaltime',
             'timecompleted' => 'privacy:metadata:timecompleted',
             'timecreated' => 'privacy:metadata:timecreated',
-            'status' => 'privacy:metadata:status'
+            'status' => 'privacy:metadata:status',
         ];
         $collection->add_database_table('englishcentral_attempts', $userdetail, 'privacy:metadata:attempttable');
 
-
         $collection->add_external_location_link('englishcentral.com', [
-            'accountid' => 'privacy:metadata:englishcentralcom:accountid'
+            'accountid' => 'privacy:metadata:englishcentralcom:accountid',
         ], 'privacy:metadata:englishcentralcom');
         return $collection;
     }
@@ -107,7 +95,7 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function _get_contexts_for_userid($userid) {
+    public static function get_contexts_for_userid(int $userid): contextlist {
 
         $sql = "SELECT c.id
                   FROM {context} c
@@ -119,8 +107,8 @@ class provider implements
         $params = [
             'contextlevel' => CONTEXT_MODULE,
             'modname' => 'englishcentral',
-            'theuserid' => $userid
-        ] ;
+            'theuserid' => $userid,
+        ];
 
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
@@ -157,7 +145,6 @@ class provider implements
         ];
 
         $userlist->add_from_sql('userid', $sql, $params);
-
     }
 
     /**
@@ -167,7 +154,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist a list of contexts approved for export.
      */
-    public static function _export_user_data(approved_contextlist $contextlist) {
+    public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
 
         if (empty($contextlist->count())) {
@@ -175,7 +162,7 @@ class provider implements
         }
 
         $user = $contextlist->get_user();
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT usert.id as attemptid,
                        cm.id AS cmid,
@@ -211,14 +198,13 @@ class provider implements
         $params = [
                 'userid' => $user->id,
                 'modulename' => 'englishcentral',
-                'contextlevel' => CONTEXT_MODULE
+                'contextlevel' => CONTEXT_MODULE,
             ] + $contextparams;
 
         $attempts = $DB->get_recordset_sql($sql, $params);
 
-
         foreach ($attempts as $attempt) {
-            $attempt->timemodified =\core_privacy\local\request\transform::datetime($attempt->timecreated);
+            $attempt->timemodified = \core_privacy\local\request\transform::datetime($attempt->timecreated);
             $context = \context_module::instance($attempt->cmid);
             $attemptdata = get_object_vars($attempt);
             self::export_attempt_data_for_user($attemptdata, $context, $user);
@@ -284,17 +270,20 @@ class provider implements
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
-
                 $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
 
-                $entries = $DB->get_records('englishcentral_attempts', ['ecid' => $instanceid, 'userid' => $userid],
-                    '', 'id');
+                $entries = $DB->get_records(
+                    'englishcentral_attempts',
+                    ['ecid' => $instanceid, 'userid' => $userid],
+                    '',
+                    'id'
+                );
 
                 if (!$entries) {
                     continue;
                 }
 
-                list($insql, $inparams) = $DB->get_in_or_equal(array_keys($entries), SQL_PARAMS_NAMED);
+                [$insql, $inparams] = $DB->get_in_or_equal(array_keys($entries), SQL_PARAMS_NAMED);
 
                 // Now delete all user related entries.
                 $DB->delete_records('englishcentral_attempts', ['ecid' => $instanceid, 'userid' => $userid]);
@@ -313,7 +302,7 @@ class provider implements
         $context = $userlist->get_context();
         $userids = $userlist->get_userids();
         $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
-        list($userinsql, $userinparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$userinsql, $userinparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
         $attemptswhere = "ecid = :instanceid AND userid {$userinsql}";
         $userinstanceparams = $userinparams + ['instanceid' => $instanceid];
@@ -330,7 +319,6 @@ class provider implements
         if (!$attempts) {
             return;
         }
-
 
         $deletewhere = "ecid = :instanceid AND userid {$userinsql}";
         $DB->delete_records_select('englishcentral_attempts', $deletewhere, $userinstanceparams);

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -47,7 +46,6 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2015031501;
     if ($oldversion < $newversion) {
-
         // Define field timecreated to be added to englishcentral
         $table = new xmldb_table('englishcentral');
         $field = new xmldb_field('lightboxmode', XMLDB_TYPE_INTEGER, '3', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, '0');
@@ -62,7 +60,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018012403;
     if ($oldversion < $newversion) {
-        require_once($CFG->dirroot.'/mod/englishcentral/db/upgradelib.php');
+        require_once($CFG->dirroot . '/mod/englishcentral/db/upgradelib.php');
 
         // =============================================
         // create USERIDS table
@@ -75,10 +73,10 @@ function xmldb_englishcentral_upgrade($oldversion) {
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('ecuserid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('engluser_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('engluser_userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
 
-        $table->add_index('engluser_ecuserid', XMLDB_INDEX_UNIQUE, array('ecuserid'));
+        $table->add_index('engluser_ecuserid', XMLDB_INDEX_UNIQUE, ['ecuserid']);
 
         xmldb_englishcentral_create_table($dbman, $table);
 
@@ -88,17 +86,17 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
         $table = new xmldb_table('englishcentral_videos');
 
-        $table->add_field('id',        XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
-        $table->add_field('ecid',      XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('videoid',   XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('visible',   XMLDB_TYPE_INTEGER,  '2', null, XMLDB_NOTNULL, null, '1');
-        $table->add_field('sortorder', XMLDB_TYPE_INTEGER,  '6', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('ecid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('videoid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('visible', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('sortorder', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0');
 
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
-        $table->add_index('englvide_ecid', XMLDB_INDEX_NOTUNIQUE, array('ecid'));
-        $table->add_index('englvide_videoid', XMLDB_INDEX_NOTUNIQUE, array('videoid'));
-        $table->add_index('englvide_sortorder', XMLDB_INDEX_NOTUNIQUE, array('ecid,sortorder'));
+        $table->add_index('englvide_ecid', XMLDB_INDEX_NOTUNIQUE, ['ecid']);
+        $table->add_index('englvide_videoid', XMLDB_INDEX_NOTUNIQUE, ['videoid']);
+        $table->add_index('englvide_sortorder', XMLDB_INDEX_NOTUNIQUE, ['ecid,sortorder']);
 
         xmldb_englishcentral_create_table($dbman, $table);
 
@@ -112,8 +110,8 @@ function xmldb_englishcentral_upgrade($oldversion) {
                 if (empty($record->videoid)) {
                     continue;
                 }
-                $params = array('ecid' => $record->id,
-                                'videoid' => $record->videoid);
+                $params = ['ecid' => $record->id,
+                                'videoid' => $record->videoid];
                 if ($DB->record_exists($table, $params)) {
                     continue;
                 }
@@ -126,10 +124,10 @@ function xmldb_englishcentral_upgrade($oldversion) {
         // =============================================
 
         $table = new xmldb_table('englishcentral');
-        $fields = array('videotitle', 'videoid', 'goalperiod',
+        $fields = ['videotitle', 'videoid', 'goalperiod',
                         'watchmode', 'speakmode', 'learnmode',
                         'hiddenchallengemode', 'speaklitemode',
-                        'lightboxmode', 'simpleui', 'maxattempts');
+                        'lightboxmode', 'simpleui', 'maxattempts'];
         foreach ($fields as $field) {
             $field = new xmldb_field($field);
             if ($dbman->field_exists($table, $field)) {
@@ -142,16 +140,16 @@ function xmldb_englishcentral_upgrade($oldversion) {
         // =============================================
 
         $table = new xmldb_table('englishcentral');
-        $fields = array(
-            new xmldb_field('watchgoal',  XMLDB_TYPE_INTEGER,  '6', null, XMLDB_NOTNULL, null, '0', 'introformat'),
-            new xmldb_field('learngoal',  XMLDB_TYPE_INTEGER,  '6', null, XMLDB_NOTNULL, null, '0', 'watchgoal'),
-            new xmldb_field('speakgoal',  XMLDB_TYPE_INTEGER,  '6', null, XMLDB_NOTNULL, null, '0', 'learngoal'),
-            new xmldb_field('studygoal',  XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'speakgoal'),
-            new xmldb_field('availablefrom',  XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'studygoal'),
+        $fields = [
+            new xmldb_field('watchgoal', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0', 'introformat'),
+            new xmldb_field('learngoal', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0', 'watchgoal'),
+            new xmldb_field('speakgoal', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0', 'learngoal'),
+            new xmldb_field('studygoal', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'speakgoal'),
+            new xmldb_field('availablefrom', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'studygoal'),
             new xmldb_field('availableuntil', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'availablefrom'),
-            new xmldb_field('readonlyfrom',   XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'availableuntil'),
-            new xmldb_field('readonlyuntil',  XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'readonlyfrom')
-        );
+            new xmldb_field('readonlyfrom', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'availableuntil'),
+            new xmldb_field('readonlyuntil', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'readonlyfrom'),
+        ];
 
         foreach ($fields as $field) {
             if ($dbman->field_exists($table, $field)) {
@@ -166,31 +164,31 @@ function xmldb_englishcentral_upgrade($oldversion) {
         // =============================================
 
         $table = new xmldb_table('englishcentral_attempts');
-        $fields = array('englishcentralid' => 'ecid');
+        $fields = ['englishcentralid' => 'ecid'];
         $oldname = 'englishcentral_attempt';
 
-        $table->add_field('id',              XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
-        $table->add_field('ecid',            XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('userid',          XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('videoid',         XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('linestotal',      XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('ecid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('videoid', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('linestotal', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
         $table->add_field('totalactivetime', XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('watchedcomplete', XMLDB_TYPE_INTEGER,  '2');
-        $table->add_field('activetime',      XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('datecompleted',   XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('linesrecorded',   XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('lineswatched',    XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('points',          XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('watchedcomplete', XMLDB_TYPE_INTEGER, '2');
+        $table->add_field('activetime', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('datecompleted', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('linesrecorded', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('lineswatched', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('points', XMLDB_TYPE_INTEGER, '10');
         $table->add_field('recordingcomplete', XMLDB_TYPE_INTEGER, '2');
-        $table->add_field('sessiongrade',    XMLDB_TYPE_CHAR,   '255');
-        $table->add_field('sessionscore',    XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('status',          XMLDB_TYPE_INTEGER,  '2', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('timecreated',     XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('sessiongrade', XMLDB_TYPE_CHAR, '255');
+        $table->add_field('sessionscore', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_index('englatte_ecid', XMLDB_INDEX_NOTUNIQUE, array('ecid'));
-        $table->add_index('englatte_userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
-        $table->add_index('englatte_videoid', XMLDB_INDEX_NOTUNIQUE, array('videoid'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('englatte_ecid', XMLDB_INDEX_NOTUNIQUE, ['ecid']);
+        $table->add_index('englatte_userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        $table->add_index('englatte_videoid', XMLDB_INDEX_NOTUNIQUE, ['videoid']);
 
         xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname);
 
@@ -199,22 +197,22 @@ function xmldb_englishcentral_upgrade($oldversion) {
         // =============================================
 
         $table = new xmldb_table('englishcentral_phonemes');
-        $fields = array('englishcentralid' => 'ecid');
+        $fields = ['englishcentralid' => 'ecid'];
         $oldname = 'englishcentral_phs';
 
-        $table->add_field('id',          XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
-        $table->add_field('ecid',        XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('attemptid',   XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('userid',      XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('phoneme',     XMLDB_TYPE_CHAR,   '255', null, null,          null, '');
-        $table->add_field('badcount',    XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
-        $table->add_field('goodcount',   XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('ecid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('attemptid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('phoneme', XMLDB_TYPE_CHAR, '255', null, null, null, '');
+        $table->add_field('badcount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('goodcount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        $table->add_key('primary',             XMLDB_KEY_PRIMARY,     array('id'));
-        $table->add_index('englphs_ecid',      XMLDB_INDEX_NOTUNIQUE, array('ecid'));
-        $table->add_index('englphs_attemptid', XMLDB_INDEX_NOTUNIQUE, array('attemptid'));
-        $table->add_index('englphs_userid',    XMLDB_INDEX_NOTUNIQUE, array('userid'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('englphs_ecid', XMLDB_INDEX_NOTUNIQUE, ['ecid']);
+        $table->add_index('englphs_attemptid', XMLDB_INDEX_NOTUNIQUE, ['attemptid']);
+        $table->add_index('englphs_userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
 
         xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname);
 
@@ -223,7 +221,6 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018012805;
     if ($oldversion < $newversion) {
-
         $config = get_config('englishcentral');
         foreach ($config as $name => $value) {
             set_config($name, $value, 'mod_englishcentral');
@@ -235,15 +232,14 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018020417;
     if ($oldversion < $newversion) {
-
         // rename timing fields in main "englishcentral" table
         $table = new xmldb_table('englishcentral');
-        $fields = array(
-            'activityopen'  => new xmldb_field('availablefrom',  XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
+        $fields = [
+            'activityopen'  => new xmldb_field('availablefrom', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
             'activityclose' => new xmldb_field('availableuntil', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
-            'videoopen'     => new xmldb_field('readonlyfrom',   XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
-            'videoclose'    => new xmldb_field('readonlyuntil',  XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0')
-        );
+            'videoopen'     => new xmldb_field('readonlyfrom', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
+            'videoclose'    => new xmldb_field('readonlyuntil', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0'),
+        ];
         foreach ($fields as $newname => $field) {
             $oldexists = $dbman->field_exists($table, $field);
             $newexists = $dbman->field_exists($table, $newname);
@@ -268,26 +264,26 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018021020;
     if ($oldversion < $newversion) {
-        require_once($CFG->dirroot.'/mod/englishcentral/db/upgradelib.php');
+        require_once($CFG->dirroot . '/mod/englishcentral/db/upgradelib.php');
 
         // =============================================
         // create ACCOUNTIDS table
         // =============================================
 
         $table = new xmldb_table('englishcentral_accountids');
-        $fields = array('ecuserid' => 'accountid');
+        $fields = ['ecuserid' => 'accountid'];
         $oldname = 'englishcentral_userids';
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('accountid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('engluser_userid', XMLDB_KEY_FOREIGN, array('userid'), 'user', array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('engluser_userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
 
         // Use NOTUNIQUE, because initially the accountid is set to "0" for all users
         // Later, it gets set to a unique non-zero value
-        $table->add_index('engluser_accountid', XMLDB_INDEX_NOTUNIQUE, array('accountid'));
+        $table->add_index('engluser_accountid', XMLDB_INDEX_NOTUNIQUE, ['accountid']);
 
         xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname);
 
@@ -317,7 +313,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
             $dbman->add_field($table, $field);
 
             // define new index on sortorder field
-            $index = new xmldb_index('englvide_sortorder', XMLDB_INDEX_UNIQUE, array('ecid,sortorder'));
+            $index = new xmldb_index('englvide_sortorder', XMLDB_INDEX_UNIQUE, ['ecid,sortorder']);
 
             // remove index, if it already exists
             if ($dbman->index_exists($table, $index)) {
@@ -327,15 +323,15 @@ function xmldb_englishcentral_upgrade($oldversion) {
             // set sortorder field on existing records
             $ecid = 0;
             $sortorder = 0;
-            if ($videos = $DB->get_records($table->getName(), array(), 'ecid,id')) {
+            if ($videos = $DB->get_records($table->getName(), [], 'ecid,id')) {
                 foreach ($videos as $video) {
-                    if ($ecid && $ecid==$video->ecid) {
+                    if ($ecid && $ecid == $video->ecid) {
                         $sortorder++;
                     } else {
                         $sortorder = 1;
                     }
                     $ecid = $video->ecid;
-                    $DB->set_field($table->getName(), 'sortorder', $sortorder, array('id' => $video->id));
+                    $DB->set_field($table->getName(), 'sortorder', $sortorder, ['id' => $video->id]);
                 }
             }
 
@@ -348,13 +344,13 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018022532;
     if ($oldversion < $newversion) {
-        require_once($CFG->dirroot.'/mod/englishcentral/db/upgradelib.php');
+        require_once($CFG->dirroot . '/mod/englishcentral/db/upgradelib.php');
 
         // Define table englishcentral_attempts to be created.
         $table = new xmldb_table('englishcentral_attempts');
 
         // define modified  field names (OLD => NEW)
-        $fields = array(
+        $fields = [
             'lineswatched'      => 'watchcount',
             'watchedcomplete'   => 'watchcomplete',
             'linestotal'        => 'speaktotal',
@@ -363,48 +359,48 @@ function xmldb_englishcentral_upgrade($oldversion) {
             'points'            => 'totalpoints',
             'totalactivetime'   => 'totaltime',
             'datecompleted'     => 'timecompleted',
-        );
+        ];
 
-        $table->add_field('id',            XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
-        $table->add_field('ecid',          XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('userid',        XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
-        $table->add_field('videoid',       XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE);
+        $table->add_field('ecid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL);
+        $table->add_field('videoid', XMLDB_TYPE_INTEGER, '10');
 
-        $table->add_field('watchcomplete', XMLDB_TYPE_INTEGER,  '2');
-        $table->add_field('watchtotal',    XMLDB_TYPE_INTEGER, '10'); // number of watchable lines
-        $table->add_field('watchcount',    XMLDB_TYPE_INTEGER, '10'); // number of lines watched
-        $table->add_field('watchlineids',  XMLDB_TYPE_TEXT);          // comma-separated list of line ids
+        $table->add_field('watchcomplete', XMLDB_TYPE_INTEGER, '2');
+        $table->add_field('watchtotal', XMLDB_TYPE_INTEGER, '10'); // number of watchable lines
+        $table->add_field('watchcount', XMLDB_TYPE_INTEGER, '10'); // number of lines watched
+        $table->add_field('watchlineids', XMLDB_TYPE_TEXT);          // comma-separated list of line ids
 
-        $table->add_field('learncomplete', XMLDB_TYPE_INTEGER,  '2');
-        $table->add_field('learntotal',    XMLDB_TYPE_INTEGER, '10'); // number of learnable words
-        $table->add_field('learncount',    XMLDB_TYPE_INTEGER, '10'); // number of words learned
-        $table->add_field('learnwordids',  XMLDB_TYPE_TEXT);          // comma-separated list of word ids
+        $table->add_field('learncomplete', XMLDB_TYPE_INTEGER, '2');
+        $table->add_field('learntotal', XMLDB_TYPE_INTEGER, '10'); // number of learnable words
+        $table->add_field('learncount', XMLDB_TYPE_INTEGER, '10'); // number of words learned
+        $table->add_field('learnwordids', XMLDB_TYPE_TEXT);          // comma-separated list of word ids
 
-        $table->add_field('speakcomplete', XMLDB_TYPE_INTEGER,  '2');
-        $table->add_field('speaktotal',    XMLDB_TYPE_INTEGER, '10'); // number of speakable lines
-        $table->add_field('speakcount',    XMLDB_TYPE_INTEGER, '10'); // number of lines spoken
-        $table->add_field('speaklineids',  XMLDB_TYPE_TEXT);          // comma-separated list of line ids
+        $table->add_field('speakcomplete', XMLDB_TYPE_INTEGER, '2');
+        $table->add_field('speaktotal', XMLDB_TYPE_INTEGER, '10'); // number of speakable lines
+        $table->add_field('speakcount', XMLDB_TYPE_INTEGER, '10'); // number of lines spoken
+        $table->add_field('speaklineids', XMLDB_TYPE_TEXT);          // comma-separated list of line ids
 
-        $table->add_field('totalpoints',   XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('sessiongrade',  XMLDB_TYPE_CHAR,   '255'); // EC grade (e.g. "A")
-        $table->add_field('sessionscore',  XMLDB_TYPE_INTEGER, '10'); // EC numeric score (e.g. 97)
+        $table->add_field('totalpoints', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('sessiongrade', XMLDB_TYPE_CHAR, '255'); // EC grade (e.g. "A")
+        $table->add_field('sessionscore', XMLDB_TYPE_INTEGER, '10'); // EC numeric score (e.g. 97)
 
-        $table->add_field('activetime',    XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('totaltime',     XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('activetime', XMLDB_TYPE_INTEGER, '10');
+        $table->add_field('totaltime', XMLDB_TYPE_INTEGER, '10');
 
         $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10');
-        $table->add_field('timecreated',   XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
 
         // the following fields doesn't seem to be necessary
-        $table->add_field('status',        XMLDB_TYPE_INTEGER,  '2', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('status', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0');
 
         // keys for englishcentral_attempts
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
         // indexes for englishcentral_attempts
-        $table->add_index('englatte_ecid', XMLDB_INDEX_NOTUNIQUE, array('ecid'));
-        $table->add_index('englatte_userid', XMLDB_INDEX_NOTUNIQUE, array('userid'));
-        $table->add_index('englatte_videoid', XMLDB_INDEX_NOTUNIQUE, array('videoid'));
+        $table->add_index('englatte_ecid', XMLDB_INDEX_NOTUNIQUE, ['ecid']);
+        $table->add_index('englatte_userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        $table->add_index('englatte_videoid', XMLDB_INDEX_NOTUNIQUE, ['videoid']);
 
         // create/modify the table
         xmldb_englishcentral_create_table($dbman, $table, $fields);
@@ -414,7 +410,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018022735;
     if ($oldversion < $newversion) {
-        require_once $CFG->dirroot.'/mod/englishcentral/lib.php';
+        require_once $CFG->dirroot . '/mod/englishcentral/lib.php';
 
         // update/create grades for all EC activities
 
@@ -423,7 +419,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
         $select = 'ec.*, cm.idnumber AS cmidnumber';
         $from   = '{englishcentral} ec, {course_modules} cm, {modules} m';
         $where  = 'ec.id = cm.instance AND cm.module = m.id AND m.name = ?';
-        $params = array('englishcentral');
+        $params = ['englishcentral'];
 
         // get previous record index (if any)
         $configname = 'updategrades';
@@ -443,7 +439,6 @@ function xmldb_englishcentral_upgrade($oldversion) {
                 }
                 $i = 0;
                 foreach ($rs as $ec) {
-
                     // update grade
                     if ($i >= $i_min) {
                         upgrade_set_timeout(); // apply for more time (3 mins)
@@ -453,7 +448,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
                     // update progress bar
                     $i++;
                     if ($bar) {
-                        $bar->update($i, $i_max, $strupdating.": ($i/$i_max)");
+                        $bar->update($i, $i_max, $strupdating . ": ($i/$i_max)");
                     }
 
                     // update record index
@@ -475,46 +470,46 @@ function xmldb_englishcentral_upgrade($oldversion) {
     if ($oldversion < $newversion) {
         // select attempts records whose ecid + videoid does not exist in videos table
         $select = 'ea.*';
-        $from   = '{englishcentral_attempts} ea '.
+        $from   = '{englishcentral_attempts} ea ' .
                   'LEFT JOIN {englishcentral_videos} ev ON ea.ecid = ev.ecid AND ea.videoid = ev.videoid';
         $where  = 'ea.ecid = ? AND ev.id IS NULL';
-        $params = array(1); // this issue only affects attempts with ecid==1
+        $params = [1]; // this issue only affects attempts with ecid==1
 
         // SELECT ea.* FROM mdl_englishcentral_attempts ea
-        //        LEFT JOIN mdl_englishcentral_videos ev
-        //               ON ea.ecid = ev.ecid
-        //              AND ea.videoid = ev.videoid
-        //  WHERE ea.ecid = 1
-        //    AND ev.id IS NULL;
+        // LEFT JOIN mdl_englishcentral_videos ev
+        // ON ea.ecid = ev.ecid
+        // AND ea.videoid = ev.videoid
+        // WHERE ea.ecid = 1
+        // AND ev.id IS NULL;
         if ($orphans = $DB->get_records_sql("SELECT $select FROM $from WHERE $where", $params)) {
-            $fields = array('watchcount' => 'watchlineids',
+            $fields = ['watchcount' => 'watchlineids',
                             'learncount' => 'learnwordids',
-                            'speakcount' => 'speaklineids');
+                            'speakcount' => 'speaklineids'];
             foreach ($orphans as $orphan) {
                 // merge all attempts by this user at this video
                 // try to locate a valid $ecid while we're at it
                 $ecid = 0;
                 $record = null; // new attempt
                 $table = 'englishcentral_attempts';
-                $params = array('userid' => $orphan->userid,
-                                'videoid' => $orphan->videoid);
+                $params = ['userid' => $orphan->userid,
+                                'videoid' => $orphan->videoid];
                 $attempts = $DB->get_records($table, $params, 'id');
                 foreach ($attempts as $attempt) {
-                    if ($record===null) {
+                    if ($record === null) {
                         $record = clone($attempt);
                         foreach ($fields as $field) {
-                            $record->$field = array();
+                            $record->$field = [];
                         }
                     } else {
                         // remove this $attempt
-                        $DB->delete_records($table, array('id' => $attempt->id));
+                        $DB->delete_records($table, ['id' => $attempt->id]);
                     }
                     // transfer attempt details
                     foreach ($fields as $field) {
                         $record->$field += array_fill_keys(explode(',', $attempt->$field), 1);
                     }
-                    if ($ecid==0) {
-                        $ecid = ($attempt->ecid==$orphan->ecid ? 0 : $attempt->ecid);
+                    if ($ecid == 0) {
+                        $ecid = ($attempt->ecid == $orphan->ecid ? 0 : $attempt->ecid);
                     }
                 }
                 foreach ($fields as $count => $field) {
@@ -523,8 +518,8 @@ function xmldb_englishcentral_upgrade($oldversion) {
                     $record->$count = count($record->$field);
                     $record->$field = implode(',', $record->$field);
                 }
-                if ($ecid==0) {
-                    if ($ecid = $DB->get_records('englishcentral_videos', array('videoid' => $orphan->videoid))) {
+                if ($ecid == 0) {
+                    if ($ecid = $DB->get_records('englishcentral_videos', ['videoid' => $orphan->videoid])) {
                         $ecid = reset($ecid);
                         $ecid = $ecid->ecid;
                     } else {
@@ -537,7 +532,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
                 } else {
                     // sorry, we couldn't rescue this orphan :-(
                     // probably because we have no record of its videoid
-                    $DB->delete_records($table, array('id' => $record->id));
+                    $DB->delete_records($table, ['id' => $record->id]);
                 }
             }
         }
@@ -547,10 +542,9 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018041763;
     if ($oldversion < $newversion) {
-
-    	// remove all attempts where userid OR videoid IS NULL
-    	$DB->delete_records_select('englishcentral_attempts', 'userid IS NULL OR userid = ?', array(0));
-    	$DB->delete_records_select('englishcentral_attempts', 'videoid IS NULL OR videoid = ?', array(0));
+        // remove all attempts where userid OR videoid IS NULL
+        $DB->delete_records_select('englishcentral_attempts', 'userid IS NULL OR userid = ?', [0]);
+        $DB->delete_records_select('englishcentral_attempts', 'videoid IS NULL OR videoid = ?', [0]);
 
         // remove duplicate attempts with same userid + videoid
         // NOTE: the old version of this module kept ALL attempts
@@ -559,20 +553,20 @@ function xmldb_englishcentral_upgrade($oldversion) {
         $table = 'englishcentral_attempts';
         $select = $DB->sql_concat('userid', "'_'", 'videoid');
         $select = "MIN(id) AS minid, $select AS ids, COUNT(*) AS countrecords";
-        $from   = '{'.$table.'}';
+        $from   = '{' . $table . '}';
         $group  = 'userid, videoid';
         $having = 'countrecords > ?';
-        $params = array(1);
+        $params = [1];
         $records = "SELECT $select FROM $from GROUP BY $group HAVING $having";
         if ($records = $DB->get_records_sql($records, $params)) {
             foreach ($records as $record) {
-                list($userid, $videoid) = explode('_', $record->ids);
-                $params = array('userid' => $userid,
-                                'videoid' => $videoid);
+                [$userid, $videoid] = explode('_', $record->ids);
+                $params = ['userid' => $userid,
+                                'videoid' => $videoid];
                 $ids = $DB->get_records($table, $params, 'id DESC');
                 $ids = array_keys($ids);
                 array_shift($ids); // i.e. keep newest record
-                list($select, $params) = $DB->get_in_or_equal($ids);
+                [$select, $params] = $DB->get_in_or_equal($ids);
                 $DB->delete_records_select($table, "id $select", $params);
             }
         }
@@ -583,11 +577,11 @@ function xmldb_englishcentral_upgrade($oldversion) {
     if ($oldversion < $newversion) {
         // add custom completion fields for EnglishCentral module
         $table = new xmldb_table('englishcentral');
-        $fields = array(
-            new xmldb_field('completionmingrade',  XMLDB_TYPE_FLOAT, '6,2', null, XMLDB_NOTNULL, null, 0.00),
+        $fields = [
+            new xmldb_field('completionmingrade', XMLDB_TYPE_FLOAT, '6,2', null, XMLDB_NOTNULL, null, 0.00),
             new xmldb_field('completionpass', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0),
-            new xmldb_field('completiongoals', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0)
-        );
+            new xmldb_field('completiongoals', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0),
+        ];
         $previous = '';
         foreach ($fields as $field) {
             if ($previous) {
@@ -606,11 +600,11 @@ function xmldb_englishcentral_upgrade($oldversion) {
     $newversion = 2020032512;
     if ($oldversion < $newversion) {
         // Remove default config settings, because they cause errors in JSDK.
-        $params = array('partnerid', 'consumerkey', 'consumersecret', 'encryptedsecret');
-        list($select, $params) = $DB->get_in_or_equal($params);
+        $params = ['partnerid', 'consumerkey', 'consumersecret', 'encryptedsecret'];
+        [$select, $params] = $DB->get_in_or_equal($params);
 
-        $select = 'plugin = ? AND name '.$select.' AND '.$DB->sql_like('value', '?');
-        $params = array_merge(array('mod_englishcentral'), $params, array('YOUR %'));
+        $select = 'plugin = ? AND name ' . $select . ' AND ' . $DB->sql_like('value', '?');
+        $params = array_merge(['mod_englishcentral'], $params, ['YOUR %']);
 
         $DB->set_field_select('config_plugins', 'value', '', $select, $params);
         upgrade_mod_savepoint(true, "$newversion", 'englishcentral');
@@ -622,7 +616,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
         $table = new xmldb_table('englishcentral');
 
         // Define field items to be added to englishcentral
-        $field= new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
+        $field = new xmldb_field('foriframe', XMLDB_TYPE_INTEGER, '2', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, 0);
 
         // add richtextprompt field to minilesson table
         if (!$dbman->field_exists($table, $field)) {
@@ -635,11 +629,11 @@ function xmldb_englishcentral_upgrade($oldversion) {
     if ($oldversion < $newversion) {
         // add custom completion fields for EnglishCentral module
         $table = new xmldb_table('englishcentral');
-        $fields = array(
-            new xmldb_field('completionmingrade',  XMLDB_TYPE_FLOAT, '6,2', null, XMLDB_NOTNULL, null, 0.00),
+        $fields = [
+            new xmldb_field('completionmingrade', XMLDB_TYPE_FLOAT, '6,2', null, XMLDB_NOTNULL, null, 0.00),
             new xmldb_field('completionpass', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0),
-            new xmldb_field('completiongoals', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0)
-        );
+            new xmldb_field('completiongoals', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 0),
+        ];
         $previous = '';
         foreach ($fields as $field) {
             if ($previous) {
@@ -656,12 +650,12 @@ function xmldb_englishcentral_upgrade($oldversion) {
     $newversion = 2022031827;
     if ($oldversion < $newversion) {
         $table = new xmldb_table('englishcentral');
-        $fields = array(
+        $fields = [
             new xmldb_field('showduration', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 1),
             new xmldb_field('showlevelnumber', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 1),
             new xmldb_field('showleveltext', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, 1),
-            new xmldb_field('showdetails', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0)
-        );
+            new xmldb_field('showdetails', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, 0),
+        ];
         $previous = 'studygoal';
         foreach ($fields as $field) {
             if ($previous) {
@@ -678,12 +672,12 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2023040432;
     if ($oldversion < $newversion) {
-        set_config('progressdials', constants::M_PROGRESSDIALS_TOP,constants::M_COMPONENT);
+        set_config('progressdials', constants::M_PROGRESSDIALS_TOP, constants::M_COMPONENT);
     }
 
     $newversion = 2023111237;
     if ($oldversion < $newversion) {
-        require_once($CFG->dirroot.'/mod/englishcentral/db/upgradelib.php');
+        require_once($CFG->dirroot . '/mod/englishcentral/db/upgradelib.php');
 
         // Add auth table.
         $table = new xmldb_table('englishcentral_auth');
@@ -706,17 +700,17 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2024060534;
     if ($oldversion < $newversion) {
-        $tables = array(
-            'englishcentral' => array(
-                new xmldb_field('chatgoal', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0', 'speakgoal')
-            ),
-            'englishcentral_attempts' => array(
-                new xmldb_field('chatcomplete', XMLDB_TYPE_INTEGER,  '2', null, null, null, null, 'speaklineids'),
+        $tables = [
+            'englishcentral' => [
+                new xmldb_field('chatgoal', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0', 'speakgoal'),
+            ],
+            'englishcentral_attempts' => [
+                new xmldb_field('chatcomplete', XMLDB_TYPE_INTEGER, '2', null, null, null, null, 'speaklineids'),
                 new xmldb_field('chattotal', XMLDB_TYPE_INTEGER, '10'),
                 new xmldb_field('chatcount', XMLDB_TYPE_INTEGER, '10'),
                 new xmldb_field('chatquestionids', XMLDB_TYPE_TEXT),
-            ),
-        );
+            ],
+        ];
         foreach ($tables as $table => $fields) {
             $table = new xmldb_table($table);
             $previous = '';
@@ -737,14 +731,13 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2024060835;
     if ($oldversion < $newversion) {
-
         // Remove deprecated config settings.
         $config = get_config('mod_englishcentral');
-        $names = array(
+        $names = [
             'hiddenchallengemode', 'lightboxmode',
             'learnmode', 'speakmode', 'watchmode',
             'simpleui', 'speaklitemode',
-        );
+        ];
         foreach ($names as $name) {
             if (property_exists($config, $name)) {
                 unset_config($name, 'mod_englishcentral');
@@ -771,7 +764,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2025040342;
     if ($oldversion < $newversion) {
-        require_once($CFG->dirroot.'/mod/englishcentral/db/upgradelib.php');
+        require_once($CFG->dirroot . '/mod/englishcentral/db/upgradelib.php');
         xmldb_englishcentral_check_structure($dbman);
         upgrade_mod_savepoint(true, $newversion, 'englishcentral');
     }

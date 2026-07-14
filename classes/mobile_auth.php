@@ -27,11 +27,10 @@ namespace mod_englishcentral;
 
 defined('MOODLE_INTERNAL') || die();
 
-use \mod_englishcentral\constants;
-use \mod_englishcentral\utils;
+use mod_englishcentral\constants;
+use mod_englishcentral\utils;
 
 class mobile_auth {
-
     const VALID_TIME = 60;
 
     /**
@@ -60,7 +59,7 @@ class mobile_auth {
 
         return [
             hash('md5', 'embed_auth' . $validfor . $secret),
-            $secret
+            $secret,
         ];
     }
 
@@ -76,8 +75,8 @@ class mobile_auth {
     public static function validate_embed_auth_token($token, $secret) {
         $timefactor = self::get_time_factor();
         // Splitting into two halves and allowing both allows for fractions roundup in the time factor.
-        list($generatedtoken) = self::create_embed_auth_token($secret, $timefactor);
-        list($generatedtoken2) = self::create_embed_auth_token($secret, $timefactor - 1);
+        [$generatedtoken] = self::create_embed_auth_token($secret, $timefactor);
+        [$generatedtoken2] = self::create_embed_auth_token($secret, $timefactor - 1);
         return $token === $generatedtoken || $token === $generatedtoken2;
     }
 
@@ -97,9 +96,9 @@ class mobile_auth {
             return false;
         }
 
-        $auth = $DB->get_record(constants::M_AUTHTABLE, array(
+        $auth = $DB->get_record(constants::M_AUTHTABLE, [
             'user_id' => $userid,
-        ));
+        ]);
         if (!$auth) {
             return false;
         }
@@ -108,9 +107,9 @@ class mobile_auth {
 
         // Cleanup user's token when used.
         if ($isvalid) {
-            $DB->delete_records(constants::M_AUTHTABLE, array(
-                'user_id' => $userid
-            ));
+            $DB->delete_records(constants::M_AUTHTABLE, [
+                'user_id' => $userid,
+            ]);
         }
 
         return $isvalid;

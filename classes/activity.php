@@ -39,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class activity {
-
     /**
      * @var string The type of the plugin.
      */
@@ -99,12 +98,12 @@ class activity {
     /**
      * construct English Central activity instance
      */
-    function __construct($instance=null, $cm=null, $course=null, $context=null) {
+    function __construct($instance = null, $cm = null, $course = null, $context = null) {
         global $COURSE;
 
         $this->plugintype = 'mod';
         $this->pluginname = 'englishcentral';
-        $this->plugin = $this->plugintype.'_'.$this->pluginname;
+        $this->plugin = $this->plugintype . '_' . $this->pluginname;
 
         if ($instance) {
             $this->ecinstance = $instance;
@@ -123,7 +122,8 @@ class activity {
         if ($context) {
             $this->context = $context;
         } else if ($cm) {
-            $this->context = \context_module::instance($cm->id);;
+            $this->context = \context_module::instance($cm->id);
+            ;
         } else if ($course) {
             $this->context = \context_course::instance($course->id);
         } else {
@@ -179,7 +179,7 @@ class activity {
      * @param stdclass $course a row from the course table
      * @return reader the new reader object
      */
-    public static function create($instance=null, $cm=null, $course=null, $context=null) {
+    public static function create($instance = null, $cm = null, $course = null, $context = null) {
         return new activity($instance, $cm, $course, $context);
     }
 
@@ -244,26 +244,25 @@ class activity {
     // URLs API
     ////////////////////////////////////////////////////////////////////////////////
 
-    public function get_report_url($escaped=null, $params=[]) {
+    public function get_report_url($escaped = null, $params = []) {
         return $this->url('reports.php', $escaped, $params);
     }
 
-    public function get_developertools_url($escaped=null, $params=[]) {
+    public function get_developertools_url($escaped = null, $params = []) {
         return $this->url('developer.php', $escaped, $params);
     }
 
-    public function get_view_url($escaped=null, $params=[]) {
+    public function get_view_url($escaped = null, $params = []) {
         return $this->url('view.php', $escaped, $params);
     }
 
-    public function get_viewajax_url($escaped=null, $params=[]) {
+    public function get_viewajax_url($escaped = null, $params = []) {
         return $this->url('view.ajax.php', $escaped, $params);
     }
 
-    public function get_videoinfo_url($escaped=null) {
+    public function get_videoinfo_url($escaped = null) {
         $lang = substr(current_language(), 0, 2);
         switch ($lang) {
-
             case 'en': // English
                 return 'https://www.englishcentral.com/videodetails';
 
@@ -287,11 +286,11 @@ class activity {
         }
     }
 
-    public function url($filepath, $escaped=null, $params=[]) {
+    public function url($filepath, $escaped = null, $params = []) {
         if (isset($this->cm)) {
             $params['id'] = $this->cm->id;
         }
-        $url = '/'.$this->plugintype.'/'.$this->pluginname.'/'.$filepath;
+        $url = '/' . $this->plugintype . '/' . $this->pluginname . '/' . $filepath;
         $url = new \moodle_url($url, $params);
         if (is_bool($escaped)) {
             $url = $url->out($escaped);
@@ -303,7 +302,7 @@ class activity {
     // strings API
     ////////////////////////////////////////////////////////////////////////////////
 
-    public function get_string($name, $a=null) {
+    public function get_string($name, $a = null) {
         return get_string($name, $this->plugin, $a);
     }
 
@@ -321,17 +320,17 @@ class activity {
         return $DB->get_field('englishcentral_accountids', 'accountid', ['userid' => $USER->id]);
     }
 
-    public function get_accountids($groupid=0) {
+    public function get_accountids($groupid = 0) {
         global $DB;
         $groupid = 0;
         if ($userids = $this->get_userids($groupid)) {
-            list($select, $params) = $DB->get_in_or_equal($userids);
+            [$select, $params] = $DB->get_in_or_equal($userids);
             return $DB->get_records_select_menu('englishcentral_accountids', "userid $select", $params, 'userid, accountid');
         }
         return false;
     }
 
-    public function get_userids($groupid=0) {
+    public function get_userids($groupid = 0) {
         global $DB;
         $mode = $this->get_groupmode();
         if ($mode == NOGROUPS || $mode == VISIBLEGROUPS || has_capability('moodle/site:accessallgroups', $this->context)) {
@@ -349,9 +348,9 @@ class activity {
                 if (empty($groups)) {
                     return false;
                 }
-                list($select, $params) = $DB->get_in_or_equal($groups['0']);
+                [$select, $params] = $DB->get_in_or_equal($groups['0']);
             }
-            $users = $DB->get_records_select_menu('group_members', 'groupid '.$select, $params, 'id, userid');
+            $users = $DB->get_records_select_menu('group_members', 'groupid ' . $select, $params, 'id, userid');
             if (empty($users)) {
                 return false;
             }
@@ -499,10 +498,9 @@ class activity {
             }
         }
 
-        //Dialog activities should not be empty, but oddly occasionally it is, so we try to fallback gradefully without killing it for students
+        // Dialog activities should not be empty, but oddly occasionally it is, so we try to fallback gradefully without killing it for students
         if (!empty($dialog->activities)) {
             foreach ($dialog->activities as $activity) {
-
                 // activityType     : watchActivity / speakActivity
                 // activityID       : 208814
                 // activityTypeID   : (see below)
@@ -513,7 +511,6 @@ class activity {
 
                 // extract DB fields
                 switch ($activity->activityTypeID) {
-
                     case \mod_englishcentral\auth::ACTIVITYTYPE_WATCH: // =9
                     case \mod_englishcentral\auth::ACTIVITYTYPE_WATCHCOMPREHENSIONCHOICE: // =40
                         $progress['watchcomplete'] = (empty($activity->completed) ? 0 : 1);
@@ -563,10 +560,10 @@ class activity {
         return $progress;
     }
 
-    public function get_attempts_fields($addvideoid=true) {
-        $fields = 'watchcount,watchcomplete,'.
-              'learncount,learncomplete,'.
-              'speakcount,speakcomplete,'.
+    public function get_attempts_fields($addvideoid = true) {
+        $fields = 'watchcount,watchcomplete,' .
+              'learncount,learncomplete,' .
+              'speakcount,speakcomplete,' .
               'chatcount,chatcomplete';
         if ($addvideoid) {
             $fields = "videoid,$fields";
@@ -574,7 +571,7 @@ class activity {
         return $fields;
     }
 
-    public function get_attempts($videoid=0) {
+    public function get_attempts($videoid = 0) {
         global $DB, $USER;
         $params = ['ecid' => $this->id,
                     'userid' => $USER->id];

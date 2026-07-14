@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,18 +30,17 @@ defined('MOODLE_INTERNAL') || die();
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
-require_once($CFG->dirroot.'/mod/englishcentral/lib.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/englishcentral/lib.php');
 
 /**
  * Module instance settings form
  */
 class mod_englishcentral_mod_form extends moodleform_mod {
-
     /** size of numeric text boxes */
     const TEXT_NUM_SIZE = 4;
 
-    public function __construct($current, $section, $cm, $course, $ajaxformdata=null, $customdata=null) {
+    public function __construct($current, $section, $cm, $course, $ajaxformdata = null, $customdata = null) {
         global $CFG;
 
         $this->current   = $current;
@@ -60,7 +58,7 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         }
 
         // Set the course format.
-        require_once($CFG->dirroot.'/course/format/lib.php');
+        require_once($CFG->dirroot . '/course/format/lib.php');
         $this->courseformat = course_get_format($course);
 
         $this->init_features();
@@ -102,7 +100,7 @@ class mod_englishcentral_mod_form extends moodleform_mod {
      * @param mixed the $default value (optional, default=null)
      * @return mixed the field value if it exists, $default otherwise
      */
-    public function get_originalvalue($field, $default=null) {
+    public function get_originalvalue($field, $default = null) {
         if (isset($this->current->$field)) {
             return $this->current->$field;
         } else {
@@ -120,10 +118,10 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         $plugin = 'mod_englishcentral';
 
         // array of elements names to be returned by this method
-        $names = array();
+        $names = [];
 
         // these fields will be disabled if grade type is not "point" or grade points = 0
-        $disablednames = array('completionusegrade');
+        $disablednames = ['completionusegrade'];
 
         // add "minimum grade" completion condition
         $name = 'completionmingrade';
@@ -133,18 +131,18 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         } else {
             $value = floatval($this->current->$name);
         }
-        $mform->addGroup(array(
-            $mform->createElement('checkbox', $name.'enabled', '', $label),
-            $mform->createElement('static', $name.'space', '', ' &nbsp; '),
-            $mform->createElement('text', $name, '', array('size' => 3)),
-        ), $name.'group', '', '', false);
+        $mform->addGroup([
+            $mform->createElement('checkbox', $name . 'enabled', '', $label),
+            $mform->createElement('static', $name . 'space', '', ' &nbsp; '),
+            $mform->createElement('text', $name, '', ['size' => 3]),
+        ], $name . 'group', '', '', false);
         $mform->setType($name, PARAM_FLOAT);
         $mform->setDefault($name, 0.00);
-        $mform->setType($name.'enabled', PARAM_INT);
-        $mform->setDefault($name.'enabled', empty($value) ? 0 : 1);
-        $mform->disabledIf($name, $name.'enabled', 'notchecked');
-        $names[] = $name.'group';
-        $disablednames[] = $name.'group';
+        $mform->setType($name . 'enabled', PARAM_INT);
+        $mform->setDefault($name . 'enabled', empty($value) ? 0 : 1);
+        $mform->disabledIf($name, $name . 'enabled', 'notchecked');
+        $names[] = $name . 'group';
+        $disablednames[] = $name . 'group';
 
         // add "grade passed" completion condition
         $name = 'completionpass';
@@ -188,6 +186,5 @@ class mod_englishcentral_mod_form extends moodleform_mod {
             }
         }
         return true; // at least one of the module-specific completion conditions is set
-
     }
 }

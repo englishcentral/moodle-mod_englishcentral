@@ -34,7 +34,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class progress_updated extends \core\event\base {
-
     /**
      * Init method.
      */
@@ -45,13 +44,13 @@ class progress_updated extends \core\event\base {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'englishcentral_attempts', 'restore' => 'englishcentral_attempts');
+        return ['db' => 'englishcentral_attempts', 'restore' => 'englishcentral_attempts'];
     }
 
     public static function get_other_mapping() {
-        return array(
-            'ecid' => array('db' => 'englishcentral', 'restore' => 'englishcentral')
-        );
+        return [
+            'ecid' => ['db' => 'englishcentral', 'restore' => 'englishcentral'],
+        ];
     }
 
     /**
@@ -72,4 +71,3 @@ class progress_updated extends \core\event\base {
         return "The user with id '$this->userid' progressed in the EnglishCentral activity with course module id '$this->contextinstanceid'.";
     }
 }
-

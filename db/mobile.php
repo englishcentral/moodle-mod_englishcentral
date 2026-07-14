@@ -16,17 +16,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$addons = array(
-    "mod_englishcentral" => array( // Plugin identifier.
-        'handlers' => array( // Different places where the plugin will display content.
-            'courseenglishcentral' => array( // Handler unique name (alphanumeric).
+$addons = [
+    "mod_englishcentral" => [ // Plugin identifier.
+        'handlers' => [ // Different places where the plugin will display content.
+            'courseenglishcentral' => [ // Handler unique name (alphanumeric).
                 'delegate'    => 'CoreCourseModuleDelegate', // Delegate (where to display the link to the plugin).
                 'method'      => 'mobile_course_view', // Main function in \mod_englishcentral\output\mobile.
-                'displaydata' => array(
+                'displaydata' => [
                     'icon'  => $CFG->wwwroot . '/mod/englishcentral/pix/icon.svg',
                     'class' => '',
-                ),
-            )
-        )
-    )
-);
+                ],
+            ],
+        ],
+    ],
+];

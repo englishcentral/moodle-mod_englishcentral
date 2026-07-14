@@ -24,7 +24,7 @@
  */
 
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
@@ -49,8 +49,10 @@ if ($id) {
     print_error(0, 'You must specify a course_module ID or an instance ID');
 }
 
-$PAGE->set_url(constants::M_URL . '/developer.php',
-    ['id' => $cm->id, 'action' => $action]);
+$PAGE->set_url(
+    constants::M_URL . '/developer.php',
+    ['id' => $cm->id, 'action' => $action]
+);
 require_login($course, true, $cm);
 $modulecontext = context_module::instance($cm->id);
 
@@ -73,51 +75,60 @@ $renderer = $PAGE->get_renderer($ec->plugin);
 $renderer->attach_activity_and_auth($ec, $auth);
 
 // Process Actions.
-switch ($action){
-
+switch ($action) {
     case 'updategrades':
         englishcentral_update_grades($moduleinstance);
-        redirect(new \moodle_url(constants::M_URL . '/developer.php',
-            ['id' => $cm->id]), 'Grades Updated', 5);
-               break;
+        redirect(new \moodle_url(
+            constants::M_URL . '/developer.php',
+            ['id' => $cm->id]
+        ), 'Grades Updated', 5);
+        break;
 
     // not a true report, separate implementation in renderer
     case 'generatedata':
-        $completeattempts = $DB->get_records(constants::M_ATTEMPTSTABLE,
+        $completeattempts = $DB->get_records(
+            constants::M_ATTEMPTSTABLE,
             ['ecid' => $moduleinstance->id, 'watchcomplete' => 1, 'learncomplete' => 1, 'speakcomplete' => 1, 'chatcomplete' => 1],
-                'timecompleted DESC', '*', 0, 1);
+            'timecompleted DESC',
+            '*',
+            0,
+            1
+        );
         $videos = $DB->get_fieldset(constants::M_VIDEOSTABLE, 'videoid', ['ecid' => $moduleinstance->id]);
 
-        if(!$completeattempts) {
+        if (!$completeattempts) {
                echo $renderer->header(get_string('developertools', constants::M_COMPONENT));
                echo '<h3>No attempt to generate data from. Please create a compelete attempt at the activity.</h3>';
                echo $renderer->footer();
                return;
-        } else if(!$videos || count($videos) < 1){
+        } else if (!$videos || count($videos) < 1) {
             echo $renderer->header(get_string('developertools', constants::M_COMPONENT));
             echo '<h3>Activity contains no videos. Please add some videos.</h3>';
             echo $renderer->footer();
             return;
-        }else{
+        } else {
             $latestattempt = array_shift($completeattempts);
             $users = get_enrolled_users($modulecontext);
             // reindex array
             $users = array_values($users);
             $created = 0;
-            for($x = 0; $x < count($users); $x++){
+            for ($x = 0; $x < count($users); $x++) {
                 $ouruser = $users[$x];
-                foreach ($videos as $videoid){
+                foreach ($videos as $videoid) {
                     // randomly skip some
-                    if(random_int(0, 2) == 0){continue;
+                    if (random_int(0, 2) == 0) {
+                        continue;
                     }
                     $ret = copyAttempt($videoid, $latestattempt, $ouruser);
-                    if($ret){$created++;
+                    if ($ret) {
+                        $created++;
                     }
                 }//end of video loop
             }//end of user loop
-            redirect(new \moodle_url(constants::M_URL . '/developer.php',
-            ['id' => $cm->id]), 'Created Attempts:' . $created);
-
+            redirect(new \moodle_url(
+                constants::M_URL . '/developer.php',
+                ['id' => $cm->id]
+            ), 'Created Attempts:' . $created);
         }
 
         return;
@@ -130,7 +141,7 @@ switch ($action){
 $header = $renderer->header(get_string('developertools', constants::M_COMPONENT));
 echo $header;
 $items = $renderer->developerpage($cm->id, $moduleinstance->id);
-foreach($items as $item){
+foreach ($items as $item) {
     echo $item;
 }
 echo $renderer->footer();
@@ -156,10 +167,11 @@ function copyattempt($videoid, $attempt, $user) {
     // points total
     $newatt->totalpoints = $newatt->watchcount + $newatt->learncount + $newatt->speakcount + $newatt->chatcount;
 
-    if($user->id !== $newatt->userid ){
+    if ($user->id !== $newatt->userid) {
         $newatt->userid = $user->id;
         $attemptid = $DB->insert_record(constants::M_ATTEMPTSTABLE, $newatt);
-        if(!$attemptid){return false;
+        if (!$attemptid) {
+            return false;
         }
     }
 

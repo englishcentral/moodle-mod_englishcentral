@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-define(['jquery', 'core/log', 'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js'], function ($, log, datatables) {
+define(['jquery', 'core/log', 'require'], function ($, log, require) {
     "use strict"; // jshint ;_;
 
     /*
@@ -13,8 +13,16 @@ define(['jquery', 'core/log', 'https://cdn.datatables.net/1.10.19/js/jquery.data
         init: function (props) {
             //pick up opts from html
             var that = this;
-            var thetable = $('#' + props.tableid);
-            this.dt = thetable.DataTable(props.tableprops);
+            // Load the locally bundled DataTables library at runtime. It is loaded
+            // via requirejs (rather than as a static AMD dependency) so we can build
+            // the plugin-relative URL from M.cfg.wwwroot instead of hard-coding a CDN
+            // path. Because the library registers itself with define(['jquery'], ...),
+            // requirejs binds it to Moodle's jQuery instance, so $().DataTable() works.
+            var dturl = M.cfg.wwwroot + '/mod/englishcentral/thirdparty/datatables/jquery.dataTables.min.js';
+            require([dturl], function () {
+                var thetable = $('#' + props.tableid);
+                that.dt = thetable.DataTable(props.tableprops);
+            });
         }
     };//end of return value
 });

@@ -14,11 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 defined('MOODLE_INTERNAL') || die();
 
-use \mod_englishcentral\constants;
-use \mod_englishcentral\utils;
+use mod_englishcentral\constants;
+use mod_englishcentral\utils;
 
 
 /**
@@ -29,7 +28,6 @@ use \mod_englishcentral\utils;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_englishcentral_renderer extends plugin_renderer_base {
-
     protected $ec = null;
     protected $auth = null;
 
@@ -47,7 +45,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param object $ec a \mod_englishcentral/activity Object.
      * @return void
      */
-    public function attach_activity_and_auth($ec=null, $auth=null) {
+    public function attach_activity_and_auth($ec = null, $auth = null) {
         $this->ec = $ec;
         $this->auth = $auth;
     }
@@ -58,14 +56,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param string $extrapagetitle String to append to the page title.
      * @return string
      */
-    public function header($extrapagetitle=null, $hidetabs=false) {
+    public function header($extrapagetitle = null, $hidetabs = false) {
         global $CFG;
 
         if (isset($this->ec->id)) {
             $activityname = format_string($this->ec->name, true, $this->ec->course->id);
-            $title = $this->ec->course->shortname.': '.$activityname;
+            $title = $this->ec->course->shortname . ': ' . $activityname;
             if ($extrapagetitle) {
-                $title .= ': '.$extrapagetitle;
+                $title .= ': ' . $extrapagetitle;
             }
             $this->page->set_title($title);
             $this->page->set_heading($this->ec->course->fullname);
@@ -74,11 +72,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $output = $this->output->header();
 
         if (isset($this->ec->ecinstance)) {
-            if ((has_capability('mod/englishcentral:manage', $this->ec->context) ||
+            if (
+                (has_capability('mod/englishcentral:manage', $this->ec->context) ||
                     has_capability('mod/englishcentral:viewreports', $this->ec->context) ||
                     has_capability('mod/englishcentral:viewdevelopertools', $this->ec->context)) &&
-                    !$hidetabs) {
-
+                    !$hidetabs
+            ) {
                 if ($this->page->url == $this->ec->get_view_url()) {
                     $icon = $this->pix_icon('i/preview', 'view', 'moodle', ['class' => 'icon']);
                     $icon = html_writer::link($this->ec->get_view_url(), $icon);
@@ -101,16 +100,15 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 // Set up tabs.
                 $moduleinstance = $this->ec;
                 ob_start();
-                include($CFG->dirroot.'/mod/englishcentral/tabs.php');
+                include($CFG->dirroot . '/mod/englishcentral/tabs.php');
                 $output .= ob_get_contents();
                 ob_end_clean();
- 
-                //dont show the heading in an iframe, it will be outside this anyway
+
+                // dont show the heading in an iframe, it will be outside this anyway
                 if (!$this->ec->foriframe && $CFG->version < 4.0) {
                     $help = $this->help_icon('overview', $this->ec->plugin);
-                    $output .= $this->heading($activityname.$help.$icon);
+                    $output .= $this->heading($activityname . $help . $icon);
                 }
-
             } else {
                 if (!$this->ec->foriframe && $CFG->version < 4.0) {
                     $output .= $this->output->heading($activityname);
@@ -162,7 +160,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     public function link_to_config_settings() {
         // moodle/site:config, moodle/category:manage
         if (has_capability('moodle/site:config', context_system::instance())) {
-            $link = array('section' => 'modsetting'.$this->ec->pluginname);
+            $link = ['section' => 'modsetting' . $this->ec->pluginname];
             $link = new moodle_url('/admin/settings.php', $link);
             $link = html_writer::link($link, get_string('settings'));
             return $this->ec->get_string('updatesettings', $link);
@@ -182,40 +180,40 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $fullname = fullname($USER);
         $subject = $this->ec->get_string('supportsubject');
         $description = $this->ec->get_string('supportmessage');
-        $institution = $DB->get_field('course', 'fullname', array('id' => SITEID));
+        $institution = $DB->get_field('course', 'fullname', ['id' => SITEID]);
 
         $output = '';
         $output .= html_writer::tag('h3', $this->ec->get_string('supporttitle'));
         $output .= html_writer::tag('p', $this->ec->get_string('supportconfirm'));
-        $output .= html_writer::start_tag('table', array('class' => 'supportconfirm', 'cellpadding' => 4, 'cellspacing' => 4));
-        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('name')).html_writer::tag('td', $fullname));
-        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('email')).html_writer::tag('td', $USER->email));
+        $output .= html_writer::start_tag('table', ['class' => 'supportconfirm', 'cellpadding' => 4, 'cellspacing' => 4]);
+        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('name')) . html_writer::tag('td', $fullname));
+        $output .= html_writer::tag('tr', html_writer::tag('th', get_string('email')) . html_writer::tag('td', $USER->email));
 
         $url = '';
         $anchor = '';
-        $params = array();
+        $params = [];
 
         if ($USER->phone1) {
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('phone1')).html_writer::tag('td', $USER->phone1));
+            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('phone1')) . html_writer::tag('td', $USER->phone1));
         }
         if ($institution) {
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('institution')).html_writer::tag('td', $institution));
+            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('institution')) . html_writer::tag('td', $institution));
         }
 
-        if ($signup==self::SIGNUP_STANDARD) {
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('subject', 'forum')).html_writer::tag('td', $subject));
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('description')).html_writer::tag('td', $description));
+        if ($signup == self::SIGNUP_STANDARD) {
+            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('subject', 'forum')) . html_writer::tag('td', $subject));
+            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('description')) . html_writer::tag('td', $description));
 
             $url = 'https://www.englishcentral.com/support/contact-school-support';
-            $params = array('name' => $fullname,
+            $params = ['name' => $fullname,
                             'email' => $USER->email,
                             'phone' => $USER->phone1,
                             'subject' => $subject,
                             'institution' => $institution,
                             'description' => $description,
-                            'type' => 'access_code_coupon');
+                            'type' => 'access_code_coupon'];
         } else {
-            if ($signup==self::SIGNUP_CORPORATE) {
+            if ($signup == self::SIGNUP_CORPORATE) {
                 $url = 'https://corporate.englishcentral.com/moodle-signup-gordon';
             } else { // self::SIGNUP_SOLUTIONS is default
                 $url = 'https://solutions.englishcentral.com/moodle-signup-gordon';
@@ -223,8 +221,8 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $anchor = 'moodle-cta';
             $formid = '11252';
             $postid = '11207';
-            $tag = 'wpcf7-f'.$formid.'-p'.$postid.'-o6';
-            $params = array('_wpcf7' => $formid,
+            $tag = 'wpcf7-f' . $formid . '-p' . $postid . '-o6';
+            $params = ['_wpcf7' => $formid,
                             '_wpcf7_unit_tag' => $tag,
                             '_wpcf7_locale' => 'en_US',
                             '_wpcf7_version' => '5.0.3',
@@ -233,7 +231,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                             'your-email' => $USER->email,
                             'school-name' => $institution,
                             'number-student' => 100,
-                            'contact-number' => (empty($USER->phone1) ? '0123456789': $USER->phone1));
+                            'contact-number' => (empty($USER->phone1) ? '0123456789' : $USER->phone1)];
         }
 
         $button = $this->single_button(new moodle_url($url, $params), get_string('continue'), 'post');
@@ -246,7 +244,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $button = str_replace($url, "$url/#$anchor", $button);
         }
 
-        $output .= html_writer::tag('tr', html_writer::tag('th', '').html_writer::tag('td', $button));
+        $output .= html_writer::tag('tr', html_writer::tag('th', '') . html_writer::tag('td', $button));
         $output .= html_writer::end_tag('table');
         return $output;
     }
@@ -294,7 +292,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     }
 
     public function course_continue_button() {
-        $url = new moodle_url('/course/view.php', array('id' => $this->ec->course->id));
+        $url = new moodle_url('/course/view.php', ['id' => $this->ec->course->id]);
         return $this->output->continue_button($url);
     }
 
@@ -302,27 +300,27 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * Show a list of availability time restrictions
      */
     public function show_dates_available() {
-        return $this->show_dates('activity', array('open', 'close'));
+        return $this->show_dates('activity', ['open', 'close']);
     }
 
     /**
      * Show a list of viewable time restrictions
      */
     public function show_dates_viewable() {
-        return $this->show_dates('viewable', array('open', 'close'));
+        return $this->show_dates('viewable', ['open', 'close']);
     }
 
     /**
      * Show a list of timing restrictions
      */
     public function show_dates($type, $suffixes) {
-        $output = array();
+        $output = [];
 
         $fmt = 'timeondate';
         $fmt = $this->ec->get_string($fmt);
 
         foreach ($suffixes as $suffix) {
-            $name = $type.$suffix;
+            $name = $type . $suffix;
             if (empty($this->ec->$name)) {
                 continue;
             }
@@ -333,7 +331,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             } else {
                 $prefix = 'future';
             }
-            $output[] = $this->ec->get_string($prefix.$name, $date);
+            $output[] = $this->ec->get_string($prefix . $name, $date);
         }
 
         if (empty($output)) {
@@ -345,8 +343,8 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     }
 
       /**
-     * Show the EC progress element
-     */
+       * Show the EC progress element
+       */
     public function show_progress() {
 
         $progress = $this->ec->get_progress();
@@ -389,11 +387,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         if ($timing) {
             $timing = html_writer::tag('dl', $timing);
         }
-        $timing = html_writer::tag('h4', $this->ec->get_string('yourprogress'), array('class' => 'title')).$timing;
-        $output .= html_writer::tag('div', $timing, array('class' => 'timing'));
+        $timing = html_writer::tag('h4', $this->ec->get_string('yourprogress'), ['class' => 'title']) . $timing;
+        $output .= html_writer::tag('div', $timing, ['class' => 'timing']);
 
         // format titlecharts
-        $output .= html_writer::start_tag('div', array('class' => 'titlechart-container'));
+        $output .= html_writer::start_tag('div', ['class' => 'titlechart-container']);
         $output .= $this->show_titlechart('total', $percent, '%', 'achieved', $percent);
         if ($this->ec->watchgoal_set()) {
             $output .= $this->show_titlechart_type('watch', $progress);
@@ -414,60 +412,64 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     public function show_titlechart_type($type, $progress) {
         $num = intval($progress->$type);
-        $div = intval($this->ec->{$type.'goal'});
-        if ($div==0) {
+        $div = intval($this->ec->{$type . 'goal'});
+        if ($div == 0) {
             $percent = 0;
         } else {
             $percent = round(100 * $num / $div);
         }
-        return $this->show_titlechart($type, $num, " / $div", $type.'goalunits', $percent);
+        return $this->show_titlechart($type, $num, " / $div", $type . 'goalunits', $percent);
     }
 
     public function show_titlechart($type, $text1, $text2, $string, $percent) {
-        $title = $this->ec->get_string($type.'goal');
-        $help = $this->help_icon($type.'goal', $this->ec->plugin);
-        $title = html_writer::tag('h4', $title.$help, array('class' => 'title'));
+        $title = $this->ec->get_string($type . 'goal');
+        $help = $this->help_icon($type . 'goal', $this->ec->plugin);
+        $title = html_writer::tag('h4', $title . $help, ['class' => 'title']);
         $chart = $this->show_chart($type, $text1, $text2, $string, $percent);
-        return html_writer::tag('div', $title.$chart, array('class' => 'titlechart'));
+        return html_writer::tag('div', $title . $chart, ['class' => 'titlechart']);
     }
 
     public function show_chart($type, $text1, $text2, $string, $percent) {
         $output = '';
 
         // outer ring
-        $params = array('class' => 'outerring',
-                        'style' => $this->get_chart_transform($percent));
+        $params = ['class' => 'outerring',
+                        'style' => $this->get_chart_transform($percent)];
         $output .= html_writer::tag('div', '', $params);
 
         // start innertext
-        $output .= html_writer::start_tag('div', array('class' => 'innertext'));
+        $output .= html_writer::start_tag('div', ['class' => 'innertext']);
 
         // line1
-        $output .= html_writer::start_tag('div', array('class' => 'line1'));
-        $output .= html_writer::tag('span', $text1, array('class' => 'text1'));
-        $output .= html_writer::tag('span', $text2, array('class' => 'text2'));
+        $output .= html_writer::start_tag('div', ['class' => 'line1']);
+        $output .= html_writer::tag('span', $text1, ['class' => 'text1']);
+        $output .= html_writer::tag('span', $text2, ['class' => 'text2']);
         $output .= html_writer::end_tag('div');
 
         // line2
-        $output .= html_writer::tag('div', $this->ec->get_string($string), array('class' => 'line2'));
+        $output .= html_writer::tag('div', $this->ec->get_string($string), ['class' => 'line2']);
 
         // end innertext
         $output .= html_writer::end_tag('div');
 
-        $params = array('class' => "chart $type ".$this->get_chart_class($percent));
+        $params = ['class' => "chart $type " . $this->get_chart_class($percent)];
         return html_writer::tag('div', $output, $params);
     }
 
     public function get_chart_transform($percent) {
         switch (true) {
-            case ($percent < 0): $percent = 0; break;
-            case ($percent > 100): $percent = 100; break;
+            case ($percent < 0):
+                $percent = 0;
+                break;
+            case ($percent > 100):
+                $percent = 100;
+                break;
         }
         $degrees = round(360 * $percent / 100);
         if ($percent >= 50) {
             $degrees -= 180;
         }
-        return 'transform: rotate('.$degrees.'deg);';
+        return 'transform: rotate(' . $degrees . 'deg);';
     }
 
     public function get_chart_class($percent) {
@@ -492,12 +494,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         // get video ids in this EC activity
         $connection_available = true;
         if ($videoids = $this->ec->get_videoids()) {
-
             // fetch video info from EC server
             if ($videos = $this->auth->fetch_dialog_list($videoids)) {
-
                 // build index to map videoid onto $videos item
-                $index = array();
+                $index = [];
                 foreach ($videos as $i => $video) {
                     if (isset($video->dialogID)) {
                         $index[$video->dialogID] = $i;
@@ -523,16 +523,16 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 $connection_available = false;
             }
         } else {
-            $output .= html_writer::tag('p', $this->ec->get_string('novideos'),['class'=>'ec-novideos-label']);
+            $output .= html_writer::tag('p', $this->ec->get_string('novideos'), ['class' => 'ec-novideos-label']);
         }
 
-		if (has_capability('mod/englishcentral:manage', $this->ec->context) ) {
-		    $initially_visible = $videoids;
+        if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
+            $initially_visible = $videoids;
             $output .= $this->show_removevideo_icon($initially_visible);
-            //$output .= $this->show_addvideo_icon();
+            // $output .= $this->show_addvideo_icon();
         }
 
-        if ($connection_available==false) {
+        if ($connection_available == false) {
             $output .= html_writer::tag('p', $this->ec->get_string('noconnection'));
         }
 
@@ -544,30 +544,43 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $output = '';
 
         switch (true) {
-            case ($video->difficulty <= 2): $difficulty = 'beginner';     break;
-            case ($video->difficulty <= 4): $difficulty = 'intermediate'; break;
-            case ($video->difficulty >= 5): $difficulty = 'advanced';     break;
-            default: $difficulty = '';
+            case ($video->difficulty <= 2):
+                $difficulty = 'beginner';
+                break;
+            case ($video->difficulty <= 4):
+                $difficulty = 'intermediate';
+                break;
+            case ($video->difficulty >= 5):
+                $difficulty = 'advanced';
+                break;
+            default:
+                $difficulty = '';
         }
 
         // remove leading 00: from duration
-        if (substr($video->duration, 0, 3)=='00:') {
+        if (substr($video->duration, 0, 3) == '00:') {
             $video->duration = substr($video->duration, 3);
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'activity-thumbnail'));
+        $output .= html_writer::start_tag('div', ['class' => 'activity-thumbnail']);
 
-        $output .= html_writer::start_tag('div', array('class' => 'thumb-outline'));
+        $output .= html_writer::start_tag('div', ['class' => 'thumb-outline']);
 
-        $params = array('class' => 'activity-title', 'data-url' => $video->dialogURL);
+        $params = ['class' => 'activity-title', 'data-url' => $video->dialogURL];
         $showdetails = false;
         if ($this->ec->showdetails) {
             $is_student = has_capability('mod/englishcentral:view', $this->ec->context);
             $is_teacher = has_capability('mod/englishcentral:addinstance', $this->ec->context);
             switch ($this->ec->showdetails) {
-                case 1: $showdetails = ($is_student && ($is_teacher == false)); break;
-                case 2: $showdetails = (($is_student == false) && $is_teacher); break;
-                case 3: $showdetails = ($is_student || $is_teacher); break;
+                case 1:
+                    $showdetails = ($is_student && ($is_teacher == false));
+                    break;
+                case 2:
+                    $showdetails = (($is_student == false) && $is_teacher);
+                    break;
+                case 3:
+                    $showdetails = ($is_student || $is_teacher);
+                    break;
             }
         }
         if ($showdetails && isset($video->videoDetailsURL)) {
@@ -575,36 +588,36 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         }
         $output .= html_writer::tag('span', $video->title, $params);
 
-        $params = array('class' => 'thumb-frame',
+        $params = ['class' => 'thumb-frame',
                         'data-url' => $video->dialogURL,
                         'data-demopicurl' => $video->demoPictureURL,
-                        'style' => 'background-image: url("'.$video->thumbnailURL.'");',
-                        'description' => $video->description
-                    ); 
+                        'style' => 'background-image: url("' . $video->thumbnailURL . '");',
+                        'description' => $video->description,
+                    ];
 
-        $topicsList = array('topics' => $video->topics);
+        $topicsList = ['topics' => $video->topics];
 
         $newTopicsList = [];
 
-        if(is_array($topicsList['topics'][0] )) {
+        if (is_array($topicsList['topics'][0])) {
             foreach ($topicsList['topics'][0] as $key => $value) {
                 array_push($newTopicsList, $value);
             }
-        }else {
+        } else {
             foreach ($topicsList['topics'] as $thetopic) {
                 array_push($newTopicsList, $thetopic->name);
             }
         }
 
-        if(count($newTopicsList)>0) {
+        if (count($newTopicsList) > 0) {
             $params['topics'] = $newTopicsList[0];
-        }else{
+        } else {
             $params['topics'] = '';
         }
 
         $output .= html_writer::start_tag('span', $params);
 
-        $params = array('class' => 'play-icon');
+        $params = ['class' => 'play-icon'];
         $output .= html_writer::tag('span', '', $params);
 
         $output .= $this->show_video_status($video);
@@ -612,18 +625,17 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $output .= html_writer::end_tag('span');
 
         if ($this->ec->showlevelnumber || $this->ec->showleveltext) {
-
-            $params = array('class' => 'difficulty-level-indicator '.$difficulty);
+            $params = ['class' => 'difficulty-level-indicator ' . $difficulty];
             $output .= html_writer::start_tag('span', $params);
 
             if ($this->ec->showlevelnumber) {
                 $label = $this->ec->get_string('levelx', $video->difficulty);
-                $params = array('class' => 'difficulty-level text-center');
+                $params = ['class' => 'difficulty-level text-center'];
                 $output .= html_writer::tag('span', $label, $params);
             }
             if ($this->ec->showleveltext) {
                 $label = $this->ec->get_string($difficulty);
-                $params = array('class' => 'difficulty-label');
+                $params = ['class' => 'difficulty-label'];
                 $output .= html_writer::tag('span', $label, $params);
             }
             $output .= html_writer::end_tag('span');
@@ -631,7 +643,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
         if ($this->ec->showduration) {
             $label = $video->duration;
-            $params = array('class' => 'duration');
+            $params = ['class' => 'duration'];
             $output .= html_writer::tag('span', $label, $params);
         }
 
@@ -645,77 +657,77 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     public function show_video_status($video) {
         $output = '';
         if (isset($video->watchcomplete) && $video->watchcomplete) {
-            $output .= html_writer::tag('span', $video->watchcomplete, array('class' => 'watch-status completed'));
-            $output .= html_writer::tag('span', $video->learncount, array('class' => 'learn-status'));
-            $output .= html_writer::tag('span', $video->speakcount, array('class' => 'speak-status'));
-            $output .= html_writer::tag('span', $video->chatcount, array('class' => 'chat-status'));
+            $output .= html_writer::tag('span', $video->watchcomplete, ['class' => 'watch-status completed']);
+            $output .= html_writer::tag('span', $video->learncount, ['class' => 'learn-status']);
+            $output .= html_writer::tag('span', $video->speakcount, ['class' => 'speak-status']);
+            $output .= html_writer::tag('span', $video->chatcount, ['class' => 'chat-status']);
         } else if (isset($video->watchcount) && $video->watchcount) {
             // we could try a fancy unicode char, core_text::code2utf8(0x27eb)
-            $output .= html_writer::tag('span', '~', array('class' => 'watch-status inprogress'));
+            $output .= html_writer::tag('span', '~', ['class' => 'watch-status inprogress']);
         }
         return $output;
     }
 
     // this method is not used,
     // nor is the addvideo icon
-    
+
     protected function show_addvideo_icon() {
         return $this->show_videos_icon('add');
     }
 
-    protected function show_removevideo_icon($initially_visible=true) {
-        return $this->show_videos_icon('remove',$initially_visible);
+    protected function show_removevideo_icon($initially_visible = true) {
+        return $this->show_videos_icon('remove', $initially_visible);
     }
 
-    protected function show_videos_icon($type,$initially_visible=true){
-        $text = $this->ec->get_string($type.'video');
+    protected function show_videos_icon($type, $initially_visible = true) {
+        $text = $this->ec->get_string($type . 'video');
         if (method_exists($this, 'image_url')) {
             $image_url = 'image_url'; // Moodle >= 3.3
         } else {
             $image_url = 'pix_url'; // Moodle <= 3.2
         }
-        $image_url = $this->$image_url($type.'video', $this->ec->plugin);
-        $image = html_writer::empty_tag('img', array('src' => $image_url, 'title' => $text));
-        $removeText = html_writer::tag('span', $this->ec->get_string('removevideo'), array('class' => 'remove-text'));
-        $removeIcon = html_writer::tag('div', '', array('class' => 'remove-icon'));
-        $help = $this->ec->get_string($type.'videohelp');
-        $help = html_writer::tag('span', $help, array('class' => 'videohelp'));
+        $image_url = $this->$image_url($type . 'video', $this->ec->plugin);
+        $image = html_writer::empty_tag('img', ['src' => $image_url, 'title' => $text]);
+        $removeText = html_writer::tag('span', $this->ec->get_string('removevideo'), ['class' => 'remove-text']);
+        $removeIcon = html_writer::tag('div', '', ['class' => 'remove-icon']);
+        $help = $this->ec->get_string($type . 'videohelp');
+        $help = html_writer::tag('span', $help, ['class' => 'videohelp']);
         $hidden = $initially_visible ? '' : ' page-mod-englishcentral-hide';
-        return html_writer::tag('div', $image.$removeIcon.$removeText.$help, array('class' => 'videoicon '.$type.'video' . $hidden));
+        return html_writer::tag('div', $image . $removeIcon . $removeText . $help, ['class' => 'videoicon ' . $type . 'video' . $hidden]);
     }
 
-    public function show_progress_report($dayslimit=0) {
+    public function show_progress_report($dayslimit = 0) {
         global $DB, $CFG;
         $output = '';
 
         $this->setup_sort();
         $url = $this->ec->get_report_url();
 
-		// fetch groupmode/menu/id for this activity
-		if ($groupmode = groups_get_activity_groupmode($this->ec->cm)) {
-			$groupmenu = groups_print_activity_menu($this->ec->cm, $url, true);
-			$groupid = groups_get_activity_group($this->ec->cm);
-		} else {
-			$groupmenu = '';
-			$groupid = 0;
-		}
+        // fetch groupmode/menu/id for this activity
+        if ($groupmode = groups_get_activity_groupmode($this->ec->cm)) {
+            $groupmenu = groups_print_activity_menu($this->ec->cm, $url, true);
+            $groupid = groups_get_activity_group($this->ec->cm);
+        } else {
+            $groupmenu = '';
+            $groupid = 0;
+        }
 
         // initialize study goals
-        $goals = (object)array('watch' => 0,
+        $goals = (object)['watch' => 0,
                                'learn' => 0,
                                'speak' => 0,
-                               'chat' => 0);
+                               'chat' => 0];
 
         // Create SQL to fetch aggregate items from the EC attempts table.
-        $select = 'userid,'.
-                  'SUM(watchcomplete) + SUM(learncount) + SUM(speakcount) + SUM(chatcount) AS percent,'.
-                  'SUM(watchcomplete) AS watch,'.
-                  'SUM(learncount) AS learn,'.
-                  'SUM(speakcount) AS speak,'.
+        $select = 'userid,' .
+                  'SUM(watchcomplete) + SUM(learncount) + SUM(speakcount) + SUM(chatcount) AS percent,' .
+                  'SUM(watchcomplete) AS watch,' .
+                  'SUM(learncount) AS learn,' .
+                  'SUM(speakcount) AS speak,' .
                   'SUM(chatcount) AS chat';
         $from   = '{englishcentral_attempts}';
         $where  = 'ecid = ?';
-        $params = array($this->ec->id);
+        $params = [$this->ec->id];
 
         // Days limit WHERE condition.
         if ($dayslimit > 0) {
@@ -727,33 +739,33 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $params['dayslimit'] = $dayslimitinseconds;
         }
 
-		if ($groupid) {
-			$where .= ' AND userid IN (SELECT gm.userid FROM {groups_members} gm WHERE gm.groupid = ?)';
-			$params[] = $groupid;
+        if ($groupid) {
+            $where .= ' AND userid IN (SELECT gm.userid FROM {groups_members} gm WHERE gm.groupid = ?)';
+            $params[] = $groupid;
         }
         $where = "$where GROUP BY userid";
 
-        $from   = "(SELECT $select FROM $from WHERE $where) items,".
+        $from   = "(SELECT $select FROM $from WHERE $where) items," .
                   '{user} u';
         $where  = 'items.userid = u.id';
 
-        //get_all_user_name_fields deprecated in 3.11
-        if($CFG->version<2021051700) {
+        // get_all_user_name_fields deprecated in 3.11
+        if ($CFG->version < 2021051700) {
             $select = 'items.*,' . get_all_user_name_fields(true, 'u');
-        }else{
+        } else {
             $userfields = \core_user\fields::for_name();
             $usersql = $userfields->get_sql('u');
-            //note no concatenating comma, thats how userfields -> selects works
+            // note no concatenating comma, thats how userfields -> selects works
             $select = 'items.*' . $usersql->selects;
         }
 
-        if ($this->sort=='firstname' || $this->sort=='lastname') {
-            $order = 'u.'.$this->sort;
+        if ($this->sort == 'firstname' || $this->sort == 'lastname') {
+            $order = 'u.' . $this->sort;
         } else {
-            $order = 'items.'.$this->sort;
+            $order = 'items.' . $this->sort;
         }
         if ($this->order) {
-            $order .= ' '.$this->order;
+            $order .= ' ' . $this->order;
         }
 
         // set goals to maximum in these aggregate items
@@ -765,7 +777,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 $goals->chat = max($goals->chat, $item->chat);
             }
         } else {
-            $items = array();
+            $items = [];
         }
 
         // override goals with teacher-specified goals, if available
@@ -790,29 +802,29 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $type = 'lastname';
         $fullname .= get_string('lastname', 'moodle');
         $fullname .= $this->get_sort_icon($url, $type);
-        $fullname = html_writer::tag('span', $fullname, array('class' => 'fullname'));
+        $fullname = html_writer::tag('span', $fullname, ['class' => 'fullname']);
 
         $type = 'percent';
         $percent = '%'; // get_string($type, 'grades');
         $percent .= $this->get_sort_icon($url, $type);
-        $percent = html_writer::tag('span', $percent, array('class' => 'percent'));
+        $percent = html_writer::tag('span', $percent, ['class' => 'percent']);
 
-        $output .= html_writer::tag('dt', $fullname.$percent, array('class' => 'user title'));
+        $output .= html_writer::tag('dt', $fullname . $percent, ['class' => 'user title']);
 
         $title = '';
         $left = 0;
-        foreach (array('watch', 'learn', 'speak', 'chat') as $type) {
+        foreach (['watch', 'learn', 'speak', 'chat'] as $type) {
             if ($goals->$type) {
-                $text = $this->ec->get_string($type.'goal');
+                $text = $this->ec->get_string($type . 'goal');
                 $sort = $this->get_sort_icon($url, $type);
                 $percent = (100 * min(1, $goals->$type / $goals->total));
                 $style = "margin-left: $left%; width: $percent%;";
-                $params = array('class' => $type, 'style' => $style);
-                $title .= html_writer::tag('span', $text.' '.$sort, $params);
+                $params = ['class' => $type, 'style' => $style];
+                $title .= html_writer::tag('span', $text . ' ' . $sort, $params);
                 $left += $percent;
             }
         }
-        $output .= html_writer::tag('dd', $title, array('class' => 'bars title'));
+        $output .= html_writer::tag('dd', $title, ['class' => 'bars title']);
 
         foreach ($items as $userid => $item) {
             $item->total = (min($goals->watch, $item->watch) +
@@ -822,13 +834,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             if ($goals->total == 0) {
                 $item->percent = '';
             } else {
-                $item->percent = round(100 * min(1, $item->total / $goals->total)).'%';
+                $item->percent = round(100 * min(1, $item->total / $goals->total)) . '%';
             }
             $items[$userid] = $item;
         }
 
         if ($this->sort == 'percent') {
-            uasort($items, array($this, 'uasort_percent'));
+            uasort($items, [$this, 'uasort_percent']);
         }
 
         foreach ($items as $userid => $item) {
@@ -836,14 +848,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         }
 
         if (count($items)) {
-            $output = html_writer::tag('dl', $output, array('class' => 'userbars'));
+            $output = html_writer::tag('dl', $output, ['class' => 'userbars']);
         } else {
             $output = html_writer::tag('p', $this->ec->get_string('noprogressreport'));
         }
 
-		if ($groupmenu) {
-			$output = $groupmenu.$output;
-		}
+        if ($groupmenu) {
+            $output = $groupmenu . $output;
+        }
 
         return $output;
     }
@@ -853,25 +865,25 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $anum = intval($a->percent);
         $bnum = intval($b->percent);
         if ($anum > $bnum) {
-            return ($this->order=='ASC' ? 1 : -1);
+            return ($this->order == 'ASC' ? 1 : -1);
         }
         if ($anum < $bnum) {
-            return ($this->order=='ASC' ? -1 : 1);
+            return ($this->order == 'ASC' ? -1 : 1);
         }
         return 0;
     }
 
     protected function show_progress_report_item($item, $goals) {
         $output = '';
-        $output .= html_writer::tag('dt', $this->show_progress_report_user($item, $goals), array('class' => 'user'));
-        $output .= html_writer::tag('dd', $this->show_progress_report_bars($item, $goals), array('class' => 'bars'));
+        $output .= html_writer::tag('dt', $this->show_progress_report_user($item, $goals), ['class' => 'user']);
+        $output .= html_writer::tag('dd', $this->show_progress_report_bars($item, $goals), ['class' => 'bars']);
         return $output;
     }
 
     protected function show_progress_report_user($item, $goals) {
         $output = '';
-        $output .= html_writer::tag('span', fullname($item), array('class' => 'fullname'));
-        $output .= html_writer::tag('span', $item->percent, array('class' => 'percent'));
+        $output .= html_writer::tag('span', fullname($item), ['class' => 'fullname']);
+        $output .= html_writer::tag('span', $item->percent, ['class' => 'percent']);
         return $output;
     }
 
@@ -889,28 +901,36 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             return '';
         }
 
-        $text = $item->$type.' / '.$goals->$type;
+        $text = $item->$type . ' / ' . $goals->$type;
         switch ($type) {
-            case 'watch': $title = $this->ec->get_string('watchvideos', $text); break;
-            case 'learn': $title = $this->ec->get_string('learnwords', $text); break;
-            case 'speak': $title = $this->ec->get_string('speaklines', $text); break;
-            case 'chat': $title = $this->ec->get_string('chatquestions', $text); break;
+            case 'watch':
+                $title = $this->ec->get_string('watchvideos', $text);
+                break;
+            case 'learn':
+                $title = $this->ec->get_string('learnwords', $text);
+                break;
+            case 'speak':
+                $title = $this->ec->get_string('speaklines', $text);
+                break;
+            case 'chat':
+                $title = $this->ec->get_string('chatquestions', $text);
+                break;
         }
-        $text = html_writer::tag('span', $text, array('class' => 'text', 'title' => $title));
+        $text = html_writer::tag('span', $text, ['class' => 'text', 'title' => $title]);
 
         if (empty($item->$type)) {
             $bar = '';
         } else {
             $value = min($item->$type, $goals->$type);
-            $width = (100 * min(1, $value / $goals->$type)).'%;';
-            $params = array('class' => 'bar', 'style' => 'width: '.$width);
+            $width = (100 * min(1, $value / $goals->$type)) . '%;';
+            $params = ['class' => 'bar', 'style' => 'width: ' . $width];
             $bar = html_writer::tag('span', '', $params);
         }
 
-        $width = (100 * min(1, $goals->$type / $goals->total)).'%';
-        $params = array('class' => $type, 'style' => 'width: '.$width);
+        $width = (100 * min(1, $goals->$type / $goals->total)) . '%';
+        $params = ['class' => $type, 'style' => 'width: ' . $width];
 
-        return html_writer::tag('span', $bar.$text, $params);
+        return html_writer::tag('span', $bar . $text, $params);
     }
 
     /**
@@ -929,13 +949,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         // override sort item/order with incoming data
         $sort = optional_param('sort', '', PARAM_ALPHA);
         switch (true) {
-
-            case ($sort==''):
+            case ($sort == ''):
                 $sort = $SESSION->englishcentral->sort;
                 $order = $SESSION->englishcentral->order;
                 break;
 
-            case ($sort==$SESSION->englishcentral->sort):
+            case ($sort == $SESSION->englishcentral->sort):
                 $order = optional_param('order', '', PARAM_ALPHA);
                 break;
 
@@ -943,13 +962,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 $order = '';
         }
 
-        if ($sort=='') {
+        if ($sort == '') {
             $sort = 'lastname';
             $order = '';
         }
 
-        if ($order=='') {
-            if ($sort=='firstname' || $sort=='lastname') {
+        if ($order == '') {
+            if ($sort == 'firstname' || $sort == 'lastname') {
                 $order = 'ASC';
             } else {
                 $order = 'DESC';
@@ -964,23 +983,23 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     protected function get_sort_icon($url, $sort) {
         global $OUTPUT;
 
-        if ($sort==$this->sort) {
+        if ($sort == $this->sort) {
             $order = $this->order;
         } else {
             $order = ''; // unsorted
         }
 
         switch (true) {
-            case ($order=='ASC'):
+            case ($order == 'ASC'):
                 $text = 'sortdesc';
                 $icon = 't/sort_asc';
                 break;
-            case ($order=='DESC'):
+            case ($order == 'DESC'):
                 $text = 'sortasc';
                 $icon = 't/sort_desc';
                 break;
-            case ($sort=='firstname'):
-            case ($sort=='lastname'):
+            case ($sort == 'firstname'):
+            case ($sort == 'lastname'):
                 $text = "sortby$sort";
                 $icon = 't/sort';
             default:
@@ -989,14 +1008,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 break;
         }
 
-        $params = array();
+        $params = [];
         if ($sort) {
             $params['sort'] = $sort;
         } else {
             $url->remove_params('sort');
         }
         if ($order) {
-            $params['order'] = ($order=='ASC' ? 'DESC' : 'ASC');
+            $params['order'] = ($order == 'ASC' ? 'DESC' : 'ASC');
         } else {
             $url->remove_params('order');
         }
@@ -1005,10 +1024,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         }
 
         $text = get_string($text, 'grades');
-        $params = array('class' => 'sorticon');
+        $params = ['class' => 'sorticon'];
         $icon = $OUTPUT->pix_icon($icon, $text, 'moodle', $params);
 
-        return html_writer::link($url, $icon, array('title' => $text));
+        return html_writer::link($url, $icon, ['title' => $text]);
     }
 
     /**
@@ -1016,26 +1035,23 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      */
     public function show_search() {
         $output = '';
-		if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
-
-
-
+        if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
             // start settings/form
-            $output .= html_writer::start_tag('form', array('class' => 'search-form'));
-            $output .= html_writer::tag('dt', $this->ec->get_string('videosearch'), array('class' => 'visible', 'id' => 'search-label'));
-            $output .= html_writer::start_tag('dl', array('class' => 'search-fields'));
+            $output .= html_writer::start_tag('form', ['class' => 'search-form']);
+            $output .= html_writer::tag('dt', $this->ec->get_string('videosearch'), ['class' => 'visible', 'id' => 'search-label']);
+            $output .= html_writer::start_tag('dl', ['class' => 'search-fields']);
 
             // text box size
             $size = ''; // 30
-            $output .= html_writer::start_tag('div', array('id' => 'search-fields-main'));
+            $output .= html_writer::start_tag('div', ['id' => 'search-fields-main']);
             $output .= $this->show_search_term('searchterm', $size);
             $output .= $this->show_search_button('searchbutton');
             $output .= html_writer::end_tag('div');
-            $output .= html_writer::start_tag('div', array('id' => 'search-fields-advanced'));
+            $output .= html_writer::start_tag('div', ['id' => 'search-fields-advanced']);
             $output .= $this->show_search_level('level'); // =difficulty
-            //$output .= $this->show_search_topics('topics', $size);
-            //$output .= $this->show_search_duration('duration');
-            //$output .= $this->show_search_copyright('copyright', $size);
+            // $output .= $this->show_search_topics('topics', $size);
+            // $output .= $this->show_search_duration('duration');
+            // $output .= $this->show_search_copyright('copyright', $size);
             $output .= html_writer::end_tag('div');
 
             // end settings/form
@@ -1043,50 +1059,50 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= html_writer::end_tag('form');
 
             // enclose settings in search-box
-            $output = html_writer::tag('div', $output, array('class' => 'search-box'));
+            $output = html_writer::tag('div', $output, ['class' => 'search-box']);
 
             // append element to display search-results
-            $output .= html_writer::tag('div', '', array('class' => 'search-results'));
+            $output .= html_writer::tag('div', '', ['class' => 'search-results']);
 
             // enclose search-box and search-results in container
-            $output = html_writer::tag('div', $output, array('id' => 'search-inner-container'));
+            $output = html_writer::tag('div', $output, ['id' => 'search-inner-container']);
 
-            $output .= html_writer::tag('div', '', array('id' => 'close-search-button'));
+            $output .= html_writer::tag('div', '', ['id' => 'close-search-button']);
             // append element to display button-alike-behavior
 
-            $output .= html_writer::start_tag('div', array('id' => 'faux-search-button'));
-            $output .= html_writer::start_tag('div', array('class' => 'faux-search-button-icon'));
+            $output .= html_writer::start_tag('div', ['id' => 'faux-search-button']);
+            $output .= html_writer::start_tag('div', ['class' => 'faux-search-button-icon']);
             $output .= html_writer::end_tag('div');
-            $output .= html_writer::tag('span', $this->ec->get_string('addvideo'), array('class' => 'faux-search-button-text'));
+            $output .= html_writer::tag('span', $this->ec->get_string('addvideo'), ['class' => 'faux-search-button-text']);
             $output .= html_writer::end_tag('div');
 
             // enclose search-box and search-results in container
-            $output = html_writer::tag('div', $output, array('id' => 'id_searchcontainer'));
+            $output = html_writer::tag('div', $output, ['id' => 'id_searchcontainer']);
 
             // append element to display search-results
-            $output .= html_writer::tag('div', '', array('class' => 'add-video-box'));
+            $output .= html_writer::tag('div', '', ['class' => 'add-video-box']);
         }
         return $output;
     }
 
-    public function show_search_term($name, $size='') {
+    public function show_search_term($name, $size = '') {
         $output = '';
-        $params = array('type' => 'text',
+        $params = ['type' => 'text',
                         'name' => $name,
-                        'id' => 'id_'.$name,
-                        'placeholder' => $this->ec->get_string('videosearchprompt'));
+                        'id' => 'id_' . $name,
+                        'placeholder' => $this->ec->get_string('videosearchprompt')];
         if ($size) {
             $params['size'] = $size;
         }
-        $output .= html_writer::tag('dd', html_writer::empty_tag('input', $params), array('class' => 'visible'));
+        $output .= html_writer::tag('dd', html_writer::empty_tag('input', $params), ['class' => 'visible']);
         return $output;
     }
 
-    public function show_search_topics($name, $size='') {
+    public function show_search_topics($name, $size = '') {
         $output = '';
-        $params = array('type' => 'text',
+        $params = ['type' => 'text',
                         'name' => $name,
-                        'id' => 'id_'.$name);
+                        'id' => 'id_' . $name];
         if ($size) {
             $params['size'] = $size;
         }
@@ -1099,16 +1115,16 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $output = '';
         $output .= html_writer::tag('dt', $this->ec->get_string($name));
         $output .= html_writer::start_tag('dd');
-        $output .= html_writer::start_tag('div', array('class' => "checkboxgroup $name"));
-        for ($i=1; $i<=7; $i++) {
-            $output .= html_writer::start_tag('div', array('class' => "checkboxitem $name-$i"));
-            $id = 'id_'.$name.'_'.$i;
-            $params = array('type'  => 'checkbox',
-                            'name'  => $name.'[]',
+        $output .= html_writer::start_tag('div', ['class' => "checkboxgroup $name"]);
+        for ($i = 1; $i <= 7; $i++) {
+            $output .= html_writer::start_tag('div', ['class' => "checkboxitem $name-$i"]);
+            $id = 'id_' . $name . '_' . $i;
+            $params = ['type'  => 'checkbox',
+                            'name'  => $name . '[]',
                             'value' => $i,
-                            'id'    => $id);
+                            'id'    => $id];
             $output .= html_writer::empty_tag('input', $params);
-            $output .= html_writer::tag('label', $i, array('for' => $id));
+            $output .= html_writer::tag('label', $i, ['for' => $id]);
             $output .= html_writer::end_tag('div');
         }
         $output .= html_writer::end_tag('div');
@@ -1120,16 +1136,16 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $output = '';
         $output .= html_writer::tag('dt', get_string('duration', 'search'));
         $output .= html_writer::start_tag('dd');
-        $output .= html_writer::start_tag('div', array('class' => "checkboxgroup $name"));
-        for ($i=1; $i<=3; $i++) {
-            $output .= html_writer::start_tag('div', array('class' => "checkboxitem $name-$i"));
-            $id = 'id_'.$name.'_'.$i;
-            $params = array('type'  => 'checkbox',
-                            'name'  => $name.'[]',
+        $output .= html_writer::start_tag('div', ['class' => "checkboxgroup $name"]);
+        for ($i = 1; $i <= 3; $i++) {
+            $output .= html_writer::start_tag('div', ['class' => "checkboxitem $name-$i"]);
+            $id = 'id_' . $name . '_' . $i;
+            $params = ['type'  => 'checkbox',
+                            'name'  => $name . '[]',
                             'value' => $i,
-                            'id'    => $id);
+                            'id'    => $id];
             $output .= html_writer::empty_tag('input', $params);
-            $output .= html_writer::tag('label', $this->ec->get_string("duration$i"), array('for' => $id));
+            $output .= html_writer::tag('label', $this->ec->get_string("duration$i"), ['for' => $id]);
             $output .= html_writer::end_tag('div');
         }
         $output .= html_writer::end_tag('div');
@@ -1139,10 +1155,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     public function show_search_copyright($name, $size) {
         $output = '';
-        $params = array('type' => 'text',
+        $params = ['type' => 'text',
                         'name' => $name,
                         'size' => $size,
-                        'id' => 'id_'.$name);
+                        'id' => 'id_' . $name];
         $output .= html_writer::tag('dt', $this->ec->get_string($name));
         $output .= html_writer::tag('dd', html_writer::empty_tag('input', $params));
         return $output;
@@ -1150,14 +1166,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     public function show_search_button($name) {
         $output = '';
-        $output .= html_writer::start_tag('dd', array('class' => 'visible'));
-        $params = array('type' => 'submit',
+        $output .= html_writer::start_tag('dd', ['class' => 'visible']);
+        $params = ['type' => 'submit',
                         'name' => $name,
-                        'id' => 'id_'.$name,
+                        'id' => 'id_' . $name,
                         'class' => 'btn btn-primary',
-                        'value' => get_string('search'));
+                        'value' => get_string('search')];
         $output .= html_writer::empty_tag('input', $params);
-        $output .= html_writer::tag('a', get_string('showadvanced', 'form'), array('class' => 'search-advanced'));
+        $output .= html_writer::tag('a', get_string('showadvanced', 'form'), ['class' => 'search-advanced']);
         $output .= html_writer::end_tag('dd');
         return $output;
     }
@@ -1167,7 +1183,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * create a container for the EC player
      */
 
-    //fetch modal content
+    // fetch modal content
     /*
     public function show_player($firstthumbnail){
         $data=[];
@@ -1175,13 +1191,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $this->render_from_template('mod_englishcentral/showplayer', $data);
     }
     */
-    public function show_player($hidden=false,$mimichat=false) {
-        $data=[];
-        $data['mimichat']=$mimichat;
-        if($hidden){
-            $data['display']='page-mod-englishcentral-hide';
-        }else{
-            $data['display']='';
+    public function show_player($hidden = false, $mimichat = false) {
+        $data = [];
+        $data['mimichat'] = $mimichat;
+        if ($hidden) {
+            $data['display'] = 'page-mod-englishcentral-hide';
+        } else {
+            $data['display'] = '';
         }
         return $this->render_from_template('mod_englishcentral/showplayer', $data);
     }
@@ -1189,23 +1205,26 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     /*
     * Developer tools for generating random data etc
     */
-    public function developerpage($cmid,$moduleid){
+    public function developerpage($cmid, $moduleid) {
         $items = [];
-        //Update gradebook
-        $items[]= get_string('updateallgrades_details',constants::M_COMPONENT);
-        $gradesbtn= new \single_button(
-            new \moodle_url(constants::M_URL . '/developer.php', array('action' => 'updategrades', 'id' => $cmid, 'n' => $moduleid)),
-            get_string('updateallgrades',constants::M_COMPONENT), 'get');
-        $gradesbtn->add_confirm_action(get_string('updategradesconfirm', constants::M_COMPONENT));   
-        $items[]=$this->render($gradesbtn);
-        $items[]='<br/><br/>';
-        $items[]= get_string('generateattemptdata_details',constants::M_COMPONENT);
-        $gendatabtn= new \single_button(
-            new \moodle_url(constants::M_URL . '/developer.php', array('action' => 'generatedata', 'id' => $cmid, 'n' => $moduleid)),
-            get_string('generateattemptdata',constants::M_COMPONENT), 'get');
+        // Update gradebook
+        $items[] = get_string('updateallgrades_details', constants::M_COMPONENT);
+        $gradesbtn = new \single_button(
+            new \moodle_url(constants::M_URL . '/developer.php', ['action' => 'updategrades', 'id' => $cmid, 'n' => $moduleid]),
+            get_string('updateallgrades', constants::M_COMPONENT),
+            'get'
+        );
+        $gradesbtn->add_confirm_action(get_string('updategradesconfirm', constants::M_COMPONENT));
+        $items[] = $this->render($gradesbtn);
+        $items[] = '<br/><br/>';
+        $items[] = get_string('generateattemptdata_details', constants::M_COMPONENT);
+        $gendatabtn = new \single_button(
+            new \moodle_url(constants::M_URL . '/developer.php', ['action' => 'generatedata', 'id' => $cmid, 'n' => $moduleid]),
+            get_string('generateattemptdata', constants::M_COMPONENT),
+            'get'
+        );
         $gendatabtn->add_confirm_action(get_string('generateattemptsconfirm', constants::M_COMPONENT));
-        $items[]=$this->render($gendatabtn);
+        $items[] = $this->render($gendatabtn);
         return $items;
     }
-
 }

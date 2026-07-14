@@ -28,8 +28,7 @@ use mod_englishcentral\constants;
 
 
 class utils {
-
-    public static function add_mform_elements($mform, $instance, $cm, $course, $context, $setuptab=false) {
+    public static function add_mform_elements($mform, $instance, $cm, $course, $context, $setuptab = false) {
         global $CFG, $PAGE;
 
         $plugin = 'mod_englishcentral';
@@ -70,7 +69,7 @@ class utils {
 
         // Adding the standard "intro" and "introformat" fields.
         // Note that we do not support this in tabs.
-        if(! $setuptab) {
+        if (! $setuptab) {
             $label = get_string('moduleintro');
             $params = [
                 'context' => $context,
@@ -137,15 +136,15 @@ class utils {
         }
         foreach ($goals as $goal => $default) {
             $label = get_string($goal, $plugin);
-            $units = get_string($goal.'units', $plugin);
+            $units = get_string($goal . 'units', $plugin);
             $elements = [
                     $mform->createElement('text', $goal, '', $textoptions),
                     $mform->createElement('static', '', '', $units),
             ];
-            $mform->addElement('group', $goal.'group', $label, $elements, ' ', false);
+            $mform->addElement('group', $goal . 'group', $label, $elements, ' ', false);
             $mform->setType($goal, PARAM_INT);
             $mform->setDefault($goal, $default);
-            $mform->addHelpButton($goal.'group', $goal, $plugin);
+            $mform->addHelpButton($goal . 'group', $goal, $plugin);
         }
 
         // -----------------------------------------------------------------------------
@@ -184,7 +183,6 @@ class utils {
         $mform->addElement('select', $name, $label, $options);
         $mform->addHelpButton($name, $name, $plugin);
         $mform->setDefault($name, 3);
-
     } //end of add_mform_elements
 
     /**
@@ -197,22 +195,22 @@ class utils {
      * @param $default (optional, default = null)
      * @todo Finish documenting this function
      */
-    public static function set_type_default_advanced($mform, $config, $name, $type, $default=null) {
+    public static function set_type_default_advanced($mform, $config, $name, $type, $default = null) {
         $mform->setType($name, $type);
         if (isset($config->$name)) {
             $mform->setDefault($name, $config->$name);
         } else if ($default) {
             $mform->setDefault($name, $default);
         }
-        $advname = 'adv'.$name;
+        $advname = 'adv' . $name;
         if (isset($config->$advname)) {
             $mform->setAdvanced($name, $config->$advname);
         }
     }
 
     public static function fetch_options_reportstable() {
-        $options = array(constants::M_USE_DATATABLES => get_string("reporttableajax", constants::M_COMPONENT),
-            constants::M_USE_PAGEDTABLES => get_string("reporttablepaged", constants::M_COMPONENT));
+        $options = [constants::M_USE_DATATABLES => get_string("reporttableajax", constants::M_COMPONENT),
+            constants::M_USE_PAGEDTABLES => get_string("reporttablepaged", constants::M_COMPONENT)];
         return $options;
     }
 
@@ -237,9 +235,9 @@ class utils {
     }
 
     public static function super_trim($str) {
-        if($str == null){
+        if ($str == null) {
             return '';
-        }else{
+        } else {
             $str = trim($str);
             return $str;
         }
@@ -247,9 +245,11 @@ class utils {
 
      // see if this is truly json or some error
     public static function is_json($string) {
-        if(!$string){return false;
+        if (!$string) {
+            return false;
         }
-        if(empty($string)){return false;
+        if (empty($string)) {
+            return false;
         }
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);

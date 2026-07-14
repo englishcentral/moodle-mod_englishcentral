@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>js/jquery-ui.js</location>
+        <name>jQuery UI</name>
+        <description>jQuery UI widgets and effects used by the activity view (dialogs, draggable/sortable video list).</description>
+        <version>1.13.2</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>thirdparty/datatables</location>
+        <name>DataTables</name>
+        <description>Table enhancing plug-in for jQuery, used by the teacher reports UI.</description>
+        <version>1.10.19</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>

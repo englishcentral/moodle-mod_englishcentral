@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -40,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class auth {
-
     // Accepted media types used by EC's API.
     const ACCEPT_V1 = 'application/vnd.englishcentral-v1+json,application/json;q=0.9,*/*;q=0.8';
     const ACCEPT_V2 = 'application/vnd.englishcentral-v2+json,application/json;q=0.9,*/*;q=0.8';
@@ -97,19 +95,18 @@ class auth {
         }
         $this->ec = $ec;
 
-
         // Specify names of EC config fields.
-        $fields = array('partnerid',
+        $fields = ['partnerid',
                         'consumerkey',
                         'consumersecret',
                         'encryptedsecret',
-                        'mimichat');
+                        'mimichat'];
 
         foreach ($fields as $field) {
             $this->$field = empty($ec->config->$field) ? '' : $ec->config->$field;
         }
 
-        //set mimi chat enabled or disabled
+        // set mimi chat enabled or disabled
         $this->set_mimichat($ec);
 
         if ($this->get_sdk_mode() == self::SDK_MODE_DEVELOPMENT) {
@@ -166,7 +163,7 @@ class auth {
      * @param object $ec an EC activity
      * @return object the new EC auth object
      */
-    static public function create($ec) {
+    public static function create($ec) {
         return new auth($ec);
     }
 
@@ -174,12 +171,12 @@ class auth {
         global $DB, $USER;
         if ($this->uniqueid === null) {
             $table = 'englishcentral_accountids';
-            $params = array('userid' => $USER->id);
+            $params = ['userid' => $USER->id];
             $this->uniqueid = $DB->get_field($table, 'id', $params);
             if (empty($this->uniqueid)) {
-                $record = (object)array('userid' => $USER->id,
-                                        'accountid' => 0);
-                $this->uniqueid = ''.$DB->insert_record($table, $record);
+                $record = (object)['userid' => $USER->id,
+                                        'accountid' => 0];
+                $this->uniqueid = '' . $DB->insert_record($table, $record);
                 // we need the quotes, '', to convert the id to a string
             }
             // NOTE: it does not seem to be necessary to create a permanent
@@ -195,7 +192,7 @@ class auth {
         global $DB, $USER;
         if ($this->accountid === null) {
             $table = 'englishcentral_accountids';
-            $params = array('userid' => $USER->id);
+            $params = ['userid' => $USER->id];
             $this->accountid = $DB->get_field($table, 'accountid', $params);
             if (empty($this->accountid)) {
                 $this->accountid = $this->create_accountid();
@@ -210,9 +207,9 @@ class auth {
 
     public function get_jwt_token() {
         if ($this->jwt_token === null) {
-            $payload = array('userID' => $this->get_uniqueid(),
+            $payload = ['userID' => $this->get_uniqueid(),
                              'consumerKey' => $this->consumerkey,
-                             'exp' => round((microtime(true) + 10000) * 1000));
+                             'exp' => round((microtime(true) + 10000) * 1000)];
             $secret = \mod_englishcentral\jwt\JWT::urlsafeB64Decode($this->encryptedsecret);
             $this->jwt_token = \mod_englishcentral\jwt\JWT::encode($payload, $secret);
         }
@@ -227,16 +224,16 @@ class auth {
         if ($this->sdk_token === null) {
             $url = $this->get_url('bridge', 'rest/identity/authorize');
 
-            $fields = array('partnerID' => $this->partnerid,
+            $fields = ['partnerID' => $this->partnerid,
                             'siteLanguage' => $this->get_site_language(),
                             'nativeLanguage' => $this->get_user_language(),
-                            'applicationBuildDate' => '2017-08-19T13:33:14.000Z');
+                            'applicationBuildDate' => '2017-08-19T13:33:14.000Z'];
             $fields = http_build_query($fields, '', '&', PHP_QUERY_RFC1738);
 
-            $header = array('Accept: ' . self::ACCEPT_V1,
+            $header = ['Accept: ' . self::ACCEPT_V1,
                             'AuthorizeRequest: ' . $this->get_jwt_token(),
                             'Content-Length: ' . strlen($fields),
-                            'Content-Type: application/x-www-form-urlencoded');
+                            'Content-Type: application/x-www-form-urlencoded'];
 
             $this->sdk_token = $this->doCurl($url, $header, false, true, $fields);
         }
@@ -256,28 +253,28 @@ class auth {
     }
 
     public function get_header($accept) {
-        return array('Accept: ' . $accept,
+        return ['Accept: ' . $accept,
                      'Authorization: ' . $this->get_authorization(),
-                     'Content-Type: application/x-www-form-urlencoded');
+                     'Content-Type: application/x-www-form-urlencoded'];
     }
 
     public function get_authorization() {
         if ($this->authorization === null) {
             if ($sdk_token = $this->get_sdk_token()) {
                 $consumersecret = \mod_englishcentral\jwt\JWT::urlsafeB64Decode($this->encryptedsecret);
-                $payload = \mod_englishcentral\jwt\JWT::decode($sdk_token, $consumersecret, array('HS256'));
-                $payload = array('accessToken' => $payload->accessToken,
-                                 'consumerKey' => $this->consumerkey);
-                $this->authorization = 'JWT '.\mod_englishcentral\jwt\JWT::encode($payload, $consumersecret);
+                $payload = \mod_englishcentral\jwt\JWT::decode($sdk_token, $consumersecret, ['HS256']);
+                $payload = ['accessToken' => $payload->accessToken,
+                                 'consumerKey' => $this->consumerkey];
+                $this->authorization = 'JWT ' . \mod_englishcentral\jwt\JWT::encode($payload, $consumersecret);
             }
         }
         return $this->authorization;
     }
 
     public function get_player_settings() {
-        return (object)array(
-            'chatMode' => $this->mimichat_enabled()
-        );
+        return (object)[
+            'chatMode' => $this->mimichat_enabled(),
+        ];
     }
 
     public function create_accountid() {
@@ -288,13 +285,13 @@ class auth {
         }
         $subdomain = 'bridge';
         $endpoint = 'rest/identity/account';
-        $fields = array('partnerID' => $this->partnerid,
+        $fields = ['partnerID' => $this->partnerid,
                         'partnerAccountID' => $this->get_uniqueid(),
                         'nativeLanguage' => $this->get_user_language(),
                         'siteLanguage' => $this->get_site_language(),
                         'isTeacher' => $isTeacher,
                         'timezone' => \core_date::get_user_timezone(),
-                        'fields' => 'accountID');
+                        'fields' => 'accountID'];
         $response = $this->doPost($subdomain, $endpoint, $fields, self::ACCEPT_V1);
         return $this->return_value($response, 'accountID', 0);
     }
@@ -302,9 +299,9 @@ class auth {
     public function fetch_accountid() {
         $subdomain = 'bridge';
         $endpoint = 'rest/identity/account';
-        $fields = array('partnerID' => $this->partnerid,
+        $fields = ['partnerID' => $this->partnerid,
                         'partnerAccountID' => $this->get_uniqueid(),
-                        'fields' => 'accountID');
+                        'fields' => 'accountID'];
         $response = $this->doPost($subdomain, $endpoint, $fields, self::ACCEPT_V1);
         return $this->return_value($response, 'accountID', 0);
     }
@@ -312,14 +309,14 @@ class auth {
     public function fetch_goal_list() {
         $subdomain = 'bridge';
         $endpoint = 'rest/content/goal';
-        $fields = array();
+        $fields = [];
         return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
-    public function fetch_course_list($goalid,$difficulty) {
+    public function fetch_course_list($goalid, $difficulty) {
         $subdomain = 'bridge';
         $endpoint = 'rest/content/course';
-        $fields = array('goalID'=>$goalid,'difficulty'=>$difficulty,'pageSize'=>25,'fields'=>'courseID,name,description,difficulty');
+        $fields = ['goalID' => $goalid, 'difficulty' => $difficulty, 'pageSize' => 25, 'fields' => 'courseID,name,description,difficulty'];
         return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
@@ -328,24 +325,26 @@ class auth {
 
         $subdomain = 'bridge';
         $endpoint = 'rest/content/dialog';
-        $fields = array('dialogIDs' => implode(',', $videoids),
+        $fields = ['dialogIDs' => implode(',', $videoids),
                         'siteLanguage' => $this->get_site_language(),
-                        'fields' => 'dialogID,title,difficulty,duration,dialogURL,thumbnailURL,videoDetailsURL,demoPictureURL,description,topics');
+                        'fields' => 'dialogID,title,difficulty,duration,dialogURL,thumbnailURL,videoDetailsURL,demoPictureURL,description,topics'];
         $dialoglist = $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
 
         // Cache the dialogs listings for later use in reports, and here eventually
         // Ideally we should do this when add a video. TO DO do that
-        list($dialogswhere, $allparams) = $DB->get_in_or_equal($videoids);
+        [$dialogswhere, $allparams] = $DB->get_in_or_equal($videoids);
         $sql = "SELECT * FROM {" . constants::M_VIDEOSTABLE . "} vt ";
         $sql .= "WHERE videoid " . $dialogswhere;
         $cachedvideoslist = $DB->get_records_sql($sql, $allparams);
         foreach ($cachedvideoslist as $cachedvideo) {
             if ($cachedvideo->detailsjson === null) {
-                foreach($dialoglist as $thedialog){
-                    if($thedialog->dialogID == $cachedvideo->videoid){
-                        $DB->update_record(constants::M_VIDEOSTABLE,
-                        ['id' => $cachedvideo->id, 'name' => $thedialog->title,
-                                        'detailsjson' => json_encode($thedialog)]);
+                foreach ($dialoglist as $thedialog) {
+                    if ($thedialog->dialogID == $cachedvideo->videoid) {
+                        $DB->update_record(
+                            constants::M_VIDEOSTABLE,
+                            ['id' => $cachedvideo->id, 'name' => $thedialog->title,
+                            'detailsjson' => json_encode($thedialog)]
+                        );
                     }
                 }
             }
@@ -356,41 +355,41 @@ class auth {
     public function fetch_course_content($courseid) {
         $subdomain = 'bridge';
         $endpoint = 'rest/content/course/' . $courseid;
-        $fields = array('siteLanguage' => $this->get_site_language());
+        $fields = ['siteLanguage' => $this->get_site_language()];
         return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
     public function fetch_dialog_content($videoid) {
         $subdomain = 'bridge';
         $endpoint = "rest/content/dialog/$videoid";
-        $fields = array('siteLanguage' => $this->get_site_language());
+        $fields = ['siteLanguage' => $this->get_site_language()];
         return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
-    public function fetch_dialog_progress($videoid, $sdk_token='') {
+    public function fetch_dialog_progress($videoid, $sdk_token = '') {
         if ($sdk_token) {
             $this->set_sdk_token($sdk_token);
         }
         $subdomain = 'reportcard';
         $endpoint = "rest/report/dialog/$videoid/progress";
-        return $this->doGet($subdomain, $endpoint, array(), self::ACCEPT_V2);
+        return $this->doGet($subdomain, $endpoint, [], self::ACCEPT_V2);
     }
 
     // This method is not used and does not seem to work, but
     // it could be used to get more info about a conversation.
     // https://chat.englishcentral.com/documentation/resource_ConversationREST.html
     // https://chat.englishcentral.com/rest/conversation/list?accountId=xxx&dialogId=xxx&chatBotId=5
-    public function fetch_chat_progress($videoid, $sdk_token='') {
+    public function fetch_chat_progress($videoid, $sdk_token = '') {
         if ($sdk_token) {
             $this->set_sdk_token($sdk_token);
         }
         $subdomain = 'chat';
         $endpoint = 'rest/conversation/list';
-        $fields = array(
+        $fields = [
             'chatBotId' => self::CHAT_BOT_ID_DQ, // =5
             'accountId' => $this->get_accountid(),
             'dialogId' => $videoid,
-        );
+        ];
         return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
@@ -406,24 +405,24 @@ class auth {
         return $this->doCurl($url, $header, true, true);
     }
 
-    public function doCurl($url, $header, $json_decode=false, $post=null, $fields=null) {
+    public function doCurl($url, $header, $json_decode = false, $post = null, $fields = null) {
         global $CFG;
 
         // Use Moodle Curl to ensure we use a proxy if Moodle server is using one.
-        require_once($CFG->libdir.'/filelib.php');
+        require_once($CFG->libdir . '/filelib.php');
         $curl = new \curl();
         $curl->setHeader($header);
-        $curl->setopt(array(
+        $curl->setopt([
             'CURLOPT_AUTOREFERER' => true,
             'CURLOPT_FOLLOWLOCATION' => true,
             'CURLOPT_RETURNTRANSFER' => true,
             'CURLOPT_SSL_VERIFYPEER' => false,
-        ));
+        ]);
 
         if ($post) {
             $response = $curl->post($url, $fields);
         } else {
-            $response = $curl->get($url,$fields);
+            $response = $curl->get($url, $fields);
         }
 
         // If its JSON, process that before returning.
@@ -434,10 +433,10 @@ class auth {
     }
 
     public function is_json($response) {
-        if (substr($response, 0, 1)=='{' && substr($response, -1)=='}') {
+        if (substr($response, 0, 1) == '{' && substr($response, -1) == '}') {
             return true;
         }
-        if (substr($response, 0, 1)=='[' && substr($response, -1)==']') {
+        if (substr($response, 0, 1) == '[' && substr($response, -1) == ']') {
             return true;
         }
         return false;
@@ -451,7 +450,7 @@ class auth {
         }
     }
 
-    public function get_user_language($default='en') {
+    public function get_user_language($default = 'en') {
         global $CFG, $USER;
         if (! empty($USER->lang)) {
             return substr($USER->lang, 0, 2);
@@ -462,9 +461,9 @@ class auth {
         return $default;
     }
 
-    public function get_site_language($default='en') {
+    public function get_site_language($default = 'en') {
         $lang = substr(current_language(), 0, 2);
-        $langs = array(
+        $langs = [
             // Only the following languages are available on the EC site.
             // See language menu on: https://www.englishcentral.com/browse/videos.
             'en', // English    English
@@ -476,11 +475,11 @@ class auth {
             'tr', // Turkish    Türkçe
             'vi', // Vietnamese Tiếng Việt
             'zh', // Chinese    简体中文
-            'he', // Hebrew     עִברִית 
-            'ar', // Arabic     عربى 
+            'he', // Hebrew     עִברִית
+            'ar', // Arabic     عربى
             'fr', // French     Français
             'th', // Thai       ภาษาไทย (added 2024-06-06)
-        );
+        ];
         if (in_array($lang, $langs)) {
             return $lang;
         }
@@ -495,19 +494,19 @@ class auth {
         return $this->get_url('bridge', 'rest/content/dialog/search/fulltext');
     }
 
-    public function get_url($subdomain, $endpoint, $fields=array()) {
+    public function get_url($subdomain, $endpoint, $fields = []) {
         $url = "https://$subdomain.$this->domain/$endpoint";
         $url = new \moodle_url($url, $fields);
         return $url->out(false); // join with "&" not "&amp;"
     }
 
     public function missing_config() {
-        $missing = array('partnerid' => '/^[0-9]+$/',
+        $missing = ['partnerid' => '/^[0-9]+$/',
                          'consumerkey' => '/^[0-9a-fA-F]{32}$/',
                          'consumersecret' => '/^[0-9a-fA-F]{64}$/',
-                         'encryptedsecret' => '/^[0-9a-zA-Z\/+=]+$/');
+                         'encryptedsecret' => '/^[0-9a-zA-Z\/+=]+$/'];
         foreach ($missing as $name => $pattern) {
-            if ($name=='consumersecret' && $this->ec->config->$name == $this->ec->config->encryptedsecret) {
+            if ($name == 'consumersecret' && $this->ec->config->$name == $this->ec->config->encryptedsecret) {
                 unset($missing[$name]);
             } else if (isset($this->ec->config->$name) && preg_match($pattern, $this->ec->config->$name)) {
                 unset($missing[$name]);

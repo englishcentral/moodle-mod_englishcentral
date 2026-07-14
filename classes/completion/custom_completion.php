@@ -31,7 +31,6 @@ use core_completion\activity_custom_completion;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class custom_completion extends activity_custom_completion {
-
     /**
      * Fetches the completion state for a given completion rule.
      *
@@ -45,23 +44,23 @@ class custom_completion extends activity_custom_completion {
 
         $userid = $this->userid;
 
-        if (!$ec = $DB->get_record('englishcentral', array('id' => $this->cm->instance))) {
+        if (!$ec = $DB->get_record('englishcentral', ['id' => $this->cm->instance])) {
             throw new \moodle_exception('Unable to find EnglishCentral with id ' . $this->cm->instance);
         }
 
-        $course = $DB->get_record('course', array('id' => $this->cm->course), '*', MUST_EXIST);
+        $course = $DB->get_record('course', ['id' => $this->cm->course], '*', MUST_EXIST);
         $ec = \mod_englishcentral\activity::create($ec, $this->cm, $course);
 
         // get grade, if necessary
         $grade = false;
         if ($ec->completionmingrade > 0.0 || $ec->completionpass) {
-            require_once($CFG->dirroot.'/lib/gradelib.php');
-            $params = array('courseid'     => $course->id,
+            require_once($CFG->dirroot . '/lib/gradelib.php');
+            $params = ['courseid'     => $course->id,
                 'itemtype'     => 'mod',
                 'itemmodule'   => 'englishcentral',
-                'iteminstance' => $this->cm->instance);
+                'iteminstance' => $this->cm->instance];
             if ($grade_item = \grade_item::fetch($params)) {
-                $grades = \grade_grade::fetch_users_grades($grade_item, array($userid), false);
+                $grades = \grade_grade::fetch_users_grades($grade_item, [$userid], false);
                 if (isset($grades[$userid])) {
                     $grade = $grades[$userid];
                 }
@@ -71,33 +70,33 @@ class custom_completion extends activity_custom_completion {
         }
 
         switch ($rule) {
-                case 'completionmingrade':
-                    // decimal (e.g. completionmingrade) fields are returned by MySQL as a string
-                    // and since empty('0.0') returns false (!!), so we must use numeric comparison
-                    if (empty($ec->completionmingrade) || floatval($ec->completionmingrade)==0.0) {
-                        $state=true;
-                        break;
-                    }
+            case 'completionmingrade':
+                // decimal (e.g. completionmingrade) fields are returned by MySQL as a string
+                // and since empty('0.0') returns false (!!), so we must use numeric comparison
+                if (empty($ec->completionmingrade) || floatval($ec->completionmingrade) == 0.0) {
+                    $state = true;
+                    break;
+                }
 
-                    $state = ($grade && $grade->finalgrade >= $ec->completionmingrade);
-                    break;
-                case 'completionpass':
-                    $state = ($grade && $grade->is_passed());
-                    break;
-                case 'completiongoals':
-                    // if goals have been set up, calculate total percent
-                    $progress = $ec->get_progress();
+                $state = ($grade && $grade->finalgrade >= $ec->completionmingrade);
+                break;
+            case 'completionpass':
+                $state = ($grade && $grade->is_passed());
+                break;
+            case 'completiongoals':
+                // if goals have been set up, calculate total percent
+                $progress = $ec->get_progress();
 
-                    if ($goals = ($ec->watchgoal + $ec->learngoal + $ec->speakgoal)) {
-                        $state = 0;
-                        $state += max(0, min($progress->watch, $ec->watchgoal));
-                        $state += max(0, min($progress->learn, $ec->learngoal));
-                        $state += max(0, min($progress->speak, $ec->speakgoal));
-                        $state = (round(100 * $state / $goals, 0) >= 100);
-                    } else {
-                        $state = false; // unusual - no goals have been set up !!
-                    }
-                    break;
+                if ($goals = ($ec->watchgoal + $ec->learngoal + $ec->speakgoal)) {
+                    $state = 0;
+                    $state += max(0, min($progress->watch, $ec->watchgoal));
+                    $state += max(0, min($progress->learn, $ec->learngoal));
+                    $state += max(0, min($progress->speak, $ec->speakgoal));
+                    $state = (round(100 * $state / $goals, 0) >= 100);
+                } else {
+                    $state = false; // unusual - no goals have been set up !!
+                }
+                break;
         }
         return $state ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
     }

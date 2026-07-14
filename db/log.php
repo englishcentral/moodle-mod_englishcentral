@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -31,9 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 
 global $DB;
 
-$logs = array(
-    array('module'=>'englishcentral', 'action'=>'add', 'mtable'=>'englishcentral', 'field'=>'name'),
-    array('module'=>'englishcentral', 'action'=>'update', 'mtable'=>'englishcentral', 'field'=>'name'),
-    array('module'=>'englishcentral', 'action'=>'view', 'mtable'=>'englishcentral', 'field'=>'name'),
-    array('module'=>'englishcentral', 'action'=>'view all', 'mtable'=>'englishcentral', 'field'=>'name')
-);
+$logs = [
+    ['module' => 'englishcentral', 'action' => 'add', 'mtable' => 'englishcentral', 'field' => 'name'],
+    ['module' => 'englishcentral', 'action' => 'update', 'mtable' => 'englishcentral', 'field' => 'name'],
+    ['module' => 'englishcentral', 'action' => 'view', 'mtable' => 'englishcentral', 'field' => 'name'],
+    ['module' => 'englishcentral', 'action' => 'view all', 'mtable' => 'englishcentral', 'field' => 'name'],
+];

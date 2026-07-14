@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
  * Created by PhpStorm.
  * User: ishineguy
@@ -8,10 +23,9 @@
 
 namespace mod_englishcentral\report;
 
-use \mod_englishcentral\constants;
+use mod_englishcentral\constants;
 
 class courseattempts extends basereport {
-
     protected $report = "courseattempts";
 
     protected $fields = ['firstname', 'lastname', 'activities', 'total', 'watch', 'learn', 'speak', 'chat'];
@@ -22,14 +36,17 @@ class courseattempts extends basereport {
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB, $CFG, $OUTPUT;
         switch ($field) {
-
             case 'username':
                 $user = $this->fetch_cache('user', $record->userid);
                 $ret = fullname($user);
                 if ($withlinks) {
-                        $link = new \moodle_url(constants::M_URL . '/reports.php',
-                                ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
-                                'id' => $this->cm->id, 'userid' => $record->userid, 'dayslimit' => $this->formdata->dayslimit]);
+                        $link = new \moodle_url(
+                            constants::M_URL . '/reports.php',
+                            ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
+                            'id' => $this->cm->id,
+                            'userid' => $record->userid,
+                            'dayslimit' => $this->formdata->dayslimit]
+                        );
                         $ret = \html_writer::link($link, $ret);
                 }
                 break;
@@ -38,9 +55,13 @@ class courseattempts extends basereport {
             case 'lastname':
                 $user = $this->fetch_cache('user', $record->userid);
                 if ($withlinks) {
-                    $link = new \moodle_url(constants::M_URL . '/reports.php',
-                            ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
-                            'id' => $this->cm->id, 'userid' => $record->userid, 'dayslimit' => $this->formdata->dayslimit]);
+                    $link = new \moodle_url(
+                        constants::M_URL . '/reports.php',
+                        ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
+                        'id' => $this->cm->id,
+                        'userid' => $record->userid,
+                        'dayslimit' => $this->formdata->dayslimit]
+                    );
                     $ret = \html_writer::link($link, $user->{$field});
                 } else {
                     $ret = $user->{$field};
@@ -48,8 +69,10 @@ class courseattempts extends basereport {
                 break;
 
             case 'chat':
-                if (get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chat) > 0) {
+                if (
+                    get_config(constants::M_COMPONENT, 'chatmode') ||
+                    intval($record->chat) > 0
+                ) {
                     $ret = $record->chat;
                 } else {
                     $ret = '-';
@@ -74,7 +97,6 @@ class courseattempts extends basereport {
         }
         $thecourse = $this->fetch_cache('course', $record->course);
         return get_string('courseattemptsheading', constants::M_COMPONENT, $thecourse->fullname);
-
     }
 
     public function fetch_chart($renderer, $showdatasource = true) {
@@ -94,7 +116,8 @@ class courseattempts extends basereport {
         $chart->set_horizontal(true);
         $chart->add_series(new \core\chart_series(
             get_string('watch', constants::M_COMPONENT),
-             $watchseries));
+            $watchseries
+        ));
         $chart->set_labels($usernames);
         $thechart = $renderer->render_chart($chart, $showdatasource);
         // We set a height of 40px per "bar.".
@@ -109,7 +132,7 @@ class courseattempts extends basereport {
 
         // Save form data for later.
         $this->formdata = $formdata;
- 
+
         $emptydata = [];
         $allparams = [];
 
@@ -118,10 +141,10 @@ class courseattempts extends basereport {
           'SUM(COALESCE(watchcomplete, 0)) + ' .
           'SUM(COALESCE(learncount, 0)) + ' .
           'SUM(COALESCE(speakcount, 0)) + ' .
-          'SUM(COALESCE(chatcount, 0)) AS total,'.
-          'SUM(COALESCE(watchcomplete, 0)) AS watch,'.
-          'SUM(COALESCE(learncount, 0)) AS learn,'.
-          'SUM(COALESCE(speakcount, 0)) AS speak,'.
+          'SUM(COALESCE(chatcount, 0)) AS total,' .
+          'SUM(COALESCE(watchcomplete, 0)) AS watch,' .
+          'SUM(COALESCE(learncount, 0)) AS learn,' .
+          'SUM(COALESCE(speakcount, 0)) AS speak,' .
           'SUM(COALESCE(chatcount, 0)) AS chat '  .
           'FROM {' . constants::M_ATTEMPTSTABLE . '} tu ' .
           'INNER JOIN {' . constants::M_TABLE . '} ec ' .
@@ -129,14 +152,14 @@ class courseattempts extends basereport {
 
         // if we need to show  groups
         if ($formdata->groupid > 0) {
-            list($groupswhere, $allparams) = $DB->get_in_or_equal($formdata->groupid);
+            [$groupswhere, $allparams] = $DB->get_in_or_equal($formdata->groupid);
 
             $alldatasql = $selectsql .
                     " INNER JOIN {groups_members} gm ON tu.userid=gm.userid " .
                     " WHERE gm.groupid $groupswhere AND ec.course = ?";
             $allparams[] = $formdata->course;
 
-        // If we don't need to show groups.
+            // If we don't need to show groups.
         } else {
             $alldatasql = $selectsql . " WHERE ec.course = ?";
             $allparams['course'] = $formdata->course;

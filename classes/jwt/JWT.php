@@ -1,11 +1,25 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace mod_englishcentral\jwt;
 
-use \DomainException;
-use \InvalidArgumentException;
-use \UnexpectedValueException;
-use \DateTime;
+use DomainException;
+use InvalidArgumentException;
+use UnexpectedValueException;
+use DateTime;
 
 /**
  * JSON Web Token implementation, based on this spec:
@@ -22,7 +36,6 @@ use \DateTime;
  */
 class JWT
 {
-
     /**
      * When checking nbf, iat or expiration times,
      * we want to provide some extra leeway time to
@@ -38,14 +51,14 @@ class JWT
      */
     public static $timestamp = null;
 
-    public static $supported_algs = array(
-        'HS256' => array('hash_hmac', 'SHA256'),
-        'HS512' => array('hash_hmac', 'SHA512'),
-        'HS384' => array('hash_hmac', 'SHA384'),
-        'RS256' => array('openssl', 'SHA256'),
-        'RS384' => array('openssl', 'SHA384'),
-        'RS512' => array('openssl', 'SHA512'),
-    );
+    public static $supported_algs = [
+        'HS256' => ['hash_hmac', 'SHA256'],
+        'HS512' => ['hash_hmac', 'SHA512'],
+        'HS384' => ['hash_hmac', 'SHA384'],
+        'RS256' => ['openssl', 'SHA256'],
+        'RS384' => ['openssl', 'SHA384'],
+        'RS512' => ['openssl', 'SHA512'],
+    ];
 
     /**
      * Decodes a JWT string into a PHP object.
@@ -67,8 +80,7 @@ class JWT
      * @uses jsonDecode
      * @uses urlsafeB64Decode
      */
-    public static function decode($jwt, $key, array $allowed_algs = array())
-    {
+    public static function decode($jwt, $key, array $allowed_algs = []) {
         $timestamp = is_null(static::$timestamp) ? time() : static::$timestamp;
 
         if (empty($key)) {
@@ -78,7 +90,7 @@ class JWT
         if (count($tks) != 3) {
             throw new UnexpectedValueException('Wrong number of segments');
         }
-        list($headb64, $bodyb64, $cryptob64) = $tks;
+        [$headb64, $bodyb64, $cryptob64] = $tks;
         if (null === ($header = static::jsonDecode(static::urlsafeB64Decode($headb64)))) {
             throw new UnexpectedValueException('Invalid header encoding');
         }
@@ -154,16 +166,15 @@ class JWT
      * @uses jsonEncode
      * @uses urlsafeB64Encode
      */
-    public static function encode($payload, $key, $alg = 'HS256', $keyId = null, $head = null)
-    {
-        $header = array('typ' => 'JWT', 'alg' => $alg);
+    public static function encode($payload, $key, $alg = 'HS256', $keyId = null, $head = null) {
+        $header = ['typ' => 'JWT', 'alg' => $alg];
         if ($keyId !== null) {
             $header['kid'] = $keyId;
         }
-        if ( isset($head) && is_array($head) ) {
+        if (isset($head) && is_array($head)) {
             $header = array_merge($head, $header);
         }
-        $segments = array();
+        $segments = [];
         $segments[] = static::urlsafeB64Encode(static::jsonEncode($header));
         $segments[] = static::urlsafeB64Encode(static::jsonEncode($payload));
         $signing_input = implode('.', $segments);
@@ -186,13 +197,12 @@ class JWT
      *
      * @throws DomainException Unsupported algorithm was specified
      */
-    public static function sign($msg, $key, $alg = 'HS256')
-    {
+    public static function sign($msg, $key, $alg = 'HS256') {
         if (empty(static::$supported_algs[$alg])) {
             throw new DomainException('Algorithm not supported');
         }
-        list($function, $algorithm) = static::$supported_algs[$alg];
-        switch($function) {
+        [$function, $algorithm] = static::$supported_algs[$alg];
+        switch ($function) {
             case 'hash_hmac':
                 return hash_hmac($algorithm, $msg, $key, true);
             case 'openssl':
@@ -219,19 +229,18 @@ class JWT
      *
      * @throws DomainException Invalid Algorithm or OpenSSL failure
      */
-    private static function verify($msg, $signature, $key, $alg)
-    {
+    private static function verify($msg, $signature, $key, $alg) {
         if (empty(static::$supported_algs[$alg])) {
             throw new DomainException('Algorithm not supported');
         }
 
-        list($function, $algorithm) = static::$supported_algs[$alg];
-        switch($function) {
+        [$function, $algorithm] = static::$supported_algs[$alg];
+        switch ($function) {
             case 'openssl':
                 $success = openssl_verify($msg, $signature, $key, $algorithm);
                 if ($success === 1) {
                     return true;
-                } elseif ($success === 0) {
+                } else if ($success === 0) {
                     return false;
                 }
                 // returns 1 on success, 0 on failure, -1 on error.
@@ -265,8 +274,7 @@ class JWT
      *
      * @throws DomainException Provided string was invalid JSON
      */
-    public static function jsonDecode($input)
-    {
+    public static function jsonDecode($input) {
         if (version_compare(PHP_VERSION, '5.4.0', '>=') && !(defined('JSON_C_VERSION') && PHP_INT_SIZE > 4)) {
             /** In PHP >=5.4.0, json_decode() accepts an options parameter, that allows you
              * to specify that large ints (like Steam Transaction IDs) should be treated as
@@ -279,13 +287,13 @@ class JWT
              *them to strings) before decoding, hence the preg_replace() call.
              */
             $max_int_length = strlen((string) PHP_INT_MAX) - 1;
-            $json_without_bigints = preg_replace('/:\s*(-?\d{'.$max_int_length.',})/', ': "$1"', $input);
+            $json_without_bigints = preg_replace('/:\s*(-?\d{' . $max_int_length . ',})/', ': "$1"', $input);
             $obj = json_decode($json_without_bigints);
         }
 
         if (function_exists('json_last_error') && $errno = json_last_error()) {
             static::handleJsonError($errno);
-        } elseif ($obj === null && $input !== 'null') {
+        } else if ($obj === null && $input !== 'null') {
             throw new DomainException('Null result with non-null input');
         }
         return $obj;
@@ -300,12 +308,11 @@ class JWT
      *
      * @throws DomainException Provided object could not be encoded to valid JSON
      */
-    public static function jsonEncode($input)
-    {
+    public static function jsonEncode($input) {
         $json = json_encode($input);
         if (function_exists('json_last_error') && $errno = json_last_error()) {
             static::handleJsonError($errno);
-        } elseif ($json === 'null' && $input !== null) {
+        } else if ($json === 'null' && $input !== null) {
             throw new DomainException('Null result with non-null input');
         }
         return $json;
@@ -318,8 +325,7 @@ class JWT
      *
      * @return string A decoded string
      */
-    public static function urlsafeB64Decode($input)
-    {
+    public static function urlsafeB64Decode($input) {
         $remainder = strlen($input) % 4;
         if ($remainder) {
             $padlen = 4 - $remainder;
@@ -335,8 +341,7 @@ class JWT
      *
      * @return string The base64 encode of what you passed in
      */
-    public static function urlsafeB64Encode($input)
-    {
+    public static function urlsafeB64Encode($input) {
         return str_replace('=', '', strtr(base64_encode($input), '+/', '-_'));
     }
 
@@ -347,15 +352,14 @@ class JWT
      *
      * @return void
      */
-    private static function handleJsonError($errno)
-    {
-        $messages = array(
+    private static function handleJsonError($errno) {
+        $messages = [
             JSON_ERROR_DEPTH => 'Maximum stack depth exceeded',
             JSON_ERROR_STATE_MISMATCH => 'Invalid or malformed JSON',
             JSON_ERROR_CTRL_CHAR => 'Unexpected control character found',
             JSON_ERROR_SYNTAX => 'Syntax error, malformed JSON',
-            JSON_ERROR_UTF8 => 'Malformed UTF-8 characters' //PHP >= 5.3.3
-        );
+            JSON_ERROR_UTF8 => 'Malformed UTF-8 characters', // PHP >= 5.3.3
+        ];
         throw new DomainException(
             isset($messages[$errno])
             ? $messages[$errno]
@@ -370,8 +374,7 @@ class JWT
      *
      * @return int
      */
-    private static function safeStrlen($str)
-    {
+    private static function safeStrlen($str) {
         if (function_exists('mb_strlen')) {
             return mb_strlen($str, '8bit');
         }

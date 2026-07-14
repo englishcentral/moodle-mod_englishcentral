@@ -41,7 +41,6 @@ use mod_englishcentral\constants;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class basereport {
-
     protected $report = "";
     protected $head = [];
     protected $rawdata = null;
@@ -57,7 +56,6 @@ abstract class basereport {
     public function fetch_formatted_description() {
 
         return '';
-
     }
 
     public function __construct($cm) {
@@ -72,7 +70,7 @@ abstract class basereport {
     }
     public function fetch_head() {
         $head = [];
-        foreach($this->fields as $field){
+        foreach ($this->fields as $field) {
             $head[] = get_string($field, constants::M_COMPONENT);
         }
         return $head;
@@ -86,7 +84,7 @@ abstract class basereport {
     }
 
     public function truncate($string, $maxlength) {
-        if(strlen($string) > $maxlength){
+        if (strlen($string) > $maxlength) {
             $string = substr($string, 0, $maxlength - 2) . '..';
         }
         return $string;
@@ -94,10 +92,10 @@ abstract class basereport {
 
     public function fetch_cache($table, $rowid) {
         global $DB;
-        if(!array_key_exists($table, $this->dbcache)){
+        if (!array_key_exists($table, $this->dbcache)) {
             $this->dbcache[$table] = [];
         }
-        if(!array_key_exists($rowid, $this->dbcache[$table])){
+        if (!array_key_exists($rowid, $this->dbcache[$table])) {
             $this->dbcache[$table][$rowid] = $DB->get_record($table, ['id' => $rowid]);
         }
         return $this->dbcache[$table][$rowid];
@@ -106,7 +104,8 @@ abstract class basereport {
     public function fetch_formatted_time($seconds) {
 
         // return empty string if the timestamps are not both present.
-        if(!$seconds){return '';
+        if (!$seconds) {
+            return '';
         }
         $time = time();
         return $this->fetch_time_difference($time, $time + $seconds);
@@ -115,7 +114,8 @@ abstract class basereport {
     public function fetch_time_difference($starttimestamp, $endtimestamp) {
 
         // return empty string if the timestamps are not both present.
-        if(!$starttimestamp || !$endtimestamp){return '';
+        if (!$starttimestamp || !$endtimestamp) {
+            return '';
         }
 
         $s = $date = new \DateTime();
@@ -129,23 +129,23 @@ abstract class basereport {
         return $ret;
     }
 
-    public function fetch_formatted_rows($withlinks=true, $paging=false) {
+    public function fetch_formatted_rows($withlinks = true, $paging = false) {
         $records = $this->rawdata;
         $fields = $this->fields;
         $returndata = [];
-        if($paging){
+        if ($paging) {
             $startrecord = ($paging->perpage * $paging->pageno) + 1;
             $endrecord = $startrecord + $paging->perpage - 1;
         }
         $reccount = 0;
-        foreach($records as $record){
+        foreach ($records as $record) {
             $reccount++;
-            if($paging && ($reccount < $startrecord || $reccount > $endrecord)){
+            if ($paging && ($reccount < $startrecord || $reccount > $endrecord)) {
                 continue;
             }
 
             $data = new \stdClass();
-            foreach($fields as $field){
+            foreach ($fields as $field) {
                 $data->{$field} = $this->fetch_formatted_field($field, $record, $withlinks);
             }//end of for each field
             $returndata[] = $data;
@@ -155,7 +155,7 @@ abstract class basereport {
 
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB;
-        switch($field){
+        switch ($field) {
             case 'timecreated':
                 $ret = date("Y-m-d H:i:s", $record->timecreated);
                 break;
@@ -164,9 +164,9 @@ abstract class basereport {
                 $ret = fullname($u);
                 break;
             default:
-                if(property_exists($record, $field)){
+                if (property_exists($record, $field)) {
                     $ret = $record->{$field};
-                }else{
+                } else {
                     $ret = '';
                 }
         }

@@ -4,7 +4,7 @@
  * CSS for SUPPORT page
  **/
 
- #page-mod-englishcentral-support .supportconfirm th {
+#page-mod-englishcentral-support .supportconfirm th {
     text-align: right;
 }
 
@@ -98,7 +98,7 @@
     vertical-align: top;
     width: 100%;
     margin-bottom: 12px;
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 #page-mod-englishcentral-view #id_progresscontainer .title {
@@ -1603,7 +1603,7 @@ Layers affected:
 
     /* different padding if chat is enabled */
     #page-mod-englishcentral-view .video-placeholder-text-progress.chat_enabled {
-        padding-top: 0px;
+        padding-top: 0;
     }
     #page-mod-englishcentral-view .video-placeholder-text-progress.chat_enabled .video-placeholder-text-row {
         padding-bottom: 8px;
@@ -1961,40 +1961,42 @@ Layers affected:
 
 #page-mod-englishcentral-view .activity-topics {
     display: flex;
- }
+}
 
- .englishcentral_reportsmenu_box {
+.englishcentral_reportsmenu_box {
     text-align: center;
     display: flex;
-  }
-  
-  .englishcentral_reportsmenu_item {
+}
+
+.englishcentral_reportsmenu_item {
     width: 250px;
     margin: 10px;
     border: 1px solid grey;
     padding: 8px;
     margin-right: 20px;
-  }
-  
-  .englishcentral_reportsmenu_itembutton button{
+}
+
+.englishcentral_reportsmenu_itembutton button {
     width: 200px;
     height: 60px;
-  }
-  .mod_ec_returntoreports {
+}
+.mod_ec_returntoreports {
     margin: auto;
     display: block;
     font-weight: bold;
     width: 200px;
     padding: 10px;
     background-color: lightgrey;
-  }
-  .mod_ec_chartcontainer .chart-area .chart-image, .mod_ec_chartcontainer .chart-area {
+}
+.mod_ec_chartcontainer .chart-area .chart-image,
+.mod_ec_chartcontainer .chart-area {
     min-height: 100%;
-  }
-  .mod_ec_chartcontainer .chart-area {
+}
+.mod_ec_chartcontainer .chart-area {
     height: 100%;
-  }
+}
 
-  ec-mobile-content-renderer .mobile-content-renderer.fullscreen .mobile-content {
+/* stylelint-disable-next-line selector-type-no-unknown -- Ionic custom element from the mobile app. */
+ec-mobile-content-renderer .mobile-content-renderer.fullscreen .mobile-content {
     padding-top: 4em;
-  }
+}

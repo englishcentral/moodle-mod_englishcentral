@@ -1,6 +1,18 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -48,8 +60,7 @@ define('MOD_ENGLISHCENTRAL_GRADENONE', 4);
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
  */
-function englishcentral_supports($feature)
-{
+function englishcentral_supports($feature) {
     switch ($feature) {
         case FEATURE_BACKUP_MOODLE2:
             return true;
@@ -80,8 +91,8 @@ function englishcentral_supports($feature)
             } else {
                 return null;
             }
-        // FEATURE_MOD_OTHERPURPOSE  - wont be defined for < 5.1. so we hard code it. 
-        // If it is defined then interactivecontent  and assessment will also be  defined.   
+            // FEATURE_MOD_OTHERPURPOSE  - wont be defined for < 5.1. so we hard code it.
+            // If it is defined then interactivecontent  and assessment will also be  defined.
         case "mod_otherpurpose":
             return "assessment";
 
@@ -106,8 +117,7 @@ function englishcentral_supports($feature)
  * @param mod_englishcentral_mod_form $mform
  * @return int The id of the newly inserted englishcentral record
  */
-function englishcentral_add_instance(stdClass $formdata, ?mod_englishcentral_mod_form $mform = null)
-{
+function englishcentral_add_instance(stdClass $formdata, ?mod_englishcentral_mod_form $mform = null) {
     return englishcentral_process_formdata($formdata, $mform);
 }
 
@@ -122,8 +132,7 @@ function englishcentral_add_instance(stdClass $formdata, ?mod_englishcentral_mod
  * @param mod_englishcentral_mod_form $mform
  * @return boolean Success/Fail
  */
-function englishcentral_update_instance(stdClass $data, ?mod_englishcentral_mod_form $mform = null)
-{
+function englishcentral_update_instance(stdClass $data, ?mod_englishcentral_mod_form $mform = null) {
     return englishcentral_process_formdata($data, $mform);
 }
 
@@ -133,8 +142,7 @@ function englishcentral_update_instance(stdClass $data, ?mod_englishcentral_mod_
  * @param stdClass $data recently submitted formdata
  * @return boolean Success/Failure
  */
-function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod_form $mform = null)
-{
+function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod_form $mform = null) {
     global $DB;
 
     // add/update record in main EC table
@@ -151,7 +159,7 @@ function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod
         $data->timemodified = time();
         $DB->update_record($table, $data);
 
-        $params = array('id' => $data->instance);
+        $params = ['id' => $data->instance];
         $grade = $DB->get_field($table, 'grade', $params);
         $update_grades = ($data->grade == $grade ? false : true);
     }
@@ -180,14 +188,13 @@ function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
  */
-function englishcentral_delete_instance($id)
-{
+function englishcentral_delete_instance($id) {
     global $DB;
-    $params = array('ecid' => $id);
+    $params = ['ecid' => $id];
     $DB->delete_records('englishcentral_videos', $params);
     $DB->delete_records('englishcentral_attempts', $params);
     $DB->delete_records('englishcentral_phonemes', $params);
-    $DB->delete_records('englishcentral', array('id' => $id));
+    $DB->delete_records('englishcentral', ['id' => $id]);
     return true;
 }
 
@@ -205,12 +212,11 @@ function englishcentral_delete_instance($id)
  * @param array|object $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
-function englishcentral_grade_item_update($englishcentral, $grades = null)
-{
+function englishcentral_grade_item_update($englishcentral, $grades = null) {
     global $CFG;
     require_once($CFG->dirroot . '/lib/gradelib.php');
 
-    $params = array('itemname' => $englishcentral->name);
+    $params = ['itemname' => $englishcentral->name];
     // isset($englishcentral->cmidnumber)
     // property_exists($englishcentral, 'cmidnumber')
     if (array_key_exists('cmidnumber', (array) $englishcentral)) {
@@ -250,19 +256,19 @@ function englishcentral_grade_item_update($englishcentral, $grades = null)
     } else if (!empty($grades)) {
         // Need to calculate raw grade (Note: $grades has many forms)
         if (is_object($grades)) {
-            $grades = array($grades->userid => $grades);
+            $grades = [$grades->userid => $grades];
         } else if (array_key_exists('userid', $grades)) {
-            $grades = array($grades['userid'] => $grades);
+            $grades = [$grades['userid'] => $grades];
         }
         foreach ($grades as $key => $grade) {
             if (!is_array($grade)) {
                 $grades[$key] = $grade = (array) $grade;
             }
-            //check raw grade isnt null otherwise we insert a grade of 0
+            // check raw grade isnt null otherwise we insert a grade of 0
             if ($grade['rawgrade'] !== null) {
                 $grades[$key]['rawgrade'] = ($grade['rawgrade'] * $params['grademax'] / 100);
             } else {
-                //setting rawgrade to null just in case user is deleting a grade
+                // setting rawgrade to null just in case user is deleting a grade
                 $grades[$key]['rawgrade'] = null;
             }
         }
@@ -285,8 +291,7 @@ function englishcentral_grade_item_update($englishcentral, $grades = null)
  * @param int $userid specific user only, 0 means all
  * @param bool $nullifnone
  */
-function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone = true)
-{
+function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone = true) {
     global $CFG, $DB;
     require_once($CFG->dirroot . '/lib/gradelib.php');
 
@@ -295,7 +300,7 @@ function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone 
     } else if ($grades = englishcentral_get_user_grades($englishcentral, $userid)) {
         // do nothing
     } else if ($userid && $nullifnone) {
-        $grades = (object) array('userid' => $userid, 'rawgrade' => null);
+        $grades = (object) ['userid' => $userid, 'rawgrade' => null];
     } else {
         $grades = null;
     }
@@ -312,8 +317,7 @@ function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone 
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */
-function englishcentral_get_user_grades($englishcentral, $userid = 0)
-{
+function englishcentral_get_user_grades($englishcentral, $userid = 0) {
     global $DB;
 
     $goal = 0;
@@ -343,7 +347,7 @@ function englishcentral_get_user_grades($englishcentral, $userid = 0)
     $select = "userid, $select AS rawgrade";
     $from = '{englishcentral_attempts}';
     $where = 'ecid = ?';
-    $params = array($goal, $englishcentral->id);
+    $params = [$goal, $englishcentral->id];
 
     if ($userid) {
         $where .= ' AND userid = ?';
@@ -361,8 +365,7 @@ function englishcentral_get_user_grades($englishcentral, $userid = 0)
  *
  * @param $mform form passed by reference
  */
-function englishcentral_reset_course_form_definition(&$mform)
-{
+function englishcentral_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'englishcentralheader', get_string('modulenameplural', 'englishcentral'));
     $mform->addElement('advcheckbox', 'reset_englishcentral', get_string('deleteallattempts', 'englishcentral'));
 }
@@ -372,9 +375,8 @@ function englishcentral_reset_course_form_definition(&$mform)
  * @param object $course
  * @return array
  */
-function englishcentral_reset_course_form_defaults($course)
-{
-    return array('reset_englishcentral' => 1);
+function englishcentral_reset_course_form_defaults($course) {
+    return ['reset_englishcentral' => 1];
 }
 
 /**
@@ -385,14 +387,13 @@ function englishcentral_reset_course_form_defaults($course)
  * @param int $courseid
  * @param string optional type
  */
-function englishcentral_reset_gradebook($courseid, $type = '')
-{
+function englishcentral_reset_gradebook($courseid, $type = '') {
     global $CFG, $DB;
 
     $sql = "SELECT l.*, cm.idnumber as cmidnumber, l.course as courseid
               FROM {englishcentral} l, {course_modules} cm, {modules} m
              WHERE m.name='englishcentral' AND m.id=cm.module AND cm.instance=l.id AND l.course=:course";
-    $params = array("course" => $courseid);
+    $params = ["course" => $courseid];
     if ($englishcentrals = $DB->get_records_sql($sql, $params)) {
         foreach ($englishcentrals as $englishcentral) {
             englishcentral_grade_item_update($englishcentral, 'reset');
@@ -409,19 +410,18 @@ function englishcentral_reset_gradebook($courseid, $type = '')
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
-function englishcentral_reset_userdata($data)
-{
+function englishcentral_reset_userdata($data) {
     global $CFG, $DB;
 
     $componentstr = get_string('modulenameplural', 'englishcentral');
-    $status = array();
+    $status = [];
 
     if (!empty($data->reset_englishcentral)) {
         $englishcentralssql = "SELECT l.id
                          FROM {englishcentral} l
                         WHERE l.course=:course";
 
-        $params = array("course" => $data->courseid);
+        $params = ["course" => $data->courseid];
         $DB->delete_records_select('englishcentral_attempts', "ecid IN ($englishcentralssql)", $params);
         $DB->delete_records_select('englishcentral_phonemes', "ecid IN ($englishcentralssql)", $params);
 
@@ -430,13 +430,13 @@ function englishcentral_reset_userdata($data)
             englishcentral_reset_gradebook($data->courseid);
         }
 
-        $status[] = array('component' => $componentstr, 'item' => get_string('deleteallattempts', 'englishcentral'), 'error' => false);
+        $status[] = ['component' => $componentstr, 'item' => get_string('deleteallattempts', 'englishcentral'), 'error' => false];
     }
 
     /// updating dates - shift may be negative too
     if ($data->timeshift) {
-        shift_course_mod_dates('englishcentral', array('available', 'deadline'), $data->timeshift, $data->courseid);
-        $status[] = array('component' => $componentstr, 'item' => get_string('datechanged'), 'error' => false);
+        shift_course_mod_dates('englishcentral', ['available', 'deadline'], $data->timeshift, $data->courseid);
+        $status[] = ['component' => $componentstr, 'item' => get_string('datechanged'), 'error' => false];
     }
 
     return $status;
@@ -451,8 +451,7 @@ function englishcentral_reset_userdata($data)
  *
  * @return stdClass|null
  */
-function englishcentral_user_outline($course, $user, $mod, $englishcentral)
-{
+function englishcentral_user_outline($course, $user, $mod, $englishcentral) {
     $return = new stdClass();
     $return->time = 0;
     $return->info = '';
@@ -469,8 +468,7 @@ function englishcentral_user_outline($course, $user, $mod, $englishcentral)
  * @param stdClass $englishcentral the module instance record
  * @return void, is supposed to echp directly
  */
-function englishcentral_user_complete($course, $user, $mod, $englishcentral)
-{
+function englishcentral_user_complete($course, $user, $mod, $englishcentral) {
 }
 
 /**
@@ -480,9 +478,8 @@ function englishcentral_user_complete($course, $user, $mod, $englishcentral)
  *
  * @return boolean
  */
-function englishcentral_print_recent_activity($course, $viewfullnames, $timestart)
-{
-    return false;  //  True if anything was printed, otherwise false
+function englishcentral_print_recent_activity($course, $viewfullnames, $timestart) {
+    return false;  // True if anything was printed, otherwise false
 }
 
 /**
@@ -501,8 +498,7 @@ function englishcentral_print_recent_activity($course, $viewfullnames, $timestar
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  * @return void adds items into $activities and increases $index
  */
-function englishcentral_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0)
-{
+function englishcentral_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
 }
 
 /**
@@ -510,8 +506,7 @@ function englishcentral_get_recent_mod_activity(&$activities, &$index, $timestar
 
  * @return void
  */
-function englishcentral_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames)
-{
+function englishcentral_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
 }
 
 /**
@@ -522,8 +517,7 @@ function englishcentral_print_recent_mod_activity($activity, $courseid, $detail,
  * @return boolean
  * @todo Finish documenting this function
  **/
-function englishcentral_cron()
-{
+function englishcentral_cron() {
     return true;
 }
 
@@ -533,9 +527,8 @@ function englishcentral_cron()
  * @example return array('moodle/site:accessallgroups');
  * @return array
  */
-function englishcentral_get_extra_capabilities()
-{
-    return array();
+function englishcentral_get_extra_capabilities() {
+    return [];
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -553,12 +546,11 @@ function englishcentral_get_extra_capabilities()
  * @param int $ecid ID of an instance of this module
  * @return bool true if the scale is used by the given englishcentral instance
  */
-function englishcentral_scale_used($ecid, $scaleid)
-{
+function englishcentral_scale_used($ecid, $scaleid) {
     global $DB;
 
     /** @example */
-    if ($scaleid and $DB->record_exists('englishcentral', array('id' => $ecid, 'grade' => -$scaleid))) {
+    if ($scaleid and $DB->record_exists('englishcentral', ['id' => $ecid, 'grade' => -$scaleid])) {
         return true;
     } else {
         return false;
@@ -573,12 +565,11 @@ function englishcentral_scale_used($ecid, $scaleid)
  * @param $scaleid int
  * @return boolean true if the scale is used by any englishcentral instance
  */
-function englishcentral_scale_used_anywhere($scaleid)
-{
+function englishcentral_scale_used_anywhere($scaleid) {
     global $DB;
 
     /** @example */
-    if ($scaleid and $DB->record_exists('englishcentral', array('grade' => -$scaleid))) {
+    if ($scaleid and $DB->record_exists('englishcentral', ['grade' => -$scaleid])) {
         return true;
     } else {
         return false;
@@ -600,9 +591,8 @@ function englishcentral_scale_used_anywhere($scaleid)
  * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
  */
-function englishcentral_get_file_areas($course, $cm, $context)
-{
-    return array();
+function englishcentral_get_file_areas($course, $cm, $context) {
+    return [];
 }
 
 /**
@@ -622,8 +612,7 @@ function englishcentral_get_file_areas($course, $cm, $context)
  * @param string $filename
  * @return file_info instance or null if not found
  */
-function englishcentral_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename)
-{
+function englishcentral_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     return null;
 }
 
@@ -641,8 +630,7 @@ function englishcentral_get_file_info($browser, $areas, $course, $cm, $context, 
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  */
-function englishcentral_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = array())
-{
+function englishcentral_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = []) {
     global $DB, $CFG;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -668,8 +656,7 @@ function englishcentral_pluginfile($course, $cm, $context, $filearea, array $arg
  * @param stdClass $module
  * @param cm_info $cm
  */
-function englishcentral_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module, cm_info $cm)
-{
+function englishcentral_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module, cm_info $cm) {
 }
 
 /**
@@ -681,8 +668,7 @@ function englishcentral_extend_navigation(navigation_node $navref, stdclass $cou
  * @param settings_navigation $settingsnav {@link settings_navigation}
  * @param navigation_node $englishcentralnode {@link navigation_node}
  */
-function englishcentral_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $englishcentralnode = null)
-{
+function englishcentral_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $englishcentralnode = null) {
 }
 
 /**
@@ -695,29 +681,28 @@ function englishcentral_extend_settings_navigation(settings_navigation $settings
  * @param  bool    $type   of comparison (or/and; used as return value if there are no conditions)
  * @return mixed   TRUE if completed, FALSE if not, or $type if no conditions are set
  */
-function englishcentral_get_completion_state($course, $cm, $userid, $type)
-{
+function englishcentral_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
 
     // set default return $state
     $state = $type;
 
     // get the englishcentral record
-    if ($ec = $DB->get_record('englishcentral', array('id' => $cm->instance))) {
+    if ($ec = $DB->get_record('englishcentral', ['id' => $cm->instance])) {
         $ec = \mod_englishcentral\activity::create($ec, $cm, $course);
 
         // get grade, if necessary
         $grade = false;
         if ($ec->completionmingrade > 0.0 || $ec->completionpass) {
             require_once($CFG->dirroot . '/lib/gradelib.php');
-            $params = array(
+            $params = [
                 'courseid' => $course->id,
                 'itemtype' => 'mod',
                 'itemmodule' => 'englishcentral',
-                'iteminstance' => $cm->instance
-            );
+                'iteminstance' => $cm->instance,
+            ];
             if ($grade_item = grade_item::fetch($params)) {
-                $grades = grade_grade::fetch_users_grades($grade_item, array($userid), false);
+                $grades = grade_grade::fetch_users_grades($grade_item, [$userid], false);
                 if (isset($grades[$userid])) {
                     $grade = $grades[$userid];
                 }
@@ -727,11 +712,11 @@ function englishcentral_get_completion_state($course, $cm, $userid, $type)
         }
 
         // the EnglishCentral completion conditions
-        $conditions = array(
+        $conditions = [
             'completionmingrade',
             'completionpass',
-            'completiongoals'
-        );
+            'completiongoals',
+        ];
 
         foreach ($conditions as $condition) {
             // decimal (e.g. completionmingrade) fields are returned by MySQL as a string
@@ -760,7 +745,6 @@ function englishcentral_get_completion_state($course, $cm, $userid, $type)
                         $state = false; // unusual - no goals have been set up !!
                     }
                     break;
-
             }
             // finish early if possible
             if ($type == COMPLETION_AND && $state == false) {
@@ -786,8 +770,7 @@ function englishcentral_get_completion_state($course, $cm, $userid, $type)
  * @return cached_cm_info An object on information that the courses
  *                        will know about (most noticeably, an icon).
  */
-function englishcentral_get_coursemodule_info($coursemodule)
-{
+function englishcentral_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
@@ -807,10 +790,10 @@ function englishcentral_get_coursemodule_info($coursemodule)
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
         $result->customdata['customcompletionrules']['completionmingrade'] = $ec->completionmingrade;
-        //how to get pass grade?
+        // how to get pass grade?
         $result->customdata['customcompletionrules']['completionpass'] = $ec->completionpass;
         if ($ec->completiongoals) {
-            //TO DO: put the watch learn and speak goals as stdclass, in the completion goals array item, and fetch for
+            // TO DO: put the watch learn and speak goals as stdclass, in the completion goals array item, and fetch for
             // display in custom_completion get_custom_rule_description
             $result->customdata['customcompletionrules']['completiongoals'] = true;
         }
