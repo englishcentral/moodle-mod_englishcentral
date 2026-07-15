@@ -187,7 +187,7 @@ class courseattempts extends basereport {
           'INNER JOIN {' . constants::M_TABLE . '} ec ' .
           'ON ec.id = tu.ecid ';
 
-        // if we need to show  groups
+        // If we need to show  groups.
         if ($formdata->groupid > 0) {
             [$groupswhere, $allparams] = $DB->get_in_or_equal($formdata->groupid);
 
@@ -212,7 +212,7 @@ class courseattempts extends basereport {
             $allparams['dayslimit'] = $dayslimit;
         }
 
-        // Add a 'group by' clause to SQL
+        // Add a 'group by' clause to SQL.
         $alldatasql .= " GROUP BY userid";
 
         // Use the SQL to fetch the data.

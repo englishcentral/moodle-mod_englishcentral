@@ -47,7 +47,7 @@ function xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname) {
         if ($records = $DB->get_records($oldname)) {
             foreach ($records as $record) {
                 if ($table_exists && $DB->record_exists($table->getName(), ['id' => $record->id])) {
-                    continue; // record has already been transferred
+                    continue; // Record has already been transferred.
                 }
                 foreach ($fields as $oldfield => $newfield) {
                     $record->$newfield = $record->$oldfield;
@@ -74,7 +74,7 @@ function xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname) {
 function xmldb_englishcentral_create_table($dbman, $table, $fields = []) {
     global $DB;
     if ($dbman->table_exists($table)) {
-        // remove all existing indexes and keys (except PRIMARY key)
+        // Remove all existing indexes and keys (except PRIMARY key).
         $indexes = $DB->get_indexes($table->getName());
         foreach ($indexes as $indexname => $index) {
             if ($indexname == 'primary') {
@@ -89,8 +89,8 @@ function xmldb_englishcentral_create_table($dbman, $table, $fields = []) {
             $dbman->drop_index($table, $index);
         }
 
-        // add/change fields
-        $previous = ''; // name of previous field in DB
+        // Add/change fields.
+        $previous = ''; // Name of previous field in DB.
         foreach ($table->getFields() as $field) {
             if ($previous) {
                 $field->setPrevious($previous);
@@ -110,7 +110,7 @@ function xmldb_englishcentral_create_table($dbman, $table, $fields = []) {
             $previous = $field->getName();
         }
 
-        // (re)add indexes
+        // Re-add indexes.
         foreach ($table->getIndexes() as $index) {
             if ($index->getName() == 'primary') {
                 continue;

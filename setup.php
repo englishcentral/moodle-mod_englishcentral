@@ -34,8 +34,8 @@ global $DB;
 
 
 // Course module ID.
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n  = optional_param('n', 0, PARAM_INT);  // englishcentral instance ID
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
+$n  = optional_param('n', 0, PARAM_INT);  // Englishcentral instance ID.
 
 // Course and course module data.
 if ($id) {
@@ -64,7 +64,7 @@ $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-// Page layout if setup is enabled is always popup
+// Page layout if setup is enabled is always popup.
 $PAGE->set_pagelayout('popup');
 
 
@@ -82,7 +82,7 @@ $mform = new \mod_englishcentral\setupform(null, [
 
 $redirecturl = new moodle_url('/mod/englishcentral/view.php', ['id' => $cm->id]);
 
-// if the cancel button was pressed, we are out of here
+// If the cancel button was pressed, we are out of here.
 if ($mform->is_cancelled()) {
     redirect($redirecturl);
     exit;
@@ -90,14 +90,14 @@ if ($mform->is_cancelled()) {
     $data->id = $data->n;
     $data->timemodified = time();
 
-    // now update the db once we have saved files and stuff
+    // Now update the db once we have saved files and stuff.
     if ($DB->update_record(constants::M_TABLE, $data)) {
         redirect($redirecturl);
         exit;
     }
 }
 
-// if we got here we is loading up dat form
+// If we got here we is loading up dat form.
 $moduleinstance->n = $moduleinstance->id;
 $mform->set_data((array)$moduleinstance);
 

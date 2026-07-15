@@ -207,14 +207,14 @@ class attemptssummary extends basereport
     protected function setup_sort() {
         global $SESSION;
 
-        // initialize session info
+        // Initialize session info.
         if (empty($SESSION->englishcentral)) {
             $SESSION->englishcentral = new \stdClass();
             $SESSION->englishcentral->sort = '';
             $SESSION->englishcentral->order = '';
         }
 
-        // override sort item/order with incoming data
+        // Override sort item/order with incoming data.
         $sort = optional_param('sort', '', PARAM_ALPHA);
         switch (true) {
             case ($sort == ''):
@@ -243,7 +243,7 @@ class attemptssummary extends basereport
             }
         }
 
-        // store new/updated sort item/order
+        // Store new/updated sort item/order.
         $this->sort = $SESSION->englishcentral->sort = $sort;
         $this->order = $SESSION->englishcentral->order = $order;
     }
@@ -261,7 +261,7 @@ class attemptssummary extends basereport
         if ($sort == $this->sort) {
             $order = $this->order;
         } else {
-            $order = ''; // unsorted
+            $order = ''; // Unsorted.
         }
 
         switch (true) {
@@ -432,7 +432,7 @@ class attemptssummary extends basereport
         // Init empty data.
         $emptydata = [];
 
-        // Groups stuff
+        // Groups stuff.
         $moduleinstance = $DB->get_record(constants::M_TABLE, ['id' => $formdata->ecid]);
         $course = $DB->get_record('course', ['id' => $moduleinstance->course], '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance(constants::M_TABLE, $moduleinstance->id, $course->id, false, MUST_EXIST);
@@ -440,7 +440,7 @@ class attemptssummary extends basereport
         $ec = \mod_englishcentral\activity::create($moduleinstance, $cm, $course, $context);
         $this->ec = $ec;
 
-        // initialize study goals
+        // Initialize study goals.
         $goals = (object) [
             'watch' => 0,
             'learn' => 0,
@@ -498,7 +498,7 @@ class attemptssummary extends basereport
             $order .= ' ' . $this->order;
         }
 
-        // set goals to maximum in these aggregate items
+        // Set goals to maximum in these aggregate items.
         if ($items = $DB->get_records_sql("SELECT $select FROM $from WHERE $where ORDER BY $order", $params)) {
             foreach ($items as $userid => $item) {
                 $goals->watch = max($goals->watch, $item->watch);
@@ -527,7 +527,7 @@ class attemptssummary extends basereport
             $goals->chat);
         $this->goals = $goals;
 
-        // Here we can manually tweak the data,
+        // Here we can manually tweak the data,.
         if ($items) {
             foreach ($items as $userid => $item) {
                 $item->total = (min($this->goals->watch, $item->watch) +

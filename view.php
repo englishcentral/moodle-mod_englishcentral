@@ -31,9 +31,9 @@ require_once($CFG->dirroot . '/mod/englishcentral/lib.php');
 use mod_englishcentral\constants;
 use mod_englishcentral\mobile_auth;
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID
-$ecid = optional_param('ecid', 0, PARAM_INT);  // englishcentral instance ID
-$embed = optional_param('embed', 0, PARAM_INT); // course_module ID, or
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID.
+$ecid = optional_param('ecid', 0, PARAM_INT);  // Englishcentral instance ID.
+$embed = optional_param('embed', 0, PARAM_INT); // Course_module ID, or.
 
 // Allow login through an authentication token.
 $userid = optional_param('user_id', null, PARAM_ALPHANUMEXT);
@@ -73,11 +73,11 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('englishcentral', $instance);
 $event->trigger();
 
-// if we got this far, we can consider the activity "viewed"
+// If we got this far, we can consider the activity "viewed".
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
-/// Set up the page header
+// Set up the page header.
 $PAGE->set_url('/mod/englishcentral/view.php', ['id' => $cm->id]);
 $PAGE->set_context($context);
 
@@ -115,13 +115,13 @@ if ($ec->not_available()) {
     echo $renderer->show_notavailable();
     die;
 }
-// instructions /intro if less then Moodle 4.0 show
+// Instructions /intro if less then Moodle 4.0 show.
 if ($CFG->version < 2022041900) {
     echo $renderer->show_intro();
 }
 
 // Because of the limit on the number of options passed,
-// more options are passed via "getoptions" in view.ajax.php
+// More options are passed via "getoptions" in view.ajax.php.
 $opts = ['cmid'          => $ec->cm->id,
               'moodlesesskey' => sesskey(),
               'viewajaxurl'   => $ec->get_viewajax_url(false),
@@ -129,7 +129,7 @@ $opts = ['cmid'          => $ec->cm->id,
               'targetwindow'  => 'EC'];
 $PAGE->requires->js_call_amd("$ec->plugin/view", 'init', [$opts]);
 
-// Displays the student's learning progress charts
+// Displays the student's learning progress charts.
 if ($config->progressdials == constants::M_PROGRESSDIALS_TOP && !$ismobile) {
     echo $renderer->show_progress();
 }
@@ -152,7 +152,7 @@ if ($ec->viewable) {
     echo $renderer->show_notviewable($ec);
 }
 
-// Displays the student's learning progress charts
+// Displays the student's learning progress charts.
 if ($config->progressdials == constants::M_PROGRESSDIALS_BOTTOM || $ismobile) {
     echo $renderer->show_progress();
 }

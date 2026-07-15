@@ -25,23 +25,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/// Replace englishcentral with the name of your module and remove this line
+// Replace englishcentral with the name of your module and remove this line.
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/lib.php');
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // Course.
 $course = $DB->get_record('course', ['id' => $id], '*', MUST_EXIST);
 require_course_login($course);
 $coursecontext = context_course::instance($course->id);
 
 if (function_exists('get_log_manager')) {
-    // Moodle >= 2.6
+    // Moodle >= 2.6.
     $params = ['context' => $coursecontext];
     $event = \mod_englishcentral\event\course_module_instance_list_viewed::create($params);
     $event->trigger();
 } else if (function_exists('add_to_log')) {
-    // Moodle <= 2.5
+    // Moodle <= 2.5.
     add_to_log($course->id, 'englishcentral', 'view all', 'index.php?id=' . $course->id, '');
 }
 
@@ -91,7 +91,7 @@ if ($englishcentrals = get_all_instances_in_course('englishcentral', $course)) {
 
     echo html_writer::table($table);
 } else {
-    // there are no EnglishCentral activities in this course
+    // There are no EnglishCentral activities in this course.
     $label = get_string('noenglishcentrals', 'englishcentral');
     notice($label, new moodle_url('/course/view.php', ['id' => $course->id]));
 }

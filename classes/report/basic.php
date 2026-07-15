@@ -99,7 +99,7 @@ class basic extends basereport {
     public function process_raw_data($formdata) {
         global $DB;
 
-        // heading data
+        // Heading data.
         $this->headingdata = new \stdClass();
 
         $emptydata = [];

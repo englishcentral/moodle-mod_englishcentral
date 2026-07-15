@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// required plugin strings
+// Required plugin strings.
 $string['modulename'] = 'EnglishCentral';
 $string['modulenameplural'] = 'EnglishCentral Activities';
 $string['modulename_help'] = 'Give students vocabulary, listening and speaking practice with authentic English language videos. Features include:
@@ -42,7 +42,7 @@ $string['modulename_help'] = 'Give students vocabulary, listening and speaking p
 $string['pluginadministration'] = 'EnglishCentral Administration';
 $string['pluginname'] = 'EnglishCentral';
 
-// capabilities
+// Capabilities.
 $string['englishcentral:addinstance'] = 'Add a new EnglishCentral activity';
 $string['englishcentral:manage'] = 'Manage an EnglishCentral activity';
 $string['englishcentral:manageattempts'] = 'Manage attempts at an EnglishCentral activity';
@@ -51,7 +51,7 @@ $string['englishcentral:view'] = 'View an EnglishCentral activity';
 $string['englishcentral:viewreports'] = 'View reports for an English Central activity';
 $string['englishcentral:viewdevelopertools'] = 'View developer tools for an English Central activity';
 
-// completion
+// Completion.
 $string['completiongoals'] = 'Require study goals';
 $string['completionmingrade'] = 'Require minimum grade';
 $string['completionpass'] = 'Require passing grade';
@@ -59,7 +59,7 @@ $string['completiondetail:mingrade'] = 'Minimum grade: {$a}';
 $string['completiondetail:pass'] = 'Achieve pass grade';
 $string['completiondetail:goals'] = 'Complete the watch,learn and speak goals';
 
-// Activity settings
+// Activity settings.
 $string['consumerkey'] = 'Consumer Key';
 $string['consumerkeydefault'] = 'YOUR CONSUMER KEY';
 $string['consumerkeyexplain'] = 'Your consumer key is provided by EnglishCentral.';
@@ -196,7 +196,7 @@ $string['updatinggrades'] = 'Updating EnglishCentral grades';
 
 $string['noprogressreport'] = 'Sorry, but there is no progress to report.';
 
-// Display settings
+// Display settings.
 $string['showdetails'] = 'Show link to details';
 $string['showdetails_help'] = 'If this option is selected, a link to details of each video will be shown. The details include a transcript, vocabulary information, comprehension questions and discusion questions.';
 $string['showduration'] = 'Show duration';
@@ -224,7 +224,7 @@ $string['videoid'] = 'Video ID';
 $string['videotitle'] = 'Video Title';
 $string['watchmode'] = 'Watch mode';
 
-// Tabs
+// Tabs.
 $string['overview'] = 'Overview';
 $string['overview_help'] = 'In an EnglishCentral activity, students interact with a selected set of videos and work toward the Watch, Learn and Study goals set by the teacher.
 
@@ -244,7 +244,7 @@ $string['preview'] = 'Preview';
 $string['previewenglishcentral'] = 'Preview English Central';
 $string['view'] = 'View';
 
-// reports
+// Reports.
 $string['activetime'] = 'Active Time';
 $string['allattempts'] = 'Attempts Manager';
 $string['allusers'] = 'All Users (most recent attempt)';
@@ -312,7 +312,7 @@ $string['value'] = 'Value';
 $string['viewreport'] = 'Details';
 $string['viewreports'] = 'View reports';
 
-// privacy api strings
+// Privacy api strings.
 $string['privacy:metadata:attempttable'] = 'The table in which the user\'s English Central attempt data is stored.';
 $string['privacy:metadata:attemptid'] = 'The unique identifier of a user\'s English Central activity attempt.';
 $string['privacy:metadata:ecid'] = 'The unique identifier of an English Central activity instance.';

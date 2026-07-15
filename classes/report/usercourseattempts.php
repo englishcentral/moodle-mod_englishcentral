@@ -260,7 +260,7 @@ class usercourseattempts extends basereport {
             $allparams['dayslimit'] = $dayslimit;
         }
 
-        // Add a 'group by' clause to SQL
+        // Add a 'group by' clause to SQL.
         $alldatasql .= "GROUP BY tu.ecid";
 
         // Use the SQL to fetch the data.
@@ -285,7 +285,7 @@ class usercourseattempts extends basereport {
                 $goals['total'] = $goals['watch'] + $goals['learn'] + $goals['speak'] + $goals['chat'];
 
                 // Add a percentage field for each pointfield and add the goal to the display
-                // eg learn = 6 becomes learn = 6/8  learn_p = 75%
+                // Eg learn = 6 becomes learn = 6/8  learn_p = 75%.
                 $totalpoints = 0;
                 foreach ($goals as $goalfield => $goalvalue) {
                     if ($goalfield == 'total') {
@@ -297,7 +297,7 @@ class usercourseattempts extends basereport {
                         $pointsvalue = $goalvalue;
                     }
                     $thedata->{$goalfield . '_p'} = $goalvalue > 0 ? round($pointsvalue / $goalvalue * 100, 0) : '-';
-                    // We recalc the total, using the goal adjusted points value
+                    // We recalc the total, using the goal adjusted points value.
                     $totalpoints += $pointsvalue;
                 }
                 $thedata->total = $totalpoints;

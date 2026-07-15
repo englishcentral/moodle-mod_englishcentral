@@ -86,7 +86,7 @@ class setupform extends \moodleform {
         $context = $this->_customdata['context'];
         utils::add_mform_elements($mform, $context, true);
 
-        // add the action buttons
+        // Add the action buttons.
         $this->add_action_buttons(get_string('cancel'), get_string('savechangesanddisplay'));
     }
 

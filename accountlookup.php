@@ -24,27 +24,27 @@
 
 require_once("../../config.php");
 
-// get the objects we need
-$id = required_param('id', PARAM_INT);  // Course Module ID
+// Get the objects we need.
+$id = required_param('id', PARAM_INT);  // Course Module ID.
 $cm = get_coursemodule_from_id('englishcentral', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $instance = $DB->get_record('englishcentral', ['id' => $cm->instance], '*', MUST_EXIST);
 
-// make sure we are logged in and can see this form
+// Make sure we are logged in and can see this form.
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/englishcentral:manageattempts', $context);
 
 // TODO: trigger event "viewed account lookup"?
 
-// set up the page object
+// Set up the page object.
 $PAGE->set_url('/mod/englishcentral/accountlookup.php', ['id' => $id]);
 $PAGE->set_title(format_string($instance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('incourse');
 
-// get EC class
+// Get EC class.
 $ec = \mod_englishcentral\activity::create($instance, $cm, $course, $context);
 $auth = \mod_englishcentral\auth::create($ec);
 

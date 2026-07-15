@@ -47,7 +47,7 @@ class auth {
     /** Accept header for version 4 of the EC API. */
     const ACCEPT_V4 = 'application/vnd.englishcentral-v4+json,application/json;q=0.9,*/*;q=0.8';
 
-    // EC constants for EC chatBotId's
+    // EC constants for EC chatBotId's.
     /** Chat bot id for the default bot. */
     const CHAT_BOT_ID_DEFAULT = 1;
     /** Chat bot id for the generic bot. */
@@ -61,15 +61,15 @@ class auth {
     /** Chat bot id for the roleplay bot. */
     const CHAT_BOT_ID_ROLEPLAY = 7;
 
-    // EC constants for EC activityType's
+    // EC constants for EC activityType's.
     /** Activity type for a watch activity. */
-    const ACTIVITYTYPE_WATCH = 9; // watchActivity
+    const ACTIVITYTYPE_WATCH = 9; // WatchActivity.
     /** Activity type for a learn activity. */
-    const ACTIVITYTYPE_LEARN = 10; // learnActivity
+    const ACTIVITYTYPE_LEARN = 10; // LearnActivity.
     /** Activity type for a speak activity. */
-    const ACTIVITYTYPE_SPEAK = 11; // speakActivity
+    const ACTIVITYTYPE_SPEAK = 11; // SpeakActivity.
     /** Activity type for a discussion/chat activity. */
-    const ACTIVITYTYPE_CHAT = 55; // discussionActivity
+    const ACTIVITYTYPE_CHAT = 55; // DiscussionActivity.
     /** Activity type for a watch comprehension choice activity. */
     const ACTIVITYTYPE_WATCHCOMPREHENSIONCHOICE = 40;
 
@@ -79,36 +79,36 @@ class auth {
     const SDK_MODE_DEVELOPMENT  = 1;
 
     /** @var object|null The EC activity. */
-    protected $ec = null; // EC activity
+    protected $ec = null; // EC activity.
     /** @var string|null The JWT token. */
-    protected $jwt_token = null; // JWT token
+    protected $jwt_token = null; // JWT token.
     /** @var string|null The SDK token. */
-    protected $sdk_token = null; // SDK token
+    protected $sdk_token = null; // SDK token.
     /** @var string|null The authorization HTTP header. */
-    protected $authorization = null; // HTTP header
+    protected $authorization = null; // HTTP header.
 
     /** @var string|null The user's unique ID on this Moodle site. */
-    protected $uniqueid = null; // user's unique ID on this Moodle site
+    protected $uniqueid = null; // User's unique ID on this Moodle site.
     /** @var int|null The EC accountid of the current user. */
-    protected $accountid = null; // the EC accountid of the current user
+    protected $accountid = null; // The EC accountid of the current user.
 
     /** @var string|null The EC partner ID. */
-    public $partnerid = null; // EC partner ID
+    public $partnerid = null; // EC partner ID.
 
     /** @var string|null The EC consumer key. */
-    public $consumerkey = null; // EC consumer key
+    public $consumerkey = null; // EC consumer key.
 
     /** @var string|null The EC consumer secret. */
-    public $consumersecret = null; // EC consumer secret
+    public $consumersecret = null; // EC consumer secret.
 
     /** @var string|null The EC encrypted secret. */
-    public $encryptedsecret = null; // EC encrypted secret
+    public $encryptedsecret = null; // EC encrypted secret.
 
     /** @var bool|null Whether EC chat mode is enabled. */
-    public $mimichat = null; // EC chatmode
+    public $mimichat = null; // EC chatmode.
 
     /** @var string|null The EnglishCentral API endpoint domain. */
-    public $domain = null; // EnglishCentral API endpoint domain
+    public $domain = null; // EnglishCentral API endpoint domain.
 
 
 
@@ -136,7 +136,7 @@ class auth {
             $this->$field = empty($ec->config->$field) ? '' : $ec->config->$field;
         }
 
-        // set mimi chat enabled or disabled
+        // Set mimi chat enabled or disabled.
         $this->set_mimichat($ec);
 
         if ($this->get_sdk_mode() == self::SDK_MODE_DEVELOPMENT) {
@@ -212,12 +212,12 @@ class auth {
                 $record = (object)['userid' => $USER->id,
                                         'accountid' => 0];
                 $this->uniqueid = '' . $DB->insert_record($table, $record);
-                // we need the quotes, '', to convert the id to a string
+                // We need the quotes, '', to convert the id to a string.
             }
             // NOTE: it does not seem to be necessary to create a permanent
             // EC accountid. Everything works without doing so.
             // However, in the future, we may offer Moodle students the
-            // chance to assume control of their anonymous EC accountid
+            // Chance to assume control of their anonymous EC accountid.
             $this->get_accountid();
         }
         return $this->uniqueid;
@@ -446,7 +446,7 @@ class auth {
         $dialoglist = $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
 
         // Cache the dialogs listings for later use in reports, and here eventually
-        // Ideally we should do this when add a video. TO DO do that
+        // Ideally we should do this when add a video. TO DO do that.
         [$dialogswhere, $allparams] = $DB->get_in_or_equal($videoids);
         $sql = "SELECT * FROM {" . constants::M_VIDEOSTABLE . "} vt ";
         $sql .= "WHERE videoid " . $dialogswhere;
@@ -512,7 +512,7 @@ class auth {
     // This method is not used and does not seem to work, but
     // it could be used to get more info about a conversation.
     // https://chat.englishcentral.com/documentation/resource_ConversationREST.html
-    // https://chat.englishcentral.com/rest/conversation/list?accountId=xxx&dialogId=xxx&chatBotId=5
+    // Https://chat.englishcentral.com/rest/conversation/list?accountId=xxx&dialogId=xxx&chatBotId=5.
     /**
      * Fetch the chat progress for a dialog.
      *
@@ -527,7 +527,7 @@ class auth {
         $subdomain = 'chat';
         $endpoint = 'rest/conversation/list';
         $fields = [
-            'chatBotId' => self::CHAT_BOT_ID_DQ, // =5
+            'chatBotId' => self::CHAT_BOT_ID_DQ, // Value 5.
             'accountId' => $this->get_accountid(),
             'dialogId' => $videoid,
         ];
@@ -661,19 +661,19 @@ class auth {
         $langs = [
             // Only the following languages are available on the EC site.
             // See language menu on: https://www.englishcentral.com/browse/videos.
-            'en', // English    English
-            'es', // Spanish    Español
-            'ja', // Japanese   日本語
-            'ko', // Korean     한국어
-            'pt', // Portuguese Português
-            'ru', // Russian    Русский
-            'tr', // Turkish    Türkçe
-            'vi', // Vietnamese Tiếng Việt
-            'zh', // Chinese    简体中文
-            'he', // Hebrew     עִברִית
-            'ar', // Arabic     عربى
-            'fr', // French     Français
-            'th', // Thai       ภาษาไทย (added 2024-06-06)
+            'en', // English    English.
+            'es', // Spanish    Español.
+            'ja', // Japanese   日本語.
+            'ko', // Korean     한국어.
+            'pt', // Portuguese Português.
+            'ru', // Russian    Русский.
+            'tr', // Turkish    Türkçe.
+            'vi', // Vietnamese Tiếng Việt.
+            'zh', // Chinese    简体中文.
+            'he', // Hebrew     עִברִית.
+            'ar', // Arabic     عربى.
+            'fr', // French     Français.
+            'th', // Thai       ภาษาไทย (added 2024-06-06).
         ];
         if (in_array($lang, $langs)) {
             return $lang;
@@ -710,7 +710,7 @@ class auth {
     public function get_url($subdomain, $endpoint, $fields = []) {
         $url = "https://$subdomain.$this->domain/$endpoint";
         $url = new \moodle_url($url, $fields);
-        return $url->out(false); // join with "&" not "&amp;"
+        return $url->out(false); // Join with "&" not "&amp;".
     }
 
     /**
@@ -745,10 +745,10 @@ class auth {
         // The token is usually 189 chars long and split into 3 parts delimited by [\.].
         // Parts 1 & 2 contain [0-9a-zA-Z]. The 3rd part can additionally contain [_-].
         if (preg_match('/^[0-9a-zA-Z\._-]{180,200}$/', $sdk_token)) {
-            return ''; // token is valid - YAY!
+            return ''; // Token is valid - YAY!
         }
         if ($this->is_json($sdk_token)) {
-            // JSON error message from EC server
+            // JSON error message from EC server.
             return json_decode($sdk_token)->log;
         }
         if (strpos($sdk_token, '<!DOCTYPE html>') === 0) {

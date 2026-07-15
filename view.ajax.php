@@ -27,37 +27,37 @@ define('AJAX_SCRIPT', true);
 /** Include required files */
 require_once('../../config.php');
 
-// check we are a valid user
+// Check we are a valid user.
 require_sesskey();
 
-// get expected input params
-$id = optional_param('id', 0, PARAM_INT); // course_modules id
+// Get expected input params.
+$id = optional_param('id', 0, PARAM_INT); // Course_modules id.
 // The 'data' param is always sent as an array (or omitted); every consumer
 // below guards with is_array(), so an empty array is a safe default.
 $data = optional_param_array('data', [], PARAM_RAW);
 $action = optional_param('action', '', PARAM_ALPHA);
 
-// extract key records from DB
+// Extract key records from DB.
 $cm = get_coursemodule_from_id('englishcentral', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $cm->course], '*', MUST_EXIST);
 $instance = $DB->get_record('englishcentral', ['id' => $cm->instance], '*', MUST_EXIST);
 
-// check we are logged in
+// Check we are logged in.
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 
-// check we have suitable capability
+// Check we have suitable capability.
 if ($action == 'getoptions' || $action == 'storeresults' || $action == 'showstatus') {
-    require_capability('mod/englishcentral:view', $context); // student
+    require_capability('mod/englishcentral:view', $context); // Student.
 } else {
-    require_capability('mod/englishcentral:manage', $context); // teacher
+    require_capability('mod/englishcentral:manage', $context); // Teacher.
 }
 
-// initialize EC activity/auth objects
+// Initialize EC activity/auth objects.
 $ec = \mod_englishcentral\activity::create($instance, $cm, $course, $context);
 $auth = \mod_englishcentral\auth::create($ec);
 
-// initialize the renderer
+// Initialize the renderer.
 $renderer = $PAGE->get_renderer($ec->plugin);
 $renderer->attach_activity_and_auth($ec, $auth);
 
@@ -107,17 +107,17 @@ switch ($action) {
 
     case 'sortvideo':
         if (is_array($data) && array_key_exists('dialogId', $data) && array_key_exists('sortorder', $data)) {
-            // sanity check on incoming values
+            // Sanity check on incoming values.
             $data = (object)$data;
             $targetvideoid = intval($data->dialogId);
             $targetsortorder = intval($data->sortorder);
 
             if ($targetvideoid && $targetsortorder) {
-                // define DB table name
+                // Define DB table name.
                 $table = 'englishcentral_videos';
 
-                // set all sort orders to negative
-                // we need to do this because the DB index requies unique (ecid, sortorder)
+                // Set all sort orders to negative.
+                // We need to do this because the DB index requies unique (ecid, sortorder).
                 $params = ['ecid' => $ec->id];
                 $DB->execute('UPDATE {' . $table . '} SET sortorder = -sortorder WHERE ecid = :ecid', $params);
 
@@ -137,8 +137,8 @@ switch ($action) {
                     }
                 }
             }
-            // there's nothing to return because the element has been dragged
-            // to the correct position in the browser
+            // There's nothing to return because the element has been dragged.
+            // To the correct position in the browser.
         }
         break;
 

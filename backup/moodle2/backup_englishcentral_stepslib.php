@@ -35,51 +35,45 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
      */
     protected function define_structure() {
 
-        // we may need the EC partnerid, if we are backing up userinfo
+        // We may need the EC partnerid, if we are backing up userinfo.
         static $partnerid = null;
 
-        // cache the $userinfo flag and $siteadmin flag
+        // Cache the $userinfo flag and $siteadmin flag.
         $userinfo = $this->get_setting_value('userinfo');
         $siteadmin = has_capability('moodle/site:config', context_system::instance());
 
-        ////////////////////////////////////////////////////////////////////////
-        // XML nodes declaration - non-user data
-        ////////////////////////////////////////////////////////////////////////
+        // XML nodes declaration - non-user data.
 
-        $fieldnames = ['id', 'course']; // excluded fields
+        $fieldnames = ['id', 'course']; // Excluded fields.
         $fieldnames = $this->get_fieldnames('englishcentral', $fieldnames);
         $activity = new backup_nested_element('englishcentral', ['id'], $fieldnames);
 
         $videos = new backup_nested_element('videos');
-        $fieldnames = ['id', 'ecid']; // excluded fields
+        $fieldnames = ['id', 'ecid']; // Excluded fields.
         $fieldnames = $this->get_fieldnames('englishcentral_videos', $fieldnames);
         $video = new backup_nested_element('video', ['id'], $fieldnames);
 
-        ////////////////////////////////////////////////////////////////////////
-        // XML nodes declaration - user data
-        ////////////////////////////////////////////////////////////////////////
+        // XML nodes declaration - user data.
 
         if ($userinfo) {
             $accountids = new backup_nested_element('accountids');
-            $fieldnames = ['id']; // excluded fields
+            $fieldnames = ['id']; // Excluded fields.
             $fieldnames = $this->get_fieldnames('englishcentral_accountids', $fieldnames);
-            $fieldnames[] = 'partnerid'; // additional field
+            $fieldnames[] = 'partnerid'; // Additional field.
             $accountid = new backup_nested_element('accountid', ['id'], $fieldnames);
 
             $attempts = new backup_nested_element('attempts');
-            $fieldnames = ['id', 'ecid']; // excluded fields
+            $fieldnames = ['id', 'ecid']; // Excluded fields.
             $fieldnames = $this->get_fieldnames('englishcentral_attempts', $fieldnames);
             $attempt = new backup_nested_element('attempt', ['id'], $fieldnames);
 
             $phonemes = new backup_nested_element('phonemes');
-            $fieldnames = ['id', 'ecid']; // excluded fields (keep attemptid)
+            $fieldnames = ['id', 'ecid']; // Excluded fields (keep attemptid).
             $fieldnames = $this->get_fieldnames('englishcentral_phonemes', $fieldnames);
             $phoneme = new backup_nested_element('phoneme', ['id'], $fieldnames);
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // build the tree in the order needed for restore
-        ////////////////////////////////////////////////////////////////////////
+        // Build the tree in the order needed for restore.
 
         $activity->add_child($videos);
         $videos->add_child($video);
@@ -95,15 +89,13 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
             $phonemes->add_child($phoneme);
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // data sources
-        ////////////////////////////////////////////////////////////////////////
+        // Data sources.
 
         $activity->set_source_table('englishcentral', ['id' => backup::VAR_ACTIVITYID]);
         $video->set_source_table('englishcentral_videos', ['ecid' => backup::VAR_PARENTID]);
 
         if ($userinfo) {
-            // get partnerid (first time only)
+            // Get partnerid (first time only).
             if ($partnerid === null) {
                 if ($siteadmin) {
                     $partnerid = get_config('mod_englishcentral', 'partnerid');
@@ -115,7 +107,7 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
                 }
             }
 
-            // accountids (include partnerid in each record)
+            // Accountids (include partnerid in each record).
             if ($partnerid) {
                 [$sql, $params] = $this->get_accountids_userids($this->get_setting_value(backup::VAR_ACTIVITYID));
                 $sql = "SELECT *, $partnerid AS partnerid " .
@@ -124,21 +116,19 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
                 $accountid->set_source_sql($sql, $params);
             }
 
-            // attempts
+            // Attempts.
             $params = ['ecid' => backup::VAR_PARENTID];
             $attempt->set_source_table('englishcentral_attempts', $params);
 
-            // phonemes
+            // Phonemes.
             $params = ['ecid' => backup::VAR_PARENTID];
             $phoneme->set_source_table('englishcentral_phonemes', $params);
             // Note that a phoneme should probably be a child of an attempt
             // but we put it as a child of an EC activity for legacy reasons
-            // i.e. that's how things were done in earlier versions of this module
+            // I.e. that's how things were done in earlier versions of this module.
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // id annotations (foreign keys on non-parent tables)
-        ////////////////////////////////////////////////////////////////////////
+        // Id annotations (foreign keys on non-parent tables).
 
         if ($userinfo) {
             $accountid->annotate_ids('user', 'userid');
@@ -146,15 +136,11 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
             $phoneme->annotate_ids('user', 'userid');
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // file annotations
-        ////////////////////////////////////////////////////////////////////////
+        // File annotations.
 
         $activity->annotate_files('mod_englishcentral', 'intro', null);
 
-        ////////////////////////////////////////////////////////////////////////
         // Return the root element, wrapped in a standard activity structure.
-        ////////////////////////////////////////////////////////////////////////
 
         return $this->prepare_activity_structure($activity);
     }
@@ -196,7 +182,7 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
         // constants, which are all negative, in $params, and will
         // throw an exception for any positive values in $params.
         // - baseelementincorrectfinalorattribute
-        // backup/util/structure/base_final_element.class.php
+        // Backup/util/structure/base_final_element.class.php.
 
         switch (count($userids)) {
             case 0:

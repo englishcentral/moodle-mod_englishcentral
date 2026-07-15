@@ -94,7 +94,7 @@ class attempts extends basereport {
                 }
                 break;
 
-            // Not necessary here . Since Watch = the same details
+            // Not necessary here . Since Watch = the same details.
             case 'attempts':
                     $ret = $record->attemptcount;
                 break;
@@ -178,7 +178,7 @@ class attempts extends basereport {
             $percentstring = str_pad(
                 $percentstring,
                 4,
-                ' ', // doesn't work
+                ' ', // Doesn't work.
                 STR_PAD_LEFT
             );
             $usernames[] = fullname($user) . ' ' . $percentstring;
@@ -229,13 +229,13 @@ class attempts extends basereport {
 
         $emptydata = [];
 
-        // Groups stuff
+        // Groups stuff.
         $moduleinstance = $DB->get_record(constants::M_TABLE, ['id' => $formdata->ecid]);
         $course = $DB->get_record('course', ['id' => $moduleinstance->course], '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance(constants::M_TABLE, $moduleinstance->id, $course->id, false, MUST_EXIST);
         $context = empty($cm) ? \context_course::instance($course->id) : \context_module::instance($cm->id);
 
-        // initialize study goals and save them for use later in when displaying data
+        // Initialize study goals and save them for use later in when displaying data.
         $goals = ['watch' => 0, 'learn' => 0, 'speak' => 0, 'chat' => 0, 'total' => 0];
         if (
             $moduleinstance->watchgoal +
@@ -253,7 +253,7 @@ class attempts extends basereport {
 
         // Now lets build our SQL.
         // We use COALESCE because the chatcount could contain nulls, and if ALL fields are NULL postgresql SUM returns null
-        // The other fields may not need COALESCE but, just in case, we added it to them too
+        // The other fields may not need COALESCE but, just in case, we added it to them too.
         $selectsql = 'SELECT tu.userid , SUM(COALESCE(watchcomplete, 0)) + ' .
           'SUM(COALESCE(learncount, 0)) + ' .
           'SUM(COALESCE(speakcount, 0)) + ' .
@@ -266,7 +266,7 @@ class attempts extends basereport {
           'MIN(timecreated) AS firstattempt ' .
           ' FROM {' . constants::M_ATTEMPTSTABLE . '} tu ';
 
-        // if we need to show  groups
+        // If we need to show  groups.
         if ($formdata->groupid > 0) {
             [$groupswhere, $allparams] = $DB->get_in_or_equal($formdata->groupid);
 
@@ -281,7 +281,7 @@ class attempts extends basereport {
             $allparams = ['ecid' => $formdata->ecid];
         }
 
-        // Days limit WHERE condition
+        // Days limit WHERE condition.
         if ($formdata->dayslimit > 0) {
             // Calculate the unix timestamp X days ago.
             // 86400 = 24 hours * 60 minutes * 60 seconds.
@@ -291,7 +291,7 @@ class attempts extends basereport {
             $allparams['dayslimit'] = $dayslimit;
         }
 
-        // Add a 'group by' clause to SQL
+        // Add a 'group by' clause to SQL.
         $alldatasql .= " GROUP BY userid";
 
         // Use the SQL to fetch the data.
@@ -302,7 +302,7 @@ class attempts extends basereport {
             foreach ($alldata as $thedata) {
                  // Add a percentage field for each pointfield
                  // eg learn = 6 becomes learn = 6/8  learn_p = 75%
-                 // We also recalculate the 'total'
+                 // We also recalculate the 'total'.
                 $totalpoints = 0;
                 foreach ($goals as $goalfield => $goalvalue) {
                     if ($goalfield == 'total') {
@@ -315,7 +315,7 @@ class attempts extends basereport {
                     }
                     // If no goal was set  ... we do not calc a percentage.
                     $thedata->{$goalfield . '_p'} = $goalvalue > 0 ? round($pointsvalue / $goalvalue * 100, 0) : '-';
-                    // We recalc the total, using the goal adjusted points value
+                    // We recalc the total, using the goal adjusted points value.
                     $totalpoints += $pointsvalue;
                 }
                 $thedata->total = $totalpoints;

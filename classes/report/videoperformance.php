@@ -149,7 +149,7 @@ class videoperformance extends basereport {
             $videonames[] = $record->videoname;
         }
 
-        // Display the chart
+        // Display the chart.
         $chart = new \core\chart_pie();
         $chart->set_doughnut(true); // Calling set_doughnut(true) we display the chart as a doughnut.
         $chart->add_series(new \core\chart_series('My series title', $videoseries));

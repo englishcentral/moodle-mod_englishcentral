@@ -110,7 +110,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 $output .= ob_get_contents();
                 ob_end_clean();
 
-                // dont show the heading in an iframe, it will be outside this anyway
+                // Dont show the heading in an iframe, it will be outside this anyway.
                 if (!$this->ec->foriframe && $CFG->version < 4.0) {
                     $help = $this->help_icon('overview', $this->ec->plugin);
                     $output .= $this->heading($activityname . $help . $icon);
@@ -164,7 +164,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * generate link to config settings page
      */
     public function link_to_config_settings() {
-        // moodle/site:config, moodle/category:manage
+        // Moodle/site:config, moodle/category:manage.
         if (has_capability('moodle/site:config', context_system::instance())) {
             $link = ['section' => 'modsetting' . $this->ec->pluginname];
             $link = new moodle_url('/admin/settings.php', $link);
@@ -251,11 +251,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
         $button = $this->single_button(new moodle_url($url, $params), get_string('continue'), 'post');
 
-        // remove sesskey from $button; it's not necessary and could be a security risk
+        // Remove sesskey from $button; it's not necessary and could be a security risk.
         $button = preg_replace('/<input[^>]*name="sesskey"[^>]*>/', '', $button);
 
         if ($anchor) {
-            // single_button with "post" does not allow #anchor, so we add it manually
+            // Single_button with "post" does not allow #anchor, so we add it manually.
             $button = str_replace($url, "$url/#$anchor", $button);
         }
 
@@ -379,7 +379,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
         $progress = $this->ec->get_progress();
 
-        // calculate total percent
+        // Calculate total percent.
         $percent = 0;
         $divisor = 0;
         if ($this->ec->watchgoal_set()) {
@@ -420,7 +420,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $timing = html_writer::tag('h4', $this->ec->get_string('yourprogress'), ['class' => 'title']) . $timing;
         $output .= html_writer::tag('div', $timing, ['class' => 'timing']);
 
-        // format titlecharts
+        // Format titlecharts.
         $output .= html_writer::start_tag('div', ['class' => 'titlechart-container']);
         $output .= $this->show_titlechart('total', $percent, '%', 'achieved', $percent);
         if ($this->ec->watchgoal_set()) {
@@ -489,24 +489,24 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     public function show_chart($type, $text1, $text2, $string, $percent) {
         $output = '';
 
-        // outer ring
+        // Outer ring.
         $params = ['class' => 'outerring',
                         'style' => $this->get_chart_transform($percent)];
         $output .= html_writer::tag('div', '', $params);
 
-        // start innertext
+        // Start innertext.
         $output .= html_writer::start_tag('div', ['class' => 'innertext']);
 
-        // line1
+        // Line1.
         $output .= html_writer::start_tag('div', ['class' => 'line1']);
         $output .= html_writer::tag('span', $text1, ['class' => 'text1']);
         $output .= html_writer::tag('span', $text2, ['class' => 'text2']);
         $output .= html_writer::end_tag('div');
 
-        // line2
+        // Line2.
         $output .= html_writer::tag('div', $this->ec->get_string($string), ['class' => 'line2']);
 
-        // end innertext
+        // End innertext.
         $output .= html_writer::end_tag('div');
 
         $params = ['class' => "chart $type " . $this->get_chart_class($percent)];
@@ -560,12 +560,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
         $attempts = $this->ec->get_attempts();
 
-        // get video ids in this EC activity
+        // Get video ids in this EC activity.
         $connection_available = true;
         if ($videoids = $this->ec->get_videoids()) {
-            // fetch video info from EC server
+            // Fetch video info from EC server.
             if ($videos = $this->auth->fetch_dialog_list($videoids)) {
-                // build index to map videoid onto $videos item
+                // Build index to map videoid onto $videos item.
                 $index = [];
                 foreach ($videos as $i => $video) {
                     if (isset($video->dialogID)) {
@@ -573,11 +573,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                     }
                 }
 
-                // extract names of count/complete $fields
+                // Extract names of count/complete $fields.
                 $fields = $this->ec->get_attempts_fields(false);
                 $fields = explode(',', $fields);
 
-                // create video thumbnails in required order
+                // Create video thumbnails in required order.
                 foreach ($videoids as $videoid) {
                     if (array_key_exists($videoid, $index)) {
                         $video = $videos[$index[$videoid]];
@@ -631,7 +631,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 $difficulty = '';
         }
 
-        // remove leading 00: from duration
+        // Remove leading 00: from duration.
         if (substr($video->duration, 0, 3) == '00:') {
             $video->duration = substr($video->duration, 3);
         }
@@ -721,9 +721,9 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('span', $label, $params);
         }
 
-        $output .= html_writer::end_tag('div'); // activity-outline
+        $output .= html_writer::end_tag('div'); // Activity-outline.
 
-        $output .= html_writer::end_tag('div'); // activity-thumbnail
+        $output .= html_writer::end_tag('div'); // Activity-thumbnail.
 
         return $output;
     }
@@ -742,14 +742,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('span', $video->speakcount, ['class' => 'speak-status']);
             $output .= html_writer::tag('span', $video->chatcount, ['class' => 'chat-status']);
         } else if (isset($video->watchcount) && $video->watchcount) {
-            // we could try a fancy unicode char, core_text::code2utf8(0x27eb)
+            // We could try a fancy unicode char, core_text::code2utf8(0x27eb).
             $output .= html_writer::tag('span', '~', ['class' => 'watch-status inprogress']);
         }
         return $output;
     }
 
-    // this method is not used,
-    // nor is the addvideo icon
+    // This method is not used,.
+    // Nor is the addvideo icon.
 
     /**
      * Show the add video icon.
@@ -780,9 +780,9 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     protected function show_videos_icon($type, $initially_visible = true) {
         $text = $this->ec->get_string($type . 'video');
         if (method_exists($this, 'image_url')) {
-            $image_url = 'image_url'; // Moodle >= 3.3
+            $image_url = 'image_url'; // Moodle >= 3.3.
         } else {
-            $image_url = 'pix_url'; // Moodle <= 3.2
+            $image_url = 'pix_url'; // Moodle <= 3.2.
         }
         $image_url = $this->$image_url($type . 'video', $this->ec->plugin);
         $image = html_writer::empty_tag('img', ['src' => $image_url, 'title' => $text]);
@@ -811,7 +811,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $this->setup_sort();
         $url = $this->ec->get_report_url();
 
-        // fetch groupmode/menu/id for this activity
+        // Fetch groupmode/menu/id for this activity.
         if ($groupmode = groups_get_activity_groupmode($this->ec->cm)) {
             $groupmenu = groups_print_activity_menu($this->ec->cm, $url, true);
             $groupid = groups_get_activity_group($this->ec->cm);
@@ -820,7 +820,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $groupid = 0;
         }
 
-        // initialize study goals
+        // Initialize study goals.
         $goals = (object)['watch' => 0,
                                'learn' => 0,
                                'speak' => 0,
@@ -857,13 +857,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                   '{user} u';
         $where  = 'items.userid = u.id';
 
-        // get_all_user_name_fields deprecated in 3.11
+        // Get_all_user_name_fields deprecated in 3.11.
         if ($CFG->version < 2021051700) {
             $select = 'items.*,' . get_all_user_name_fields(true, 'u');
         } else {
             $userfields = \core_user\fields::for_name();
             $usersql = $userfields->get_sql('u');
-            // note no concatenating comma, thats how userfields -> selects works
+            // Note no concatenating comma, thats how userfields -> selects works.
             $select = 'items.*' . $usersql->selects;
         }
 
@@ -876,7 +876,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $order .= ' ' . $this->order;
         }
 
-        // set goals to maximum in these aggregate items
+        // Set goals to maximum in these aggregate items.
         if ($items = $DB->get_records_sql("SELECT $select FROM $from WHERE $where ORDER BY $order", $params)) {
             foreach ($items as $userid => $item) {
                 $goals->watch = max($goals->watch, $item->watch);
@@ -888,7 +888,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $items = [];
         }
 
-        // override goals with teacher-specified goals, if available
+        // Override goals with teacher-specified goals, if available.
         if ($this->ec->watchgoal + $this->ec->learngoal + $this->ec->speakgoal + $this->ec->chatgoal) {
             $goals->watch = intval($this->ec->watchgoal);
             $goals->learn = intval($this->ec->learngoal);
@@ -1083,14 +1083,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     protected function setup_sort() {
         global $SESSION;
 
-        // initialize session info
+        // Initialize session info.
         if (empty($SESSION->englishcentral)) {
             $SESSION->englishcentral = new stdClass();
             $SESSION->englishcentral->sort = '';
             $SESSION->englishcentral->order = '';
         }
 
-        // override sort item/order with incoming data
+        // Override sort item/order with incoming data.
         $sort = optional_param('sort', '', PARAM_ALPHA);
         switch (true) {
             case ($sort == ''):
@@ -1119,7 +1119,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             }
         }
 
-        // store new/updated sort item/order
+        // Store new/updated sort item/order.
         $this->sort = $SESSION->englishcentral->sort = $sort;
         $this->order = $SESSION->englishcentral->order = $order;
     }
@@ -1135,7 +1135,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         if ($sort == $this->sort) {
             $order = $this->order;
         } else {
-            $order = ''; // unsorted
+            $order = ''; // Unsorted.
         }
 
         switch (true) {
@@ -1191,7 +1191,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('dt', $this->ec->get_string('videosearch'), ['class' => 'visible', 'id' => 'search-label']);
             $output .= html_writer::start_tag('dl', ['class' => 'search-fields']);
 
-            // text box size
+            // Text box size.
             $size = ''; // 30
             $output .= html_writer::start_tag('div', ['id' => 'search-fields-main']);
             $output .= $this->show_search_term('searchterm', $size);
@@ -1201,21 +1201,21 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= $this->show_search_level('level'); // Level maps to difficulty.
             $output .= html_writer::end_tag('div');
 
-            // end settings/form
+            // End settings/form.
             $output .= html_writer::end_tag('dl');
             $output .= html_writer::end_tag('form');
 
-            // enclose settings in search-box
+            // Enclose settings in search-box.
             $output = html_writer::tag('div', $output, ['class' => 'search-box']);
 
-            // append element to display search-results
+            // Append element to display search-results.
             $output .= html_writer::tag('div', '', ['class' => 'search-results']);
 
-            // enclose search-box and search-results in container
+            // Enclose search-box and search-results in container.
             $output = html_writer::tag('div', $output, ['id' => 'search-inner-container']);
 
             $output .= html_writer::tag('div', '', ['id' => 'close-search-button']);
-            // append element to display button-alike-behavior
+            // Append element to display button-alike-behavior.
 
             $output .= html_writer::start_tag('div', ['id' => 'faux-search-button']);
             $output .= html_writer::start_tag('div', ['class' => 'faux-search-button-icon']);
@@ -1223,10 +1223,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('span', $this->ec->get_string('addvideo'), ['class' => 'faux-search-button-text']);
             $output .= html_writer::end_tag('div');
 
-            // enclose search-box and search-results in container
+            // Enclose search-box and search-results in container.
             $output = html_writer::tag('div', $output, ['id' => 'id_searchcontainer']);
 
-            // append element to display search-results
+            // Append element to display search-results.
             $output .= html_writer::tag('div', '', ['class' => 'add-video-box']);
         }
         return $output;
@@ -1391,7 +1391,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      */
     public function developerpage($cmid, $moduleid) {
         $items = [];
-        // Update gradebook
+        // Update gradebook.
         $items[] = get_string('updateallgrades_details', constants::M_COMPONENT);
         $gradesbtn = new \single_button(
             new \moodle_url(constants::M_URL . '/developer.php', ['action' => 'updategrades', 'id' => $cmid, 'n' => $moduleid]),

@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/englishcentral/backup/moodle2/restore_englishcentral_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/englishcentral/backup/moodle2/restore_englishcentral_stepslib.php'); // Because it exists (must).
 
 /**
  * englishcentral restore task that provides all the settings and steps to perform one
@@ -35,7 +35,7 @@ class restore_englishcentral_activity_task extends restore_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**

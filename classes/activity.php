@@ -181,9 +181,7 @@ class activity {
         return new activity($instance, $cm, $course, $context);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // availability API
-    ////////////////////////////////////////////////////////////////////////////////
+    // Availability API.
 
     /**
      * Detect if this activity is not available.
@@ -248,9 +246,7 @@ class activity {
         return ($this->config->chatmode ? true : false);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // URLs API
-    ////////////////////////////////////////////////////////////////////////////////
+    // URLs API.
 
     /**
      * Get the URL of the reports page for this activity.
@@ -305,21 +301,21 @@ class activity {
     public function get_videoinfo_url($escaped = null) {
         $lang = substr(current_language(), 0, 2);
         switch ($lang) {
-            case 'en': // English
+            case 'en': // English.
                 return 'https://www.englishcentral.com/videodetails';
 
-            case 'ar': // Arabic
-            case 'es': // Spanish
-            case 'he': // Hebrew
-            case 'ja': // Japanese
-            case 'pt': // Portuguese
-            case 'ru': // Russian
-            case 'th': // Thai
-            case 'tr': // Turkish
-            case 'vi': // Vietnamese
+            case 'ar': // Arabic.
+            case 'es': // Spanish.
+            case 'he': // Hebrew.
+            case 'ja': // Japanese.
+            case 'pt': // Portuguese.
+            case 'ru': // Russian.
+            case 'th': // Thai.
+            case 'tr': // Turkish.
+            case 'vi': // Vietnamese.
                 return "https://$lang.englishcentral.com/videodetails";
 
-            case 'zh': // Chinese
+            case 'zh': // Chinese.
                 return 'https://www.englishcentralchina.com/videodetails';
 
             default:
@@ -347,9 +343,7 @@ class activity {
         return $url;
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // strings API
-    ////////////////////////////////////////////////////////////////////////////////
+    // Strings API.
 
     /**
      * Get a language string for this plugin.
@@ -362,9 +356,7 @@ class activity {
         return get_string($name, $this->plugin, $a);
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // database API
-    ////////////////////////////////////////////////////////////////////////////////
+    // Database API.
 
     /**
      * Get the video ids configured for this activity.
@@ -487,7 +479,7 @@ class activity {
     public function update_progress($dialog) {
         global $DB, $USER;
 
-        // extract/create $attempt
+        // Extract/create $attempt.
         $table = 'englishcentral_attempts';
         $params = ['ecid' => $this->id,
                     'userid' => $USER->id,
@@ -511,7 +503,7 @@ class activity {
             $DB->update_record($table, $attempt);
         }
 
-        // trigger progress update event
+        // Trigger progress update event.
         $event = \mod_englishcentral\event\progress_updated::create([
         'context' => $this->context,
         'objectid' => $attempt->id,
@@ -538,37 +530,37 @@ class activity {
      */
     public function extract_progress($dialog, $attempt) {
 
-        // initialize totals for goals
+        // Initialize totals for goals.
         $progress = [
         'dialogID' => $dialog->dialogID,
 
         'watchcomplete' => 0,
         'watchtotal'    => 0,
         'watchcount'    => 0,
-        'watchlineids'  => [], // dialogLineID's of lines watched,
+        'watchlineids'  => [], // DialogLineID's of lines watched,.
 
         'learncomplete' => 0,
         'learntotal'    => 0,
         'learncount'    => 0,
-        'learnwordids'  => [], // wordHeadID's of words learned,
+        'learnwordids'  => [], // WordHeadID's of words learned,.
 
         'speakcomplete' => 0,
         'speaktotal'    => 0,
         'speakcount'    => 0,
-        'speaklineids'  => [], // dialogLineID's of lines spoken,
+        'speaklineids'  => [], // DialogLineID's of lines spoken,.
 
         'chatcomplete' => 0,
         'chattotal'    => 0,
         'chatcount'    => 0,
-        'chatquestionids'  => [], // chatQuestionID's of chat questions discussed,
+        'chatquestionids'  => [], // ChatQuestionID's of chat questions discussed,.
 
         'totalpoints'   => 0,
 
-        // this info is no longer available
+        // This info is no longer available.
         'activetime'    => 0,
         'totaltime'     => 0,
         'sessionScore'  => 0,
-        'sessionGrade'  => '', // A-F
+        'sessionGrade'  => '', // A-F.
         ];
 
         if (isset($dialog->hash)) {
@@ -578,7 +570,7 @@ class activity {
             $progress['totalpoints']  = $dialog->totalPoints;
         }
 
-        // populate the $progress array with values earned hitherto
+        // Populate the $progress array with values earned hitherto.
         $names = ['watchlineids', 'learnwordids', 'speaklineids', 'chatquestionids'];
         foreach ($names as $thename) {
             if (isset($attempt->$thename) && $attempt->$thename) {
@@ -591,25 +583,25 @@ class activity {
         // so we try to fall back gracefully without killing it for students.
         if (!empty($dialog->activities)) {
             foreach ($dialog->activities as $activity) {
-                // activityType     : watchActivity / speakActivity
+                // ActivityType     : watchActivity / speakActivity.
                 // activityID       : 208814
                 // activityTypeID   : (see below)
                 // activityPoints   : 10
                 // activityProgress : 1
                 // completed        : 1
-                // grade            : A (speakActivity only ?)
+                // Grade            : A (speakActivity only ?).
 
-                // extract DB fields
+                // Extract DB fields.
                 switch ($activity->activityTypeID) {
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_WATCH: // =9
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_WATCHCOMPREHENSIONCHOICE: // =40
+                    case \mod_englishcentral\auth::ACTIVITYTYPE_WATCH: // Value 9.
+                    case \mod_englishcentral\auth::ACTIVITYTYPE_WATCHCOMPREHENSIONCHOICE: // Value 40.
                         $progress['watchcomplete'] = (empty($activity->completed) ? 0 : 1);
                         foreach ($activity->watchedDialogLines as $line) {
                             $progress['watchlineids'][$line->dialogLineID] = 1;
                         }
                         break;
 
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_LEARN: // =10
+                    case \mod_englishcentral\auth::ACTIVITYTYPE_LEARN: // Value 10.
                         $progress['learncomplete'] = (empty($activity->completed) ? 0 : 1);
                         foreach ($activity->learnedDialogLines as $line) {
                             foreach ($line->learnedWords as $word) {
@@ -620,14 +612,14 @@ class activity {
                         }
                         break;
 
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_SPEAK: // =11
+                    case \mod_englishcentral\auth::ACTIVITYTYPE_SPEAK: // Value 11.
                         $progress['speakcomplete'] = (empty($activity->completed) ? 0 : 1);
                         foreach ($activity->spokenDialogLines as $line) {
                             $progress['speaklineids'][$line->dialogLineID] = 1;
                         }
                         break;
 
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_CHAT: // =55
+                    case \mod_englishcentral\auth::ACTIVITYTYPE_CHAT: // Value 55.
                         $progress['chatcomplete'] = (empty($activity->completed) ? 0 : 1);
                         foreach ($activity->submittedQuestionIds as $questionid) {
                             $progress['chatquestionids'][$questionid] = 1;

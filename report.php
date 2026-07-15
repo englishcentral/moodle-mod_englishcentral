@@ -30,8 +30,8 @@ require_once($CFG->dirroot . '/mod/englishcentral/lib.php');
 
 use mod_englishcentral\constants;
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID
-$ecid = optional_param('ecid', 0, PARAM_INT);  // englishcentral instance ID
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID.
+$ecid = optional_param('ecid', 0, PARAM_INT);  // Englishcentral instance ID.
 $mode = optional_param('mode', '', PARAM_ALPHA);
 
 if ($id) {
@@ -59,7 +59,7 @@ $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('englishcentral', $instance);
 $event->trigger();
 
-/// Set up the page header
+// Set up the page header.
 $params = ['id' => $cm->id];
 if ($mode) {
     $params['mode'] = $mode;

@@ -60,7 +60,7 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         $this->_course   = $course;
         $this->_modname = 'englishcentral';
 
-        // Set context
+        // Set context.
         if ($cm) {
             $this->context = context_module::instance($cm->id);
         } else {
@@ -94,10 +94,10 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         // Grade.
         $this->standard_grading_coursemodule_elements();
 
-        // add standard elements, common to all modules
+        // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 
-        // add standard buttons, common to all modules
+        // Add standard buttons, common to all modules.
         $this->add_action_buttons();
     }
 
@@ -127,13 +127,13 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         $mform = $this->_form;
         $plugin = 'mod_englishcentral';
 
-        // array of elements names to be returned by this method
+        // Array of elements names to be returned by this method.
         $names = [];
 
-        // these fields will be disabled if grade type is not "point" or grade points = 0
+        // These fields will be disabled if grade type is not "point" or grade points = 0.
         $disablednames = ['completionusegrade'];
 
-        // add "minimum grade" completion condition
+        // Add "minimum grade" completion condition.
         $name = 'completionmingrade';
         $label = get_string($name, $plugin);
         if (empty($this->current->$name)) {
@@ -154,7 +154,7 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         $names[] = $name . 'group';
         $disablednames[] = $name . 'group';
 
-        // add "grade passed" completion condition
+        // Add "grade passed" completion condition.
         $name = 'completionpass';
         $label = get_string($name, $plugin);
         $mform->addElement('advcheckbox', $name, '', $label);
@@ -163,16 +163,16 @@ class mod_englishcentral_mod_form extends moodleform_mod {
         $names[] = $name;
         $disablednames[] = $name;
 
-        // add "status completed" completion condition
+        // Add "status completed" completion condition.
         $name = 'completiongoals';
         $label = get_string($name, $plugin);
         $mform->addElement('advcheckbox', $name, '', $label);
         $mform->setType($name, PARAM_INT);
         $mform->setDefault($name, 0);
         $names[] = $name;
-        // no need to disable this field :-)
+        // No need to disable this field :-).
 
-        // disable grade conditions, if necessary
+        // Disable grade conditions, if necessary.
         foreach ($disablednames as $name) {
             if ($mform->elementExists($name)) {
                 $mform->disabledIf($name, 'grade[modgrade_point]', 'eq', 0);
@@ -195,6 +195,6 @@ class mod_englishcentral_mod_form extends moodleform_mod {
                 return false;
             }
         }
-        return true; // at least one of the module-specific completion conditions is set
+        return true; // At least one of the module-specific completion conditions is set.
     }
 }

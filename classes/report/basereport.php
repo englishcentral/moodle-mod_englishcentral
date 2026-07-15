@@ -170,7 +170,7 @@ abstract class basereport {
      */
     public function fetch_formatted_time($seconds) {
 
-        // return empty string if the timestamps are not both present.
+        // Return empty string if the timestamps are not both present.
         if (!$seconds) {
             return '';
         }
@@ -187,7 +187,7 @@ abstract class basereport {
      */
     public function fetch_time_difference($starttimestamp, $endtimestamp) {
 
-        // return empty string if the timestamps are not both present.
+        // Return empty string if the timestamps are not both present.
         if (!$starttimestamp || !$endtimestamp) {
             return '';
         }

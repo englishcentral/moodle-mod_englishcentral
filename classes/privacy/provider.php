@@ -249,7 +249,7 @@ class provider implements
 
         $attempts = $DB->get_records('englishcentral_attempts', ['ecid' => $instanceid], '', 'id');
 
-        // Now delete all attempts
+        // Now delete all attempts.
         $DB->delete_records('englishcentral_attempts', ['ecid' => $instanceid]);
     }
 

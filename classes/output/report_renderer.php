@@ -138,7 +138,7 @@ class report_renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_exportbuttons_html($cm, $formdata, $showreport) {
-        // convert formdata to array
+        // Convert formdata to array.
         $formdata = (array) $formdata;
         $formdata['id'] = $cm->id;
         $formdata['report'] = $showreport;
@@ -161,7 +161,7 @@ class report_renderer extends \plugin_renderer_base {
      * @return string The rendered HTML.
      */
     public function render_grading_exportbuttons_html($cm, $formdata, $action) {
-        // convert formdata to array
+        // Convert formdata to array.
         $formdata = (array) $formdata;
         $formdata['id'] = $cm->id;
         $formdata['action'] = $action;
@@ -191,20 +191,20 @@ class report_renderer extends \plugin_renderer_base {
         $name = clean_param($sectiontitle, PARAM_FILE);
         $name = preg_replace("/[^A-Z0-9]+/i", "_", utils::super_trim($name));
         $quote = '"';
-        $delim = ",";// "\t";
+        $delim = ",";
         $newline = "\r\n";
 
         header("Content-Disposition: attachment; filename=$name.csv");
         header("Content-Type: text/comma-separated-values");
 
-        // echo header
+        // Echo header.
         $heading = "";
         foreach ($head as $headfield) {
             $heading .= $quote . $headfield . $quote . $delim;
         }
         echo $heading . $newline;
 
-        // echo data rows
+        // Echo data rows.
         foreach ($rows as $row) {
             $datarow = "";
             foreach ($fields as $field) {
@@ -230,7 +230,7 @@ class report_renderer extends \plugin_renderer_base {
             return $this->render_empty_section_html();
         }
 
-        // set up our table and head attributes
+        // Set up our table and head attributes.
         $tableattributes = ['class' => 'generaltable ' . constants::M_CLASS . '_table'];
 
         $htmltable = new \html_table();
@@ -246,7 +246,7 @@ class report_renderer extends \plugin_renderer_base {
 
         foreach ($rows as $row) {
             $htr = new \html_table_row();
-            // set up descrption cell
+            // Set up descrption cell.
             $cells = [];
             foreach ($fields as $field) {
                 $cell = new \html_table_cell($row->{$field});
@@ -259,7 +259,7 @@ class report_renderer extends \plugin_renderer_base {
 
         $html = \html_writer::table($htmltable);
 
-        // if datatables set up datatables
+        // If datatables set up datatables.
         $config = get_config(constants::M_COMPONENT);
         if ($config->reportstable == constants::M_USE_DATATABLES) {
             $dtlang = [];
@@ -416,7 +416,7 @@ class report_renderer extends \plugin_renderer_base {
      */
     public function show_paging_bar($totalcount, $paging, $baseurl) {
         $pagevar = "pageno";
-        // add paging params to url (NOT pageno)
+        // Add paging params to url (NOT pageno).
         $baseurl->params(['perpage' => $paging->perpage, 'sort' => $paging->sort]);
         return $this->output->paging_bar($totalcount, $paging->pageno, $paging->perpage, $baseurl, $pagevar);
     }

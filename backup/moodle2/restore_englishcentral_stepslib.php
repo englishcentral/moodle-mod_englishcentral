@@ -33,14 +33,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
      */
     protected function define_structure() {
 
-        // fetch the $userinfo flag
+        // Fetch the $userinfo flag.
         $userinfo = $this->get_setting_value('userinfo');
 
         $paths = [];
 
-        ////////////////////////////////////////////////////////////////////////
-        // XML interesting paths - non-user data
-        ////////////////////////////////////////////////////////////////////////
+        // XML interesting paths - non-user data.
 
         $path = '/activity/englishcentral';
         $paths[] = new restore_path_element('englishcentral', $path);
@@ -48,9 +46,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         $path = '/activity/englishcentral/videos/video';
         $paths[] = new restore_path_element('englishcentral_videos', $path);
 
-        ////////////////////////////////////////////////////////////////////////
-        // XML interesting paths - user data
-        ////////////////////////////////////////////////////////////////////////
+        // XML interesting paths - user data.
 
         if ($userinfo) {
             $path = '/activity/englishcentral/accountids/accountid';
@@ -63,7 +59,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
             $paths[] = new restore_path_element('englishcentral_phonemes', $path);
         }
 
-        // Return the paths wrapped into standard activity structure
+        // Return the paths wrapped into standard activity structure.
         return $this->prepare_activity_structure($paths);
     }
 
@@ -76,27 +72,27 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
     protected function process_englishcentral($data) {
         global $DB;
 
-        // convert $data to object
+        // Convert $data to object.
         $data = (object)$data;
 
-        // save $oldid
+        // Save $oldid.
         $oldid = $data->id;
 
-        // fix fields (e.g. convert fields names from OLD to NEW)
+        // Fix fields (e.g. convert fields names from OLD to NEW).
         if (! $data->course = $this->get_courseid()) {
-            return false; // missing courseid - shouldn't happen !!
+            return false; // Missing courseid - shouldn't happen !!
         }
         $data->activityopen  = $this->apply_date_offset($data->activityopen);
         $data->activityclose = $this->apply_date_offset($data->activityclose);
         $data->videoopen     = $this->apply_date_offset($data->videoopen);
         $data->videoclose    = $this->apply_date_offset($data->videoclose);
 
-        // add new record
+        // Add new record.
         if (! $newid = $DB->insert_record('englishcentral', $data)) {
-            return false; // could not add new record - shouldn't happen !!
+            return false; // Could not add new record - shouldn't happen !!
         }
 
-        // inmediately after inserting "activity" record, call this
+        // Inmediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newid);
     }
 
@@ -109,21 +105,21 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
     protected function process_englishcentral_videos($data) {
         global $DB;
 
-        // convert $data to object
+        // Convert $data to object.
         $data = (object)$data;
 
-        // save $oldid
+        // Save $oldid.
         $oldid = $data->id;
 
-        // fix fields (e.g. convert fields names from OLD to NEW)
+        // Fix fields (e.g. convert fields names from OLD to NEW).
         $data->ecid = $this->get_new_parentid('englishcentral');
 
-        // add new record
+        // Add new record.
         if (! $newid = $DB->insert_record('englishcentral_videos', $data)) {
-            return false; // could not add new record - shouldn't happen !!
+            return false; // Could not add new record - shouldn't happen !!
         }
 
-        // store mapping from $oldid to $newid
+        // Store mapping from $oldid to $newid.
         $this->set_mapping('englishcentral_videos', $oldid, $newid, false);
     }
 
@@ -136,13 +132,13 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
     protected function process_englishcentral_accountids($data) {
         global $DB;
 
-        // we should only restore the accountids if the backup
-        // and restore sites have the same partnerID
+        // We should only restore the accountids if the backup.
+        // And restore sites have the same partnerID.
         static $partnerid = null;
 
-        // fetch $partnerid of restore site (first time only)
+        // Fetch $partnerid of restore site (first time only).
         if ($partnerid === null) {
-            // only site admin has access to the partnerid on the Moodle site
+            // Only site admin has access to the partnerid on the Moodle site.
             if (has_capability('moodle/site:config', context_system::instance())) {
                 $partnerid = get_config('mod_englishcentral', 'partnerid');
             }
@@ -154,31 +150,31 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         }
 
         if ($partnerid == 0) {
-            return false; // current user does have access to partnerID
+            return false; // Current user does have access to partnerID.
         }
 
-        // convert $data to object
+        // Convert $data to object.
         $data = (object)$data;
 
-        // sanity check on the values
+        // Sanity check on the values.
         if (empty($data->userid) || empty($data->accountid)) {
-            return false; // nothing to do
+            return false; // Nothing to do.
         }
 
-        // check partnerID
+        // Check partnerID.
         if (empty($data->partnerid) || $data->partnerid != $partnerid) {
-            return false; // accountid is for a different partnerID
+            return false; // Accountid is for a different partnerID.
         }
 
-        // fix fields
+        // Fix fields.
         if (! $data->userid = $this->get_mappingid('user', $data->userid)) {
-            return false; // invalid userid - shouldn't happen !!
+            return false; // Invalid userid - shouldn't happen !!
         }
 
-        // add new record, if necessary
+        // Add new record, if necessary.
         if (! $DB->record_exists('englishcentral_accountids', ['userid' => $data->userid])) {
             if (! $newid = $DB->insert_record('englishcentral_accountids', $data)) {
-                return false; // could not add new record - shouldn't happen !!
+                return false; // Could not add new record - shouldn't happen !!
             }
         }
     }
@@ -192,21 +188,21 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
     protected function process_englishcentral_attempts($data) {
         global $DB;
 
-        // convert $data to object
+        // Convert $data to object.
         $data = (object)$data;
 
-        // save $oldid
+        // Save $oldid.
         $oldid = $data->id;
 
-        // fix fields (e.g. convert fields names from OLD to NEW)
+        // Fix fields (e.g. convert fields names from OLD to NEW).
         $data->ecid = $this->get_new_parentid('englishcentral');
 
-        // add new record
+        // Add new record.
         if (! $newid = $DB->insert_record('englishcentral_attempts', $data)) {
-            return false; // could not add new record - shouldn't happen !!
+            return false; // Could not add new record - shouldn't happen !!
         }
 
-        // store mapping from $oldid to $newid
+        // Store mapping from $oldid to $newid.
         $this->set_mapping('englishcentral_attempts', $oldid, $newid, false);
     }
 
@@ -219,22 +215,22 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
     protected function process_englishcentral_phonemes($data) {
         global $DB;
 
-        // convert $data to object
+        // Convert $data to object.
         $data = (object)$data;
 
-        // save $oldid
+        // Save $oldid.
         $oldid = $data->id;
 
-        // fix fields (e.g. convert fields names from OLD to NEW)
+        // Fix fields (e.g. convert fields names from OLD to NEW).
         $data->ecid = $this->get_new_parentid('englishcentral');
         $data->attemptid = $this->get_mappingid('englishcentral_attempt', $data->attemptid);
 
-        // add new record
+        // Add new record.
         if (! $newid = $DB->insert_record('englishcentral_phonemes', $data)) {
-            return false; // could not add new record - shouldn't happen !!
+            return false; // Could not add new record - shouldn't happen !!
         }
 
-        // store mapping from $oldid to $newid
+        // Store mapping from $oldid to $newid.
         $this->set_mapping('englishcentral_phonemes', $oldid, $newid);
     }
 
@@ -244,7 +240,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
      * @return void
      */
     protected function after_execute() {
-        // Add englishcentral related files, no need to match by itemname (just internally handled context)
+        // Add englishcentral related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_englishcentral', 'intro', null);
     }
 }

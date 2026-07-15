@@ -50,7 +50,7 @@ class utils {
         $ec = \mod_englishcentral\activity::create($instance, $cm, $course, $context);
         $auth = \mod_englishcentral\auth::create($ec);
 
-        // if this is setup tab we need to add a field to tell it the id of the activity
+        // If this is setup tab we need to add a field to tell it the id of the activity.
         if ($setuptab) {
             $mform->addElement('hidden', 'n');
             $mform->setType('n', PARAM_INT);
@@ -67,7 +67,7 @@ class utils {
         $mform->addElement('header', $name, $label);
         // -------------------------------------------------------------------------------
 
-        // Adding the standard "name" field
+        // Adding the standard "name" field.
         $name = 'name';
         $label = get_string('activityname', $plugin);
         $mform->addElement('text', $name, $label, ['size' => '64']);
@@ -91,7 +91,7 @@ class utils {
                 'subdirs' => true,
             ];
             $mform->addElement('editor', 'introeditor', $label, ['rows' => 10], $params);
-            $mform->setType('introeditor', PARAM_RAW); // no XSS prevention here, users must be trusted
+            $mform->setType('introeditor', PARAM_RAW); // No XSS prevention here, users must be trusted.
             $mform->addElement('advcheckbox', 'showdescription', get_string('showdescription'));
             $mform->addHelpButton('showdescription', 'showdescription');
         }

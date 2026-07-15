@@ -28,14 +28,14 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n = optional_param('n', 0, PARAM_INT);  // englishcentral instance ID
-$format = optional_param('format', 'combined', PARAM_TEXT); // export format csv/tabular/graphical/combined
-$showreport = optional_param('report', 'menu', PARAM_TEXT); // report type
-$userid = optional_param('userid', 0, PARAM_INT); // user id
-$dayslimit = optional_param('dayslimit', 0, PARAM_INT); // no. of days data to show
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
+$n = optional_param('n', 0, PARAM_INT);  // Englishcentral instance ID.
+$format = optional_param('format', 'combined', PARAM_TEXT); // Export format csv/tabular/graphical/combined.
+$showreport = optional_param('report', 'menu', PARAM_TEXT); // Report type.
+$userid = optional_param('userid', 0, PARAM_INT); // User id.
+$dayslimit = optional_param('dayslimit', 0, PARAM_INT); // No. of days data to show.
 
-// paging details
+// Paging details.
 $paging = new stdClass();
 $paging->perpage = optional_param('perpage', -1, PARAM_INT);
 $paging->pageno = optional_param('pageno', 0, PARAM_INT);
@@ -64,10 +64,10 @@ $modulecontext = context_module::instance($cm->id);
 
 require_capability('mod/englishcentral:viewreports', $modulecontext);
 
-// Get an admin settings
+// Get an admin settings.
 $config = get_config(constants::M_COMPONENT);
 
-// set per page according to admin setting
+// Set per page according to admin setting.
 if ($config->reportstable == constants::M_USE_DATATABLES) {
     $paging = false;
 } else if ($paging->perpage == -1) {
@@ -85,7 +85,7 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot(constants::M_MODNAME, $moduleinstance);
 $event->trigger();
 
-/// Set up the page header
+// Set up the page header.
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
@@ -98,7 +98,7 @@ if ($config->enablesetuptab) {
 
 $PAGE->requires->jquery();
 
-// This puts all our display logic into the renderer.php files in this plugin
+// This puts all our display logic into the renderer.php files in this plugin.
 $ec = \mod_englishcentral\activity::create($moduleinstance, $cm, $course, $modulecontext);
 $auth = \mod_englishcentral\auth::create($ec);
 $renderer = $PAGE->get_renderer(constants::M_COMPONENT);
@@ -106,23 +106,23 @@ $renderer->attach_activity_and_auth($ec, $auth);
 $reportrenderer = $PAGE->get_renderer(constants::M_COMPONENT, 'report');
 
 // From here we actually display the page.
-// this is core renderer stuff
+// This is core renderer stuff.
 $mode = "reports";
 $extraheader = "";
 switch ($showreport) {
-    // not a true report, separate implementation in renderer
+    // Not a true report, separate implementation in renderer.
     case 'menu':
         echo $renderer->header(get_string('reports', constants::M_COMPONENT));
         echo $reportrenderer->show_user_report_options($PAGE->url, $dayslimit, $format);
         echo $reportrenderer->render_reportmenu($moduleinstance, $cm, $dayslimit, $format);
-        // Finish the page
+        // Finish the page.
         echo $renderer->footer();
         return;
 
     case 'basic':
         $report = new \mod_englishcentral\report\basic($cm);
-        // formdata should only have simple values, not objects
-        // later it gets turned into urls for the export buttons
+        // Formdata should only have simple values, not objects.
+        // Later it gets turned into urls for the export buttons.
         $formdata = new stdClass();
         break;
 
@@ -224,7 +224,7 @@ switch ($format) {
         exit;
 
     case 'graphical':
-        // these colors may not work as expected
+        // These colors may not work as expected.
         $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8', '#f2d7a4', '#c7d9a3'];
         echo $renderer->header(get_string('reports', constants::M_COMPONENT));
         echo $reportrenderer->show_user_report_options($PAGE->url, $dayslimit, $format);
@@ -243,7 +243,7 @@ switch ($format) {
         $reportrows = $report->fetch_formatted_rows(true, $paging);
         $allrowscount = $report->fetch_all_rows_count();
         if ($config->reportstable == constants::M_USE_DATATABLES) {
-            // css must be required before header sent out
+            // Css must be required before header sent out.
             $PAGE->requires->css(new \moodle_url('https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css'));
             echo $renderer->header(get_string('reports', constants::M_COMPONENT));
             echo $reportrenderer->show_user_report_options($PAGE->url, $dayslimit, $format);
@@ -253,7 +253,7 @@ switch ($format) {
             echo $reportrenderer->heading($reportdescription, 5);
             // First the chart.
             if ($format == 'combined') {
-                // these colors may not work as expected
+                // These colors may not work as expected.
                 $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8', '#f2d7a4', '#c7d9a3'];
                 echo $report->fetch_chart($reportrenderer, false);
             }
@@ -275,7 +275,7 @@ switch ($format) {
             echo $reportrenderer->heading($reportdescription, 5);
             // First the chart.
             if ($format == 'combined') {
-                // these colors may not work as expected
+                // These colors may not work as expected.
                 $CFG->chart_colorset = ['#ceb9df', '#a9dbef', '#f7c1a1', '#d3e9af', '#e3b9d9', '#a7d2e8', '#f2d7a4', '#c7d9a3'];
                 echo $report->fetch_chart($reportrenderer, false);
             }

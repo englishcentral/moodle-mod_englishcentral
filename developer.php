@@ -29,10 +29,10 @@ require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
-$id = optional_param('id', 0, PARAM_INT); // course_module ID, or
-$n  = optional_param('n', 0, PARAM_INT);  // solo instance ID
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
+$n  = optional_param('n', 0, PARAM_INT);  // Solo instance ID.
 
-$action = optional_param('action', 'none', PARAM_TEXT); // report type
+$action = optional_param('action', 'none', PARAM_TEXT); // Report type.
 
 
 
@@ -61,14 +61,14 @@ require_capability('mod/englishcentral:viewdevelopertools', $modulecontext);
 // Get the admin settings.
 $config = get_config(constants::M_COMPONENT);
 
-/// Set up the page header
+// Set up the page header.
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 $PAGE->set_pagelayout('incourse');
 $PAGE->requires->jquery();
 
-// Set up renderer and activity
+// Set up renderer and activity.
 $ec = \mod_englishcentral\activity::create($moduleinstance, $cm, $course, $modulecontext);
 $auth = \mod_englishcentral\auth::create($ec);
 $renderer = $PAGE->get_renderer($ec->plugin);
@@ -84,7 +84,7 @@ switch ($action) {
         ), 'Grades Updated', 5);
         break;
 
-    // not a true report, separate implementation in renderer
+    // Not a true report, separate implementation in renderer.
     case 'generatedata':
         $completeattempts = $DB->get_records(
             constants::M_ATTEMPTSTABLE,
@@ -109,13 +109,13 @@ switch ($action) {
         } else {
             $latestattempt = array_shift($completeattempts);
             $users = get_enrolled_users($modulecontext);
-            // reindex array
+            // Reindex array.
             $users = array_values($users);
             $created = 0;
             for ($x = 0; $x < count($users); $x++) {
                 $ouruser = $users[$x];
                 foreach ($videos as $videoid) {
-                    // randomly skip some
+                    // Randomly skip some.
                     if (random_int(0, 2) == 0) {
                         continue;
                     }
@@ -137,7 +137,7 @@ switch ($action) {
     default:
 }
 
-// output the page
+// Output the page.
 $header = $renderer->header(get_string('developertools', constants::M_COMPONENT));
 echo $header;
 $items = $renderer->developerpage($cm->id, $moduleinstance->id);
@@ -158,21 +158,21 @@ function copyattempt($videoid, $attempt, $user) {
     global $DB;
     $newatt = clone $attempt;
 
-    // attempt
+    // Attempt.
     $newatt->id = null;
     $newatt->timecompleted = time();
     $newatt->videoid = $videoid;
-    // counts
+    // Counts.
     $newatt->watchcount = random_int(1, (int) $newatt->watchcount);
     $newatt->learncount = random_int(1, (int) $newatt->learncount);
     $newatt->speakcount = random_int(1, (int) $newatt->speakcount);
     $newatt->chatcount = random_int(1, (int) $newatt->chatcount);
-    // line ids
+    // Line ids.
     $newatt->watchlineids = implode(',', (array_slice(explode(',', $newatt->watchlineids), 0, $newatt->watchcount)));
     $newatt->learnwordids = implode(',', (array_slice(explode(',', $newatt->learnwordids), 0, $newatt->learncount)));
     $newatt->speaklineids = implode(',', (array_slice(explode(',', $newatt->speaklineids), 0, $newatt->speakcount)));
     $newatt->chatquestionids = implode(',', (array_slice(explode(',', $newatt->chatquestionids), 0, $newatt->chatcount)));
-    // points total
+    // Points total.
     $newatt->totalpoints = $newatt->watchcount + $newatt->learncount + $newatt->speakcount + $newatt->chatcount;
 
     if ($user->id !== $newatt->userid) {

@@ -51,7 +51,7 @@ class custom_completion extends activity_custom_completion {
         $course = $DB->get_record('course', ['id' => $this->cm->course], '*', MUST_EXIST);
         $ec = \mod_englishcentral\activity::create($ec, $this->cm, $course);
 
-        // get grade, if necessary
+        // Get grade, if necessary.
         $grade = false;
         if ($ec->completionmingrade > 0.0 || $ec->completionpass) {
             require_once($CFG->dirroot . '/lib/gradelib.php');
@@ -71,8 +71,8 @@ class custom_completion extends activity_custom_completion {
 
         switch ($rule) {
             case 'completionmingrade':
-                // decimal (e.g. completionmingrade) fields are returned by MySQL as a string
-                // and since empty('0.0') returns false (!!), so we must use numeric comparison
+                // Decimal (e.g. completionmingrade) fields are returned by MySQL as a string.
+                // And since empty('0.0') returns false (!!), so we must use numeric comparison.
                 if (empty($ec->completionmingrade) || floatval($ec->completionmingrade) == 0.0) {
                     $state = true;
                     break;
@@ -84,7 +84,7 @@ class custom_completion extends activity_custom_completion {
                 $state = ($grade && $grade->is_passed());
                 break;
             case 'completiongoals':
-                // if goals have been set up, calculate total percent
+                // If goals have been set up, calculate total percent.
                 $progress = $ec->get_progress();
 
                 if ($goals = ($ec->watchgoal + $ec->learngoal + $ec->speakgoal)) {
@@ -94,7 +94,7 @@ class custom_completion extends activity_custom_completion {
                     $state += max(0, min($progress->speak, $ec->speakgoal));
                     $state = (round(100 * $state / $goals, 0) >= 100);
                 } else {
-                    $state = false; // unusual - no goals have been set up !!
+                    $state = false; // Unusual - no goals have been set up !!
                 }
                 break;
         }

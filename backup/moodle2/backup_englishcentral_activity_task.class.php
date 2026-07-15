@@ -35,7 +35,7 @@ class backup_englishcentral_activity_task extends backup_activity_task {
      * No specific settings for this activity
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
@@ -56,11 +56,11 @@ class backup_englishcentral_activity_task extends backup_activity_task {
 
         $wwwroot = preg_quote($CFG->wwwroot, '/');
 
-        // Link to the list of EnglishCentral activities
+        // Link to the list of EnglishCentral activities.
         $search = '/(' . $wwwroot . '\/mod\/englishcentral\/index.php\?id\=)([0-9]+)/';
         $content = preg_replace($search, '$@ENGLISHCENTRALINDEX*$2@$', $content);
 
-        // Link to EnglishCentral activity view by course module id
+        // Link to EnglishCentral activity view by course module id.
         $search = '/(' . $wwwroot . '\/mod\/englishcentral\/view.php\?id\=)([0-9]+)/';
         $content = preg_replace($search, '$@ENGLISHCENTRALVIEWBYID*$2@$', $content);
 
