@@ -17,8 +17,10 @@
 /**
  * Services definition.
  *
- * @package mod_wordcards
+ * @package    mod_englishcentral
  * @author  Frédéric Massart - FMCorz.net
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $functions = [

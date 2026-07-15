@@ -23,9 +23,9 @@ use mod_englishcentral\utils;
 /**
  * A custom renderer class that extends the plugin_renderer_base.
  *
- * @package mod_englishcentral
+ * @package    mod_englishcentral
  * @copyright COPYRIGHTNOTICE
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_englishcentral_renderer extends plugin_renderer_base {
     protected $ec = null;

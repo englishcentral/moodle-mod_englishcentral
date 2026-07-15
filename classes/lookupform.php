@@ -39,7 +39,7 @@
  *
  * @package    mod_englishcentral
  * @author     Justin Hunt <poodllsupport@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @copyright  (C) 1999 onwards Justin Hunt  http://poodll.com
  */
 

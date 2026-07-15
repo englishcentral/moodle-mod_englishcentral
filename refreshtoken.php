@@ -17,6 +17,7 @@
 /**
  * @package    mod_englishcentral
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
  */
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');

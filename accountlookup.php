@@ -17,7 +17,7 @@
 /**
  * Lookup a user's id
  *
- * @package mod_englishcentral;
+ * @package    mod_englishcentral
  * @copyright  2019 Justin Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/

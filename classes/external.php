@@ -17,8 +17,10 @@
 /**
  * External.
  *
- * @package mod_englishcentral
+ * @package    mod_englishcentral
  * @author  Justin Hunt - poodll.com
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 global $CFG;

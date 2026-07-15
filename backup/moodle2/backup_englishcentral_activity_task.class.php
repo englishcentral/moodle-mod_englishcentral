@@ -17,10 +17,10 @@
 /**
  * Defines {@link backup_englishcentral_activity_task} class
  *
- * @package     mod_englishcentral
+ * @package    mod_englishcentral
  * @category    backup
  * @copyright   2014 Justin Hunt poodllsupport@gmail.com
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

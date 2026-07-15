@@ -19,6 +19,9 @@
  * User: ishineguy
  * Date: 2018/06/16
  * Time: 19:31
+ * @package    mod_englishcentral
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_englishcentral;

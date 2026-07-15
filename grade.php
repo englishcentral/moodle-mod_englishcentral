@@ -17,10 +17,10 @@
 /**
  * Redirects the user to either a englishcentral or to the englishcentral statistics
  *
- * @package   mod_englishcentral
+ * @package    mod_englishcentral
  * @category  grade
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
 /**

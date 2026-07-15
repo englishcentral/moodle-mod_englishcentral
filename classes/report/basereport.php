@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_englishcentral\report;
-
 /**
- *  Report Classes.
+ * Report Classes.
  *
  * @package    mod_englishcentral
  * @copyright  Poodll
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+namespace mod_englishcentral\report;
 
 defined('MOODLE_INTERNAL') || die();
 

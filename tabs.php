@@ -19,9 +19,9 @@
  *
  * This file was adapted from the mod/lesson/tabs.php
  *
- * @package mod_englishcentral
+ * @package    mod_englishcentral
  * @copyright  2014 Justin Hunt  {@link http://poodll.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

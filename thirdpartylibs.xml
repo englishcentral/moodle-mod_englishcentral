@@ -16,4 +16,12 @@
         <license>MIT</license>
         <licenseversion></licenseversion>
     </library>
+    <library>
+        <location>classes/jwt</location>
+        <name>firebase/php-jwt</name>
+        <description>JSON Web Token encode/decode library, used to sign EnglishCentral API requests.</description>
+        <version>3.0</version>
+        <license>BSD-3-Clause</license>
+        <licenseversion></licenseversion>
+    </library>
 </libraries>

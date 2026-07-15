@@ -17,8 +17,7 @@
 /**
  * mod/englishcentral/db/upgradelib.php
  *
- * @package    mod
- * @subpackage englishcentral
+ * @package    mod_englishcentral
  * @copyright  2025 Gordon Bateson (gordon.bateson@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 2.0

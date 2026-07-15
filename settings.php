@@ -17,8 +17,7 @@
 /**
  * englishcentral module admin settings and defaults
  *
- * @package    mod
- * @subpackage englishcentral
+ * @package    mod_englishcentral
  * @copyright  2014 Justin Hunt poodllsupport@gmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -17,9 +17,9 @@
 /**
  * Contains the class for fetching the important dates in mod_englishcentral for a given module instance and a user.
  *
- * @package   mod_englishcentral
+ * @package    mod_englishcentral
  * @copyright Justin Hunt <poodllsupport@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 declare(strict_types=1);

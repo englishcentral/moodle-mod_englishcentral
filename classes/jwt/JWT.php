@@ -28,11 +28,12 @@ use DateTime;
  * PHP version 5
  *
  * @category Authentication
- * @package  Authentication_JWT
+ * @package    mod_englishcentral
  * @author   Neuman Vong <neuman@twilio.com>
  * @author   Anant Narayanan <anant@php.net>
- * @license  http://opensource.org/licenses/BSD-3-Clause 3-clause BSD
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @link     https://github.com/firebase/php-jwt
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
  */
 class JWT
 {

@@ -26,9 +26,9 @@ use core_completion\activity_custom_completion;
  * Class for defining english centrals custom completion rules and fetching the completion statuses
  * of the custom completion rules for a giveninstance and a user.
  *
- * @package mod_englishcentral
+ * @package    mod_englishcentral
  * @copyright Justin Hunt <poodllsupport@gmail.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class custom_completion extends activity_custom_completion {
     /**
