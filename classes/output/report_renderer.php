@@ -29,7 +29,19 @@ namespace mod_englishcentral\output;
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
+/**
+ * Renderer for englishcentral reports.
+ */
 class report_renderer extends \plugin_renderer_base {
+    /**
+     * Render the reports menu.
+     *
+     * @param object $moduleinstance The englishcentral module instance.
+     * @param object $cm The course module.
+     * @param int $dayslimit The days limit filter.
+     * @param string $format The report format.
+     * @return string
+     */
     public function render_reportmenu($moduleinstance, $cm, $dayslimit, $format) {
         $reports = [];
         $theurl = new \moodle_url(
@@ -78,6 +90,12 @@ class report_renderer extends \plugin_renderer_base {
         return $ret;
     }
 
+    /**
+     * Render the delete all attempts button.
+     *
+     * @param object $cm The course module.
+     * @return string
+     */
     public function render_delete_allattempts($cm) {
         $deleteallbutton = new \single_button(
             new \moodle_url(constants::M_URL . '/manageattempts.php', ['id' => $cm->id, 'action' => 'confirmdeleteall']),
@@ -88,17 +106,37 @@ class report_renderer extends \plugin_renderer_base {
         return $ret;
     }
 
+    /**
+     * Render the report title heading HTML.
+     *
+     * @param object $course The course object.
+     * @param string $username The user name displayed in the title.
+     * @return string
+     */
     public function render_reporttitle_html($course, $username) {
         $ret = $this->output->heading(format_string($course->fullname), 2);
         $ret .= $this->output->heading(get_string('reporttitle', constants::M_COMPONENT, $username), 3);
         return $ret;
     }
 
+    /**
+     * Render the HTML shown when a section has no data.
+     *
+     * @return string
+     */
     public function render_empty_section_html() {
         global $CFG;
         return $this->output->heading(get_string('nodataavailable', constants::M_COMPONENT), 3);
     }
 
+    /**
+     * Render the export buttons HTML.
+     *
+     * @param object $cm The course module.
+     * @param object $formdata The report form data.
+     * @param string $showreport The report being shown.
+     * @return string
+     */
     public function render_exportbuttons_html($cm, $formdata, $showreport) {
         // convert formdata to array
         $formdata = (array) $formdata;
@@ -114,6 +152,14 @@ class report_renderer extends \plugin_renderer_base {
         return \html_writer::div($this->render($excel), constants::M_CLASS . '_actionbuttons');
     }
 
+    /**
+     * Render the CSV export button for the grading page.
+     *
+     * @param object $cm The course module.
+     * @param object $formdata The submitted form data.
+     * @param string $action The grading action.
+     * @return string The rendered HTML.
+     */
     public function render_grading_exportbuttons_html($cm, $formdata, $action) {
         // convert formdata to array
         $formdata = (array) $formdata;
@@ -129,6 +175,16 @@ class report_renderer extends \plugin_renderer_base {
         return \html_writer::div($this->render($excel), constants::M_CLASS . '_actionbuttons');
     }
 
+    /**
+     * Output a report as a downloadable CSV file and terminate the script.
+     *
+     * @param string $sectiontitle The report section title, used as the file name.
+     * @param string $report The report identifier.
+     * @param array $head The report heading fields.
+     * @param array $rows The formatted report rows.
+     * @param array $fields The list of fields to output for each row.
+     * @return void
+     */
     public function render_report_csv($sectiontitle, $report, $head, $rows, $fields) {
 
         // Use the sectiontitle as the file name. Clean it and change any non-filename characters to '_'.
@@ -159,6 +215,15 @@ class report_renderer extends \plugin_renderer_base {
         exit();
     }
 
+    /**
+     * Render a report as an HTML table.
+     *
+     * @param string $report The report identifier.
+     * @param array $head The report heading fields.
+     * @param array $rows The formatted report rows.
+     * @param array $fields The list of fields to output for each row.
+     * @return string The rendered HTML.
+     */
     public function render_report_tabular($report, $head, $rows, $fields) {
         global $CFG;
         if (empty($rows)) {
@@ -225,6 +290,15 @@ class report_renderer extends \plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * Render the reports page footer, including the return-to-reports link and export buttons.
+     *
+     * @param object $moduleinstance The module instance.
+     * @param object $cm The course module.
+     * @param object $formdata The submitted form data.
+     * @param string $showreport The report currently being shown.
+     * @return string The rendered HTML.
+     */
     public function show_reports_footer($moduleinstance, $cm, $formdata, $showreport) {
         // A return to reports top link.
         $link = new \moodle_url(
@@ -246,6 +320,13 @@ class report_renderer extends \plugin_renderer_base {
         return $ret;
     }
 
+    /**
+     * Render a selector for the number of attempts shown per page.
+     *
+     * @param \moodle_url $url The base URL for the selector.
+     * @param object $paging The paging object, providing the current perpage value.
+     * @return string The rendered HTML.
+     */
     public function show_perpage_selector($url, $paging) {
         $options = ['5' => 5, '10' => 10, '20' => 20, '40' => 40, '80' => 80, '150' => 150];
         $selector = new \single_select($url, 'perpage', $options, $paging->perpage);
@@ -253,12 +334,27 @@ class report_renderer extends \plugin_renderer_base {
         return $this->render($selector);
     }
 
+    /**
+     * Render the days-limit and format selectors for the user report.
+     *
+     * @param \moodle_url $url The base URL for the selectors.
+     * @param int $currentdayslimit The currently selected days limit.
+     * @param string $currentformat The currently selected format.
+     * @return string The rendered HTML.
+     */
     public function show_user_report_options($url, $currentdayslimit, $currentformat) {
         $dayslimitselector = $this->fetch_dayslimit_selector($url, $currentdayslimit);
         $formatselector = $this->fetch_format_selector($url, $currentformat);
         return \html_writer::div($formatselector . $dayslimitselector, 'mod_ec_user_report_opts float-right');
     }
 
+    /**
+     * Render a selector for the report's days limit.
+     *
+     * @param \moodle_url $url The base URL for the selector.
+     * @param int $currentselection The currently selected days limit.
+     * @return string The rendered HTML.
+     */
     public function fetch_dayslimit_selector($url, $currentselection) {
         $options = ['0' => get_string('nodayslimit', constants::M_COMPONENT),
             '7' => get_string('xdayslimit', constants::M_COMPONENT, 7),
@@ -274,6 +370,13 @@ class report_renderer extends \plugin_renderer_base {
         return $widget;
     }
 
+    /**
+     * Render the selector for the report's display format (tabular/graphical/combined).
+     *
+     * @param \moodle_url $url The base URL for the selector.
+     * @param string $currentselection The currently selected format.
+     * @return string The rendered HTML.
+     */
     public function fetch_format_selector($url, $currentselection) {
         $params = [];
         $theurl = clone $url;
@@ -318,6 +421,14 @@ class report_renderer extends \plugin_renderer_base {
         return $this->output->paging_bar($totalcount, $paging->pageno, $paging->perpage, $baseurl, $pagevar);
     }
 
+    /**
+     * Render the export buttons appropriate for the current report.
+     *
+     * @param object $cm The course module.
+     * @param object $formdata The submitted form data.
+     * @param string $showreport The report currently being shown.
+     * @return string The rendered HTML.
+     */
     public function show_export_buttons($cm, $formdata, $showreport) {
         switch ($showreport) {
             case 'grading':

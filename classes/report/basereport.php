@@ -39,31 +39,72 @@ use mod_englishcentral\constants;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class basereport {
+    /** @var string The report identifier. */
     protected $report = "";
+    /** @var array The report heading fields. */
     protected $head = [];
+    /** @var array|null The raw data for the report. */
     protected $rawdata = null;
+    /** @var array The list of fields in the report. */
     protected $fields = [];
+    /** @var array A cache of database records keyed by table and row id. */
     protected $dbcache = [];
+    /** @var object The course module. */
     protected $cm;
+    /** @var object The module instance. */
     protected $mod;
+    /** @var \context The module context. */
     protected $context;
 
+    /**
+     * Process the raw log data into report rows.
+     *
+     * @param object $formdata The submitted form data.
+     * @return bool True on success.
+     */
     abstract public function process_raw_data($formdata);
+
+    /**
+     * Fetch the formatted heading for the report.
+     *
+     * @return string The formatted heading.
+     */
     abstract public function fetch_formatted_heading();
 
+    /**
+     * Fetch the formatted description for the report.
+     *
+     * @return string The formatted description.
+     */
     public function fetch_formatted_description() {
 
         return '';
     }
 
+    /**
+     * Constructor.
+     *
+     * @param object $cm The course module.
+     */
     public function __construct($cm) {
         $this->cm = $cm;
         $this->context = \context_module::instance($cm->id);
     }
 
+    /**
+     * Fetch the list of fields in the report.
+     *
+     * @return array The list of fields.
+     */
     public function fetch_fields() {
         return $this->fields;
     }
+
+    /**
+     * Fetch the formatted heading row for the report.
+     *
+     * @return array The list of heading strings.
+     */
     public function fetch_head() {
         $head = [];
         foreach ($this->fields as $field) {
@@ -71,14 +112,31 @@ abstract class basereport {
         }
         return $head;
     }
+    /**
+     * Fetch the report name.
+     *
+     * @return string The report name.
+     */
     public function fetch_name() {
         return $this->report;
     }
 
+    /**
+     * Fetch the total count of rows in the raw data.
+     *
+     * @return int The number of rows.
+     */
     public function fetch_all_rows_count() {
         return $this->rawdata ? count($this->rawdata) : 0;
     }
 
+    /**
+     * Truncate a string to a maximum length.
+     *
+     * @param string $string The string to truncate.
+     * @param int $maxlength The maximum length.
+     * @return string The truncated string.
+     */
     public function truncate($string, $maxlength) {
         if (strlen($string) > $maxlength) {
             $string = substr($string, 0, $maxlength - 2) . '..';
@@ -86,6 +144,13 @@ abstract class basereport {
         return $string;
     }
 
+    /**
+     * Fetch a database record, using a local cache.
+     *
+     * @param string $table The database table name.
+     * @param int $rowid The id of the row to fetch.
+     * @return object The database record.
+     */
     public function fetch_cache($table, $rowid) {
         global $DB;
         if (!array_key_exists($table, $this->dbcache)) {
@@ -97,6 +162,12 @@ abstract class basereport {
         return $this->dbcache[$table][$rowid];
     }
 
+    /**
+     * Fetch a formatted duration for a number of seconds.
+     *
+     * @param int $seconds The number of seconds.
+     * @return string The formatted time difference.
+     */
     public function fetch_formatted_time($seconds) {
 
         // return empty string if the timestamps are not both present.
@@ -107,6 +178,13 @@ abstract class basereport {
         return $this->fetch_time_difference($time, $time + $seconds);
     }
 
+    /**
+     * Fetch a formatted difference between two timestamps.
+     *
+     * @param int $starttimestamp The start timestamp.
+     * @param int $endtimestamp The end timestamp.
+     * @return string The formatted time difference.
+     */
     public function fetch_time_difference($starttimestamp, $endtimestamp) {
 
         // return empty string if the timestamps are not both present.
@@ -125,6 +203,13 @@ abstract class basereport {
         return $ret;
     }
 
+    /**
+     * Fetch the formatted rows for the report.
+     *
+     * @param bool $withlinks Whether to include links in the output.
+     * @param object|bool $paging The paging information, or false for no paging.
+     * @return array The formatted rows.
+     */
     public function fetch_formatted_rows($withlinks = true, $paging = false) {
         $records = $this->rawdata;
         $fields = $this->fields;
@@ -149,6 +234,14 @@ abstract class basereport {
         return $returndata;
     }
 
+    /**
+     * Fetch a single formatted field value.
+     *
+     * @param string $field The field name.
+     * @param object $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB;
         switch ($field) {

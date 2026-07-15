@@ -42,6 +42,11 @@ class course_module_viewed extends \core\event\course_module_viewed {
         $this->data['objecttable'] = 'englishcentral';
     }
 
+    /**
+     * Get the object id mapping for backup/restore.
+     *
+     * @return array The mapping array.
+     */
     public static function get_objectid_mapping() {
         return ['db' => 'englishcentral', 'restore' => 'englishcentral'];
     }

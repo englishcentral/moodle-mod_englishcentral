@@ -28,7 +28,11 @@ namespace mod_englishcentral;
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
+/**
+ * Helper class for authenticating mobile users through tokens.
+ */
 class mobile_auth {
+    /** @var int Number of seconds a generated token remains valid for. */
     const VALID_TIME = 60;
 
     /**

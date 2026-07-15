@@ -40,6 +40,16 @@ class mod_englishcentral_mod_form extends moodleform_mod {
     /** size of numeric text boxes */
     const TEXT_NUM_SIZE = 4;
 
+    /**
+     * Constructor.
+     *
+     * @param object $current The current form data.
+     * @param int $section The section number.
+     * @param object $cm The course module.
+     * @param object $course The course.
+     * @param object|null $ajaxformdata Data submitted via AJAX, if any.
+     * @param object|null $customdata Custom data passed to the form.
+     */
     public function __construct($current, $section, $cm, $course, $ajaxformdata = null, $customdata = null) {
         global $CFG;
 

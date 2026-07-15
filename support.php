@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Displays and processes the EnglishCentral support/contact form.
+ *
  * @package    mod_englishcentral
  * @copyright  2018 Gordon Bateson
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

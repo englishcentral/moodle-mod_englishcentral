@@ -30,13 +30,29 @@ use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
 
+/**
+ * Report showing per-video performance statistics.
+ */
 class videoperformance extends basereport {
+    /** @var string The report identifier. */
     protected $report = "videoperformance";
+    /** @var array The fields displayed in the report. */
     protected $fields = ['videoid', 'videoname', 'difficulty', 'totalwatches', 'averagelearn', 'averagespeak', 'averagechat'];
+    /** @var \stdClass|null The submitted form data. */
     protected $formdata = null;
+    /** @var array Cache of question records. */
     protected $qcache = [];
+    /** @var array Cache of user records. */
     protected $ucache = [];
 
+    /**
+     * Return a formatted value for the given field of a record.
+     *
+     * @param string $field The field name to format.
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB, $CFG, $OUTPUT;
 
@@ -98,6 +114,11 @@ class videoperformance extends basereport {
         return $ret;
     }
 
+    /**
+     * Return the formatted heading for the report.
+     *
+     * @return string The report heading.
+     */
     public function fetch_formatted_heading() {
         $record = $this->formdata;
         $ret = '';
@@ -109,6 +130,13 @@ class videoperformance extends basereport {
         return get_string('videoperformanceheading', constants::M_COMPONENT, $ec->name);
     }
 
+    /**
+     * Build and return the chart markup for the report.
+     *
+     * @param \renderer_base $renderer The output renderer.
+     * @param bool $showdatasource Whether to show the data source table.
+     * @return string The rendered chart HTML.
+     */
     public function fetch_chart($renderer, $showdatasource = true) {
         global $CFG;
         $records = $this->rawdata;
@@ -130,6 +158,12 @@ class videoperformance extends basereport {
         return $thechart;
     }
 
+    /**
+     * Process the submitted form data into raw report data.
+     *
+     * @param object $formdata The submitted form data.
+     * @return bool True on success.
+     */
     public function process_raw_data($formdata) {
         global $DB, $USER;
 

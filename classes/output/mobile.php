@@ -29,7 +29,16 @@ use mod_englishcentral;
 use mod_englishcentral\mobile_auth;
 use mod_englishcentral\constants;
 
+/**
+ * Mobile app output class for mod_englishcentral.
+ */
 class mobile {
+    /**
+     * Build the mobile app view for the englishcentral course module.
+     *
+     * @param array $args Arguments passed by the mobile app, including cmid.
+     * @return array The mobile view definition (templates and javascript).
+     */
     public static function mobile_course_view($args) {
         global $DB, $CFG, $OUTPUT, $USER;
 

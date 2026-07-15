@@ -26,15 +26,23 @@ use mod_englishcentral\utils;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_englishcentral_renderer extends plugin_renderer_base {
+    /** @var object The englishcentral activity object. */
     protected $ec = null;
+    /** @var object The authentication/auth helper object. */
     protected $auth = null;
 
+    /** @var string The current sort field for reports. */
     protected $sort = null;
+    /** @var string The current sort order (ASC or DESC) for reports. */
     protected $order = null;
 
+    /** @var int Signup type indicating no signup. */
     const SIGNUP_NONE = 0;
+    /** @var int Signup type for standard school signup. */
     const SIGNUP_STANDARD = 1;
+    /** @var int Signup type for corporate signup. */
     const SIGNUP_CORPORATE = 2;
+    /** @var int Signup type for solutions signup. */
     const SIGNUP_SOLUTIONS = 3;
 
     /**
@@ -282,6 +290,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the message shown when the activity is not available.
+     *
+     * @return string
+     */
     public function show_notavailable() {
         $output = $this->notification($this->ec->get_string('notavailable'), 'warning');
         $output .= $this->show_dates_available();
@@ -290,6 +303,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the message shown when the activity is not viewable.
+     *
+     * @return string
+     */
     public function show_notviewable() {
         $output = $this->notification($this->ec->get_string('notviewable'), 'warning');
         $output .= $this->show_dates_viewable();
@@ -298,6 +316,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Return a continue button that links back to the course page.
+     *
+     * @return string
+     */
     public function course_continue_button() {
         $url = new moodle_url('/course/view.php', ['id' => $this->ec->course->id]);
         return $this->output->continue_button($url);
@@ -417,6 +440,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show a title chart for a given goal type using progress data.
+     *
+     * @param string $type The goal type (watch, learn, speak or chat).
+     * @param object $progress The progress data object.
+     * @return string
+     */
     public function show_titlechart_type($type, $progress) {
         $num = intval($progress->$type);
         $div = intval($this->ec->{$type . 'goal'});
@@ -428,6 +458,16 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $this->show_titlechart($type, $num, " / $div", $type . 'goalunits', $percent);
     }
 
+    /**
+     * Show a titled chart with a heading and the chart itself.
+     *
+     * @param string $type The goal type.
+     * @param string $text1 The primary text displayed in the chart.
+     * @param string $text2 The secondary text displayed in the chart.
+     * @param string $string The language string key for the chart label.
+     * @param int $percent The percentage value for the chart.
+     * @return string
+     */
     public function show_titlechart($type, $text1, $text2, $string, $percent) {
         $title = $this->ec->get_string($type . 'goal');
         $help = $this->help_icon($type . 'goal', $this->ec->plugin);
@@ -436,6 +476,16 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return html_writer::tag('div', $title . $chart, ['class' => 'titlechart']);
     }
 
+    /**
+     * Show a circular progress chart.
+     *
+     * @param string $type The goal type.
+     * @param string $text1 The primary text displayed in the chart.
+     * @param string $text2 The secondary text displayed in the chart.
+     * @param string $string The language string key for the chart label.
+     * @param int $percent The percentage value for the chart.
+     * @return string
+     */
     public function show_chart($type, $text1, $text2, $string, $percent) {
         $output = '';
 
@@ -463,6 +513,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return html_writer::tag('div', $output, $params);
     }
 
+    /**
+     * Return the CSS transform style for the chart ring based on a percentage.
+     *
+     * @param int $percent The percentage value.
+     * @return string
+     */
     public function get_chart_transform($percent) {
         switch (true) {
             case ($percent < 0):
@@ -479,6 +535,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return 'transform: rotate(' . $degrees . 'deg);';
     }
 
+    /**
+     * Return the CSS class for the chart based on a percentage.
+     *
+     * @param int $percent The percentage value.
+     * @return string
+     */
     public function get_chart_class($percent) {
         if ($percent >= 50) {
             return 'over50';
@@ -546,6 +608,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show a single video thumbnail element.
+     *
+     * @param object $video The video data object.
+     * @return string
+     */
     public function show_video($video) {
         $output = '';
 
@@ -660,6 +728,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the status indicators for a video.
+     *
+     * @param object $video The video data object.
+     * @return string
+     */
     public function show_video_status($video) {
         $output = '';
         if (isset($video->watchcomplete) && $video->watchcomplete) {
@@ -677,14 +751,32 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     // this method is not used,
     // nor is the addvideo icon
 
+    /**
+     * Show the add video icon.
+     *
+     * @return string
+     */
     protected function show_addvideo_icon() {
         return $this->show_videos_icon('add');
     }
 
+    /**
+     * Show the remove video icon.
+     *
+     * @param bool $initially_visible Whether the icon is initially visible.
+     * @return string
+     */
     protected function show_removevideo_icon($initially_visible = true) {
         return $this->show_videos_icon('remove', $initially_visible);
     }
 
+    /**
+     * Show a video action icon of the given type.
+     *
+     * @param string $type The icon type (add or remove).
+     * @param bool $initially_visible Whether the icon is initially visible.
+     * @return string
+     */
     protected function show_videos_icon($type, $initially_visible = true) {
         $text = $this->ec->get_string($type . 'video');
         if (method_exists($this, 'image_url')) {
@@ -706,6 +798,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         );
     }
 
+    /**
+     * Show the progress report for all users in the activity.
+     *
+     * @param int $dayslimit Limit results to attempts within this many days.
+     * @return string
+     */
     public function show_progress_report($dayslimit = 0) {
         global $DB, $CFG;
         $output = '';
@@ -871,6 +969,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     }
 
 
+    /**
+     * Comparison callback used to sort report items by percentage.
+     *
+     * @param object $a The first item to compare.
+     * @param object $b The second item to compare.
+     * @return int
+     */
     protected function uasort_percent($a, $b) {
         $anum = intval($a->percent);
         $bnum = intval($b->percent);
@@ -883,6 +988,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return 0;
     }
 
+    /**
+     * Show a single row in the progress report.
+     *
+     * @param object $item The user item data.
+     * @param object $goals The goals data object.
+     * @return string
+     */
     protected function show_progress_report_item($item, $goals) {
         $output = '';
         $output .= html_writer::tag('dt', $this->show_progress_report_user($item, $goals), ['class' => 'user']);
@@ -890,6 +1002,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the user name and percentage for a progress report row.
+     *
+     * @param object $item The user item data.
+     * @param object $goals The goals data object.
+     * @return string
+     */
     protected function show_progress_report_user($item, $goals) {
         $output = '';
         $output .= html_writer::tag('span', fullname($item), ['class' => 'fullname']);
@@ -897,6 +1016,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the set of progress bars for a progress report row.
+     *
+     * @param object $item The user item data.
+     * @param object $goals The goals data object.
+     * @return string
+     */
     protected function show_progress_report_bars($item, $goals) {
         $output = '';
         $output .= $this->show_progress_report_bar($item, $goals, 'watch');
@@ -906,6 +1032,14 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show a single progress bar of a given type for a progress report row.
+     *
+     * @param object $item The user item data.
+     * @param object $goals The goals data object.
+     * @param string $type The goal type (watch, learn, speak or chat).
+     * @return string
+     */
     protected function show_progress_report_bar($item, $goals, $type) {
         if (empty($goals->$type)) {
             return '';
@@ -990,6 +1124,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $this->order = $SESSION->englishcentral->order = $order;
     }
 
+    /**
+     * Return a sort icon link for a report column.
+     *
+     * @param moodle_url $url The base URL for the sort link.
+     * @param string $sort The sort field this icon represents.
+     * @return string
+     */
     protected function get_sort_icon($url, $sort) {
         if ($sort == $this->sort) {
             $order = $this->order;
@@ -1091,6 +1232,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the search term input field.
+     *
+     * @param string $name The input field name.
+     * @param string $size The input field size.
+     * @return string
+     */
     public function show_search_term($name, $size = '') {
         $output = '';
         $params = ['type' => 'text',
@@ -1104,6 +1252,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the search topics input field.
+     *
+     * @param string $name The input field name.
+     * @param string $size The input field size.
+     * @return string
+     */
     public function show_search_topics($name, $size = '') {
         $output = '';
         $params = ['type' => 'text',
@@ -1117,6 +1272,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the search level checkbox group.
+     *
+     * @param string $name The input field name.
+     * @return string
+     */
     public function show_search_level($name) {
         $output = '';
         $output .= html_writer::tag('dt', $this->ec->get_string($name));
@@ -1138,6 +1299,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the search duration checkbox group.
+     *
+     * @param string $name The input field name.
+     * @return string
+     */
     public function show_search_duration($name) {
         $output = '';
         $output .= html_writer::tag('dt', get_string('duration', 'search'));
@@ -1159,6 +1326,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the search copyright input field.
+     *
+     * @param string $name The input field name.
+     * @param string $size The input field size.
+     * @return string
+     */
     public function show_search_copyright($name, $size) {
         $output = '';
         $params = ['type' => 'text',
@@ -1170,6 +1344,12 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    /**
+     * Show the search submit button.
+     *
+     * @param string $name The button name.
+     * @return string
+     */
     public function show_search_button($name) {
         $output = '';
         $output .= html_writer::start_tag('dd', ['class' => 'visible']);
@@ -1202,6 +1382,13 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     /*
     * Developer tools for generating random data etc
     */
+    /**
+     * Build the developer tools page items for generating random data etc.
+     *
+     * @param int $cmid The course module id.
+     * @param int $moduleid The module instance id.
+     * @return array
+     */
     public function developerpage($cmid, $moduleid) {
         $items = [];
         // Update gradebook

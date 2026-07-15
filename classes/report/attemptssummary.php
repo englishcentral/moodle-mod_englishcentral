@@ -29,19 +29,43 @@ namespace mod_englishcentral\report;
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
+/**
+ * Report showing a summary of attempts for each user.
+ *
+ * @package    mod_englishcentral
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class attemptssummary extends basereport
 {
+    /** @var string The report identifier. */
     protected $report = "attemptssummary";
+    /** @var array The list of fields in the report. */
     protected $fields = ['firstname', 'lastname', 'total_p', 'watch', 'learn', 'speak', 'chat'];
+    /** @var object|null The submitted form data. */
     protected $formdata = null;
+    /** @var array A cache of question records. */
     protected $qcache = [];
+    /** @var array A cache of user records. */
     protected $ucache = [];
+    /** @var object|null The study goals. */
     protected $goals = null;
+    /** @var string The current sort field. */
     protected $sort = 'firstname';
+    /** @var string The current sort order. */
     protected $order = 'ASC';
 
+    /** @var object|null The EnglishCentral activity. */
     protected $ec = null;
 
+    /**
+     * Fetch a single formatted field value.
+     *
+     * @param string $field The field name.
+     * @param object $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB, $CFG, $OUTPUT;
 
@@ -98,6 +122,11 @@ class attemptssummary extends basereport
         return $ret;
     }
 
+    /**
+     * Fetch the formatted heading for the report.
+     *
+     * @return string The formatted heading.
+     */
     public function fetch_formatted_heading() {
         $record = $this->formdata;
         $ret = '';
@@ -108,6 +137,13 @@ class attemptssummary extends basereport
         return get_string('attemptssummaryheading', constants::M_COMPONENT, $ec->name);
     }
 
+    /**
+     * Fetch the chart output for the report.
+     *
+     * @param object $renderer The renderer.
+     * @param bool $showdatasource Whether to show the data source.
+     * @return string The chart HTML.
+     */
     public function fetch_chart($renderer, $showdatasource = true) {
         global $PAGE, $CFG;
         $PAGE->requires->js_call_amd($this->ec->plugin . "/report", 'init');
@@ -212,6 +248,13 @@ class attemptssummary extends basereport
         $this->order = $SESSION->englishcentral->order = $order;
     }
 
+    /**
+     * Fetch the sort icon link for a column.
+     *
+     * @param \moodle_url $url The base URL.
+     * @param string $sort The sort field for this column.
+     * @return string The sort icon HTML link.
+     */
     protected function get_sort_icon($url, $sort) {
         global $OUTPUT;
 
@@ -263,6 +306,13 @@ class attemptssummary extends basereport
         return \html_writer::link($url, $icon, ['title' => $text]);
     }
 
+    /**
+     * Comparison callback for sorting report items by percent complete.
+     *
+     * @param object $a The first item to compare.
+     * @param object $b The second item to compare.
+     * @return int Negative, zero or positive depending on the sort order.
+     */
     protected function uasort_percent($a, $b) {
         $anum = intval($a->percent);
         $bnum = intval($b->percent);
@@ -275,6 +325,13 @@ class attemptssummary extends basereport
         return 0;
     }
 
+    /**
+     * Render a single user's progress report item.
+     *
+     * @param object $item The user's progress data.
+     * @param object $goals The activity goals.
+     * @return string The rendered HTML.
+     */
     protected function show_progress_report_item($item, $goals) {
         $output = '';
         $output .= \html_writer::tag('dt', $this->show_progress_report_user($item, $goals), ['class' => 'user']);
@@ -282,6 +339,13 @@ class attemptssummary extends basereport
         return $output;
     }
 
+    /**
+     * Render the user's name and overall percentage for a progress report item.
+     *
+     * @param object $item The user's progress data.
+     * @param object $goals The activity goals.
+     * @return string The rendered HTML.
+     */
     protected function show_progress_report_user($item, $goals) {
         $output = '';
         $output .= \html_writer::tag('span', fullname($item), ['class' => 'fullname']);
@@ -289,6 +353,13 @@ class attemptssummary extends basereport
         return $output;
     }
 
+    /**
+     * Render all progress bars (watch/learn/speak/chat) for a progress report item.
+     *
+     * @param object $item The user's progress data.
+     * @param object $goals The activity goals.
+     * @return string The rendered HTML.
+     */
     protected function show_progress_report_bars($item, $goals) {
         $output = '';
         $output .= $this->show_progress_report_bar($item, $goals, 'watch');
@@ -298,6 +369,14 @@ class attemptssummary extends basereport
         return $output;
     }
 
+    /**
+     * Render a single progress bar for the given goal type.
+     *
+     * @param object $item The user's progress data.
+     * @param object $goals The activity goals.
+     * @param string $type The goal type (watch/learn/speak/chat).
+     * @return string The rendered HTML, or an empty string if the goal is not set.
+     */
     protected function show_progress_report_bar($item, $goals, $type) {
         if (empty($this->goals->$type)) {
             return '';
@@ -335,6 +414,12 @@ class attemptssummary extends basereport
         return \html_writer::tag('span', $bar . $text, $params);
     }
 
+    /**
+     * Process the submitted form data into raw report data.
+     *
+     * @param object $formdata The submitted form data.
+     * @return bool True on success.
+     */
     public function process_raw_data($formdata) {
         global $CFG, $DB, $USER;
 

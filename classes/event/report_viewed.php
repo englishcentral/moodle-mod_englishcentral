@@ -97,6 +97,11 @@ class report_viewed extends \core\event\base {
         }
     }
 
+    /**
+     * Get the "other" field mapping for backup/restore.
+     *
+     * @return array The mapping array.
+     */
     public static function get_other_mapping() {
         return [
             'ecid' => ['db' => 'englishcentral', 'restore' => 'englishcentral'],

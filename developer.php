@@ -146,6 +146,14 @@ foreach ($items as $item) {
 }
 echo $renderer->footer();
 
+/**
+ * Copy an attempt record for a different video and user.
+ *
+ * @param int $videoid The id of the video the copied attempt is for.
+ * @param object $attempt The attempt record to copy.
+ * @param object $user The user the copied attempt belongs to.
+ * @return object The new attempt record.
+ */
 function copyattempt($videoid, $attempt, $user) {
     global $DB;
     $newatt = clone $attempt;

@@ -310,8 +310,6 @@ function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone 
 /**
  * Return grade for given user or all users.
  *
- * @global stdClass
- * @global object
  * @param int $ecid id of englishcentral
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
@@ -381,8 +379,6 @@ function englishcentral_reset_course_form_defaults($course) {
 /**
  * Removes all grades from gradebook
  *
- * @global stdClass
- * @global object
  * @param int $courseid
  * @param string optional type
  */
@@ -404,8 +400,6 @@ function englishcentral_reset_gradebook($courseid, $type = '') {
  * Actual implementation of the reset course functionality, delete all the
  * englishcentral attempts for course $data->courseid.
  *
- * @global stdClass
- * @global object
  * @param object $data the data submitted from the reset course.
  * @return array status array
  */
@@ -502,7 +496,12 @@ function englishcentral_get_recent_mod_activity(&$activities, &$index, $timestar
 
 /**
  * Prints single activity item prepared by {@see englishcentral_get_recent_mod_activity()}
-
+ *
+ * @param object $activity The activity record.
+ * @param int $courseid The course id.
+ * @param bool $detail Whether to show additional details.
+ * @param array $modnames Array of module names.
+ * @param bool $viewfullnames Whether the current user can view full names.
  * @return void
  */
 function englishcentral_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
@@ -514,8 +513,7 @@ function englishcentral_print_recent_mod_activity($activity, $courseid, $detail,
  * as sending out mail, toggling flags etc ...
  *
  * @return boolean
- * @todo Finish documenting this function
- **/
+ */
 function englishcentral_cron() {
     return true;
 }
@@ -523,7 +521,6 @@ function englishcentral_cron() {
 /**
  * Returns all other caps used in the module
  *
- * @example return array('moodle/site:accessallgroups');
  * @return array
  */
 function englishcentral_get_extra_capabilities() {
@@ -548,7 +545,6 @@ function englishcentral_get_extra_capabilities() {
 function englishcentral_scale_used($ecid, $scaleid) {
     global $DB;
 
-    /** @example */
     if ($scaleid && $DB->record_exists('englishcentral', ['id' => $ecid, 'grade' => -$scaleid])) {
         return true;
     } else {
@@ -567,7 +563,6 @@ function englishcentral_scale_used($ecid, $scaleid) {
 function englishcentral_scale_used_anywhere($scaleid) {
     global $DB;
 
-    /** @example */
     if ($scaleid && $DB->record_exists('englishcentral', ['grade' => -$scaleid])) {
         return true;
     } else {

@@ -41,10 +41,10 @@ use core_privacy\local\request\writer;
 class provider implements
     // This plugin does store personal user data.
     \core_privacy\local\metadata\provider,
-    // This plugin is a core_user_data_provider.
-    \core_privacy\local\request\plugin\provider,
     // This plugin can identify the users within a context.
-    \core_privacy\local\request\core_userlist_provider {
+    \core_privacy\local\request\core_userlist_provider,
+    // This plugin is a core_user_data_provider.
+    \core_privacy\local\request\plugin\provider {
     /**
      * Return meta data about this plugin.
      *

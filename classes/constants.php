@@ -26,21 +26,41 @@
 
 namespace mod_englishcentral;
 
-class constants
-{
-    // component name, db tables, things that define app
+/**
+ * Constants used throughout the EnglishCentral module.
+ *
+ * @package    mod_englishcentral
+ * @copyright  2014 onwards Justin Hunt; 2024 onwards EnglishCentral
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class constants {
+    // Component name, db tables, things that define app.
+    /** @var string The frankenstyle component name. */
     const M_COMPONENT = 'mod_englishcentral';
+    /** @var string The main module database table. */
     const M_TABLE = 'englishcentral';
+    /** @var string The attempts database table. */
     const M_ATTEMPTSTABLE = 'englishcentral_attempts';
+    /** @var string The videos database table. */
     const M_VIDEOSTABLE = 'englishcentral_videos';
+    /** @var string The authentication database table. */
     const M_AUTHTABLE = 'englishcentral_auth';
+    /** @var string The module name. */
     const M_MODNAME = 'englishcentral';
+    /** @var string The module URL path. */
     const M_URL = '/mod/englishcentral';
+    /** @var string The module filesystem path. */
     const M_PATH = '/mod/englishcentral';
+    /** @var string The module frankenstyle class prefix. */
     const M_CLASS = 'mod_englishcentral';
+    /** @var string The admin plugin settings URL. */
     const M_PLUGINSETTINGS = '/admin/settings.php?section=modsettingenglishcentral';
+    /** @var int Flag to show progress dials at the top. */
     const M_PROGRESSDIALS_TOP = 1;
+    /** @var int Flag to show progress dials at the bottom. */
     const M_PROGRESSDIALS_BOTTOM = 0;
+    /** @var int Flag to use DataTables for tables. */
     const M_USE_DATATABLES = 0;
+    /** @var int Flag to use paged tables for tables. */
     const M_USE_PAGEDTABLES = 1;
 }

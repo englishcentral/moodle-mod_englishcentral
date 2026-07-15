@@ -37,7 +37,6 @@ use mod_englishcentral\utils;
  *
  * This is the abstract class that add item type forms must extend.
  *
- * @abstract
  * @copyright  2021 Justin Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -91,6 +90,15 @@ class setupform extends \moodleform {
         $this->add_action_buttons(get_string('cancel'), get_string('savechangesanddisplay'));
     }
 
+    /**
+     * Add a filemanager element for uploading media.
+     *
+     * @param string $name The base element name.
+     * @param int $count The count of the element to add, or -1 for none.
+     * @param string|null $label The element label, null means default.
+     * @param bool $required Whether the element is required.
+     * @return void
+     */
     final protected function add_media_upload($name, $count = -1, $label = null, $required = false) {
         if ($count > -1) {
             $name = $name . $count;
@@ -105,6 +113,13 @@ class setupform extends \moodleform {
         );
     }
 
+    /**
+     * Add a filemanager element for uploading the audio prompt.
+     *
+     * @param string|null $label The element label, null means default.
+     * @param bool $required Whether the element is required.
+     * @return void
+     */
     final protected function add_media_prompt_upload($label = null, $required = false) {
         return $this->add_media_upload(constants::AUDIOPROMPT, -1, $label, $required);
     }

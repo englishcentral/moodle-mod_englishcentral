@@ -28,13 +28,29 @@ namespace mod_englishcentral\report;
 
 use mod_englishcentral\constants;
 
+/**
+ * Basic report showing raw activity records.
+ */
 class basic extends basereport {
+    /** @var string The report identifier. */
     protected $report = "basic";
+    /** @var array The fields displayed in the report. */
     protected $fields = ['id', 'name', 'timecreated'];
+    /** @var \stdClass|null The heading data for the report. */
     protected $headingdata = null;
+    /** @var array Cache of question records. */
     protected $qcache = [];
+    /** @var array Cache of user records. */
     protected $ucache = [];
 
+    /**
+     * Return a formatted value for the given field of a record.
+     *
+     * @param string $field The field name to format.
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
     public function fetch_formatted_field($field, $record, $withlinks) {
         global $DB;
         switch ($field) {
@@ -60,6 +76,11 @@ class basic extends basereport {
         return $ret;
     }
 
+    /**
+     * Return the formatted heading for the report.
+     *
+     * @return string The report heading.
+     */
     public function fetch_formatted_heading() {
         $record = $this->headingdata;
         $ret = '';
@@ -69,6 +90,12 @@ class basic extends basereport {
         return get_string('basicheading', constants::M_COMPONENT);
     }
 
+    /**
+     * Fetch and store the raw data for the report.
+     *
+     * @param \stdClass $formdata The submitted form data.
+     * @return bool True on success.
+     */
     public function process_raw_data($formdata) {
         global $DB;
 

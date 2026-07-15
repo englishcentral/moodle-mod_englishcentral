@@ -52,7 +52,6 @@ require_once($CFG->dirroot . '/lib/formslib.php');
 /**
  * Account lookup form.
  *
- * @abstract
  * @copyright  2019 Justin Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -26,7 +26,21 @@ namespace mod_englishcentral;
 use mod_englishcentral\constants;
 
 
+/**
+ * Utils class holding shared helper functions for mod_englishcentral.
+ */
 class utils {
+    /**
+     * Add the standard mod_form elements shared by the module settings and setup tab forms.
+     *
+     * @param \MoodleQuickForm $mform The form to add elements to.
+     * @param object $instance The module instance.
+     * @param object $cm The course module.
+     * @param object $course The course.
+     * @param \context $context The module context.
+     * @param bool $setuptab Whether this is being added to the setup tab form.
+     * @return void
+     */
     public static function add_mform_elements($mform, $instance, $cm, $course, $context, $setuptab = false) {
         global $CFG, $PAGE;
 
@@ -183,14 +197,14 @@ class utils {
     }
 
     /**
-     * set_type_default_advanced
+     * Set a form field's type, default value and advanced state from the plugin config.
      *
-     * @param $mform
-     * @param $config
-     * @param $name of field
-     * @param $type PARAM_xxx constant value
-     * @param $default (optional, default = null)
-     * @todo Finish documenting this function
+     * @param \MoodleQuickForm $mform The form containing the field.
+     * @param object $config The plugin config object.
+     * @param string $name The name of the field.
+     * @param int $type A PARAM_xxx constant value.
+     * @param mixed $default The fallback default value if none is set in config.
+     * @return void
      */
     public static function set_type_default_advanced($mform, $config, $name, $type, $default = null) {
         $mform->setType($name, $type);
@@ -205,12 +219,24 @@ class utils {
         }
     }
 
+    /**
+     * Get the options for the "reportstable" setting.
+     *
+     * @return array Options keyed by their constant value.
+     */
     public static function fetch_options_reportstable() {
         $options = [constants::M_USE_DATATABLES => get_string("reporttableajax", constants::M_COMPONENT),
             constants::M_USE_PAGEDTABLES => get_string("reporttablepaged", constants::M_COMPONENT)];
         return $options;
     }
 
+    /**
+     * Add a video to an activity's video list, if not already present.
+     *
+     * @param int $ecid The englishcentral activity id.
+     * @param int $videoid The video id to add.
+     * @return int The id of the video record.
+     */
     public static function add_video($ecid, $videoid) {
             global $DB;
 
@@ -230,6 +256,12 @@ class utils {
             return $record['id'];
     }
 
+    /**
+     * Trim a string, gracefully handling null input.
+     *
+     * @param string|null $str The string to trim.
+     * @return string The trimmed string, or an empty string if null.
+     */
     public static function super_trim($str) {
         if ($str == null) {
             return '';
@@ -239,7 +271,12 @@ class utils {
         }
     }
 
-     // see if this is truly json or some error
+    /**
+     * Check whether a string is valid JSON.
+     *
+     * @param string $string The string to check.
+     * @return bool True if the string is valid JSON.
+     */
     public static function is_json($string) {
         if (!$string) {
             return false;

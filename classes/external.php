@@ -47,6 +47,11 @@ use mod_englishcentral\constants;
  * @author  Justin Hunt - Poodll.com
  */
 class mod_englishcentral_external extends external_api {
+    /**
+     * Describe the parameters for add_video.
+     *
+     * @return external_function_parameters
+     */
     public static function add_video_parameters() {
         return new external_function_parameters([
             'ecid' => new external_value(PARAM_INT),
@@ -54,6 +59,13 @@ class mod_englishcentral_external extends external_api {
         ]);
     }
 
+    /**
+     * Add a video to the activity.
+     *
+     * @param int $ecid The englishcentral activity id.
+     * @param int $videoid The video id to add.
+     * @return bool True on success.
+     */
     public static function add_video($ecid, $videoid) {
         $ret = utils::add_video($ecid, $videoid);
         if ($ret) {
@@ -62,6 +74,12 @@ class mod_englishcentral_external extends external_api {
             return false;
         }
     }
+
+    /**
+     * Describe the return value for add_video.
+     *
+     * @return external_value
+     */
     public static function add_video_returns() {
         return new external_value(PARAM_BOOL);
     }

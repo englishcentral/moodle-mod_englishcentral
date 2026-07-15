@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Custom uninstallation procedure for mod_englishcentral.
+ *
  * @see uninstall_plugin()
  *
  * @package    mod_englishcentral

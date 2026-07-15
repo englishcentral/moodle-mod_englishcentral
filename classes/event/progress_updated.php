@@ -42,10 +42,20 @@ class progress_updated extends \core\event\base {
         $this->data['objecttable'] = 'englishcentral';
     }
 
+    /**
+     * Get the object id mapping for backup/restore.
+     *
+     * @return array The mapping array.
+     */
     public static function get_objectid_mapping() {
         return ['db' => 'englishcentral_attempts', 'restore' => 'englishcentral_attempts'];
     }
 
+    /**
+     * Get the "other" field mapping for backup/restore.
+     *
+     * @return array The mapping array.
+     */
     public static function get_other_mapping() {
         return [
             'ecid' => ['db' => 'englishcentral', 'restore' => 'englishcentral'],

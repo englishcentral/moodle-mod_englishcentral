@@ -15,19 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Defines all the restore steps that will be used by the restore_englishcentral_activity_task.
+ *
  * @package    mod_englishcentral
  * @copyright 2014 Justin Hunt poodllsupport@gmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Define all the restore steps that will be used by the restore_englishcentral_activity_task
- */
-
-/**
  * Structure step to restore one englishcentral activity
  */
 class restore_englishcentral_activity_structure_step extends restore_activity_structure_step {
+    /**
+     * Defines the structure of the restore workflow.
+     *
+     * @return mixed the fully constructed activity structure
+     */
     protected function define_structure() {
 
         // fetch the $userinfo flag
@@ -64,6 +67,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Processes the englishcentral element and inserts the activity record.
+     *
+     * @param array $data the data for a single englishcentral record
+     * @return bool|void false on failure, otherwise nothing
+     */
     protected function process_englishcentral($data) {
         global $DB;
 
@@ -91,6 +100,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         $this->apply_activity_instance($newid);
     }
 
+    /**
+     * Processes an englishcentral video element and inserts the record.
+     *
+     * @param array $data the data for a single video record
+     * @return bool|void false on failure, otherwise nothing
+     */
     protected function process_englishcentral_videos($data) {
         global $DB;
 
@@ -112,6 +127,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         $this->set_mapping('englishcentral_videos', $oldid, $newid, false);
     }
 
+    /**
+     * Processes an englishcentral accountid element and inserts the record.
+     *
+     * @param array $data the data for a single accountid record
+     * @return bool|void false on failure, otherwise nothing
+     */
     protected function process_englishcentral_accountids($data) {
         global $DB;
 
@@ -162,6 +183,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         }
     }
 
+    /**
+     * Processes an englishcentral attempt element and inserts the record.
+     *
+     * @param array $data the data for a single attempt record
+     * @return bool|void false on failure, otherwise nothing
+     */
     protected function process_englishcentral_attempts($data) {
         global $DB;
 
@@ -183,6 +210,12 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         $this->set_mapping('englishcentral_attempts', $oldid, $newid, false);
     }
 
+    /**
+     * Processes an englishcentral phoneme element and inserts the record.
+     *
+     * @param array $data the data for a single phoneme record
+     * @return bool|void false on failure, otherwise nothing
+     */
     protected function process_englishcentral_phonemes($data) {
         global $DB;
 
@@ -205,6 +238,11 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
         $this->set_mapping('englishcentral_phonemes', $oldid, $newid);
     }
 
+    /**
+     * Adds the englishcentral related files after execution.
+     *
+     * @return void
+     */
     protected function after_execute() {
         // Add englishcentral related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_englishcentral', 'intro', null);

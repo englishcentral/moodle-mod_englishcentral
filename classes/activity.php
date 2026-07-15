@@ -185,15 +185,25 @@ class activity {
     // availability API
     ////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Detect if this activity is not available.
+     *
+     * @return bool TRUE if not available; otherwise FALSE.
+     */
     public function not_available() {
         return ($this->available ? false : true);
     }
 
+    /**
+     * Detect if this activity is not viewable.
+     *
+     * @return bool TRUE if not viewable; otherwise FALSE.
+     */
     public function not_viewable() {
         return ($this->viewable ? false : true);
     }
 
-    /*
+    /**
      * Detect if watch goal is set.
      *
      * @return boolean TRUE if watch goal is > 0; otherwise FALSE.
@@ -202,7 +212,7 @@ class activity {
         return ($this->watchgoal ? true : false);
     }
 
-    /*
+    /**
      * Detect if learn goal is set.
      *
      * @return boolean TRUE if learn goal is > 0; otherwise FALSE.
@@ -211,7 +221,7 @@ class activity {
         return ($this->learngoal ? true : false);
     }
 
-    /*
+    /**
      * Detect if speak goal is set.
      *
      * @return boolean TRUE if speak goal is > 0; otherwise FALSE.
@@ -220,7 +230,7 @@ class activity {
         return ($this->speakgoal ? true : false);
     }
 
-    /*
+    /**
      * Detect if chat goal is set.
      *
      * @return boolean TRUE if chat goal is > 0; otherwise FALSE.
@@ -229,7 +239,7 @@ class activity {
         return ($this->chatgoal ? true : false);
     }
 
-    /*
+    /**
      * Detect if chat mode is enabled for this Moodle site.
      *
      * @return boolean TRUE if chat mode is enabled; otherwise FALSE.
@@ -242,22 +252,56 @@ class activity {
     // URLs API
     ////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Get the URL of the reports page for this activity.
+     *
+     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * @param array $params Additional URL parameters.
+     * @return \moodle_url|string The reports page URL.
+     */
     public function get_report_url($escaped = null, $params = []) {
         return $this->url('reports.php', $escaped, $params);
     }
 
+    /**
+     * Get the URL of the developer tools page for this activity.
+     *
+     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * @param array $params Additional URL parameters.
+     * @return \moodle_url|string The developer tools page URL.
+     */
     public function get_developertools_url($escaped = null, $params = []) {
         return $this->url('developer.php', $escaped, $params);
     }
 
+    /**
+     * Get the URL of the view page for this activity.
+     *
+     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * @param array $params Additional URL parameters.
+     * @return \moodle_url|string The view page URL.
+     */
     public function get_view_url($escaped = null, $params = []) {
         return $this->url('view.php', $escaped, $params);
     }
 
+    /**
+     * Get the URL of the view AJAX endpoint for this activity.
+     *
+     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * @param array $params Additional URL parameters.
+     * @return \moodle_url|string The view AJAX endpoint URL.
+     */
     public function get_viewajax_url($escaped = null, $params = []) {
         return $this->url('view.ajax.php', $escaped, $params);
     }
 
+    /**
+     * Get the EnglishCentral video details URL for the current language.
+     *
+     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * @return string The video details URL.
+     */
     public function get_videoinfo_url($escaped = null) {
         $lang = substr(current_language(), 0, 2);
         switch ($lang) {
@@ -283,6 +327,14 @@ class activity {
         }
     }
 
+    /**
+     * Build a URL to a file within this plugin.
+     *
+     * @param string $filepath The path to the file, relative to the plugin folder.
+     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * @param array $params Additional URL parameters.
+     * @return \moodle_url|string The built URL.
+     */
     public function url($filepath, $escaped = null, $params = []) {
         if (isset($this->cm)) {
             $params['id'] = $this->cm->id;
@@ -299,6 +351,13 @@ class activity {
     // strings API
     ////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Get a language string for this plugin.
+     *
+     * @param string $name The string identifier.
+     * @param mixed $a Additional data for the string.
+     * @return string The language string.
+     */
     public function get_string($name, $a = null) {
         return get_string($name, $this->plugin, $a);
     }
@@ -307,16 +366,32 @@ class activity {
     // database API
     ////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Get the video ids configured for this activity.
+     *
+     * @return array Video ids keyed by record id, ordered by sortorder.
+     */
     public function get_videoids() {
         global $DB;
         return $DB->get_records_menu('englishcentral_videos', ['ecid' => $this->id], 'sortorder', 'id,videoid');
     }
 
+    /**
+     * Get the EnglishCentral account id of the current user.
+     *
+     * @return string|false The account id, or false if not found.
+     */
     public function get_accountid() {
         global $DB, $USER;
         return $DB->get_field('englishcentral_accountids', 'accountid', ['userid' => $USER->id]);
     }
 
+    /**
+     * Get the EnglishCentral account ids of users enrolled in this activity.
+     *
+     * @param int $groupid Optional group id to restrict the users to.
+     * @return array|false Account ids keyed by user id, or false if none found.
+     */
     public function get_accountids($groupid = 0) {
         global $DB;
         $groupid = 0;
@@ -327,6 +402,12 @@ class activity {
         return false;
     }
 
+    /**
+     * Get the user ids enrolled in this activity, respecting group mode.
+     *
+     * @param int $groupid Optional group id to restrict the users to.
+     * @return array|false User ids, or false if none found.
+     */
     public function get_userids($groupid = 0) {
         global $DB;
         $mode = $this->get_groupmode();
@@ -355,11 +436,11 @@ class activity {
         }
     }
 
-    /*
-     * get groupmode (0=NOGROUPS, 1=VISIBLEGROUPS, 2=SEPARATEGROUPS)
+    /**
+     * Get the group mode (0=NOGROUPS, 1=VISIBLEGROUPS, 2=SEPARATEGROUPS).
      *
-     * @return integer, the groupmode of this activity or course
-     **/
+     * @return int The groupmode of this activity or course.
+     */
     public function get_groupmode() {
         if ($this->cm) {
             return groups_get_activity_groupmode($this->cm);
@@ -370,6 +451,11 @@ class activity {
         return NOGROUPS;
     }
 
+    /**
+     * Get the current user's cumulative progress totals for this activity.
+     *
+     * @return object Progress totals keyed by watch, learn, speak and chat.
+     */
     public function get_progress() {
         global $DB, $USER;
         $progress = (object)[
@@ -392,6 +478,12 @@ class activity {
         return $progress;
     }
 
+    /**
+     * Update the current user's attempt with progress data from an EC dialog, and trigger events.
+     *
+     * @param object $dialog JSON data returned from the EC REST call.
+     * @return void
+     */
     public function update_progress($dialog) {
         global $DB, $USER;
 
@@ -558,6 +650,12 @@ class activity {
         return $progress;
     }
 
+    /**
+     * Get the comma-separated list of attempt fields to select.
+     *
+     * @param bool $addvideoid Whether to include the videoid field.
+     * @return string The comma-separated field list.
+     */
     public function get_attempts_fields($addvideoid = true) {
         $fields = 'watchcount,watchcomplete,' .
               'learncount,learncomplete,' .
@@ -569,6 +667,12 @@ class activity {
         return $fields;
     }
 
+    /**
+     * Get the current user's attempts for this activity.
+     *
+     * @param int $videoid Optional video id to restrict the attempts to.
+     * @return array The matching attempt records.
+     */
     public function get_attempts($videoid = 0) {
         global $DB, $USER;
         $params = ['ecid' => $this->id,

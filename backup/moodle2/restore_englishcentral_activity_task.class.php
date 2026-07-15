@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Defines {@link restore_englishcentral_activity_task} class.
+ *
  * @package    mod_englishcentral
  * @copyright 2014 Justin Hunt poodllsupport@gmail.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
