@@ -40,13 +40,13 @@
 function xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname) {
     global $DB;
 
-    $table_exists = $dbman->table_exists($table);
+    $tableexists = $dbman->table_exists($table);
     xmldb_englishcentral_create_table($dbman, $table);
 
     if ($dbman->table_exists($oldname)) {
         if ($records = $DB->get_records($oldname)) {
             foreach ($records as $record) {
-                if ($table_exists && $DB->record_exists($table->getName(), ['id' => $record->id])) {
+                if ($tableexists && $DB->record_exists($table->getName(), ['id' => $record->id])) {
                     continue; // Record has already been transferred.
                 }
                 foreach ($fields as $oldfield => $newfield) {

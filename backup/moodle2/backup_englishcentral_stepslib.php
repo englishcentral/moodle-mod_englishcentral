@@ -150,13 +150,13 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
      *
      * @uses $DB
      * @param account $tablename the name of the Moodle table (without prefix)
-     * @param array $excluded_fieldnames these field names will be excluded
+     * @param array $excludedfieldnames these field names will be excluded
      * @return array of field names
      */
-    protected function get_fieldnames($tablename, array $excluded_fieldnames) {
+    protected function get_fieldnames($tablename, array $excludedfieldnames) {
         global $DB;
         $fieldnames = array_keys($DB->get_columns($tablename));
-        return array_diff($fieldnames, $excluded_fieldnames);
+        return array_diff($fieldnames, $excludedfieldnames);
     }
 
     /**

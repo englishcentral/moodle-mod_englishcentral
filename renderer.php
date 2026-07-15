@@ -561,7 +561,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $attempts = $this->ec->get_attempts();
 
         // Get video ids in this EC activity.
-        $connection_available = true;
+        $connectionavailable = true;
         if ($videoids = $this->ec->get_videoids()) {
             // Fetch video info from EC server.
             if ($videos = $this->auth->fetch_dialog_list($videoids)) {
@@ -589,18 +589,18 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                     }
                 }
             } else {
-                $connection_available = false;
+                $connectionavailable = false;
             }
         } else {
             $output .= html_writer::tag('p', $this->ec->get_string('novideos'), ['class' => 'ec-novideos-label']);
         }
 
         if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
-            $initially_visible = $videoids;
-            $output .= $this->show_removevideo_icon($initially_visible);
+            $initiallyvisible = $videoids;
+            $output .= $this->show_removevideo_icon($initiallyvisible);
         }
 
-        if ($connection_available == false) {
+        if ($connectionavailable == false) {
             $output .= html_writer::tag('p', $this->ec->get_string('noconnection'));
         }
 
@@ -643,17 +643,17 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $params = ['class' => 'activity-title', 'data-url' => $video->dialogURL];
         $showdetails = false;
         if ($this->ec->showdetails) {
-            $is_student = has_capability('mod/englishcentral:view', $this->ec->context);
-            $is_teacher = has_capability('mod/englishcentral:addinstance', $this->ec->context);
+            $isstudent = has_capability('mod/englishcentral:view', $this->ec->context);
+            $isteacher = has_capability('mod/englishcentral:addinstance', $this->ec->context);
             switch ($this->ec->showdetails) {
                 case 1:
-                    $showdetails = ($is_student && ($is_teacher == false));
+                    $showdetails = ($isstudent && ($isteacher == false));
                     break;
                 case 2:
-                    $showdetails = (($is_student == false) && $is_teacher);
+                    $showdetails = (($isstudent == false) && $isteacher);
                     break;
                 case 3:
-                    $showdetails = ($is_student || $is_teacher);
+                    $showdetails = ($isstudent || $isteacher);
                     break;
             }
         }
@@ -669,22 +669,22 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                         'description' => $video->description,
                     ];
 
-        $topicsList = ['topics' => $video->topics];
+        $topicslist = ['topics' => $video->topics];
 
-        $newTopicsList = [];
+        $newtopicslist = [];
 
-        if (is_array($topicsList['topics'][0])) {
-            foreach ($topicsList['topics'][0] as $key => $value) {
-                array_push($newTopicsList, $value);
+        if (is_array($topicslist['topics'][0])) {
+            foreach ($topicslist['topics'][0] as $key => $value) {
+                array_push($newtopicslist, $value);
             }
         } else {
-            foreach ($topicsList['topics'] as $thetopic) {
-                array_push($newTopicsList, $thetopic->name);
+            foreach ($topicslist['topics'] as $thetopic) {
+                array_push($newtopicslist, $thetopic->name);
             }
         }
 
-        if (count($newTopicsList) > 0) {
-            $params['topics'] = $newTopicsList[0];
+        if (count($newtopicslist) > 0) {
+            $params['topics'] = $newtopicslist[0];
         } else {
             $params['topics'] = '';
         }
@@ -763,37 +763,37 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     /**
      * Show the remove video icon.
      *
-     * @param bool $initially_visible Whether the icon is initially visible.
+     * @param bool $initiallyvisible Whether the icon is initially visible.
      * @return string
      */
-    protected function show_removevideo_icon($initially_visible = true) {
-        return $this->show_videos_icon('remove', $initially_visible);
+    protected function show_removevideo_icon($initiallyvisible = true) {
+        return $this->show_videos_icon('remove', $initiallyvisible);
     }
 
     /**
      * Show a video action icon of the given type.
      *
      * @param string $type The icon type (add or remove).
-     * @param bool $initially_visible Whether the icon is initially visible.
+     * @param bool $initiallyvisible Whether the icon is initially visible.
      * @return string
      */
-    protected function show_videos_icon($type, $initially_visible = true) {
+    protected function show_videos_icon($type, $initiallyvisible = true) {
         $text = $this->ec->get_string($type . 'video');
         if (method_exists($this, 'image_url')) {
-            $image_url = 'image_url'; // Moodle >= 3.3.
+            $imageurl = 'image_url'; // Moodle >= 3.3.
         } else {
-            $image_url = 'pix_url'; // Moodle <= 3.2.
+            $imageurl = 'pix_url'; // Moodle <= 3.2.
         }
-        $image_url = $this->$image_url($type . 'video', $this->ec->plugin);
-        $image = html_writer::empty_tag('img', ['src' => $image_url, 'title' => $text]);
-        $removeText = html_writer::tag('span', $this->ec->get_string('removevideo'), ['class' => 'remove-text']);
-        $removeIcon = html_writer::tag('div', '', ['class' => 'remove-icon']);
+        $imageurl = $this->$imageurl($type . 'video', $this->ec->plugin);
+        $image = html_writer::empty_tag('img', ['src' => $imageurl, 'title' => $text]);
+        $removetext = html_writer::tag('span', $this->ec->get_string('removevideo'), ['class' => 'remove-text']);
+        $removeicon = html_writer::tag('div', '', ['class' => 'remove-icon']);
         $help = $this->ec->get_string($type . 'videohelp');
         $help = html_writer::tag('span', $help, ['class' => 'videohelp']);
-        $hidden = $initially_visible ? '' : ' page-mod-englishcentral-hide';
+        $hidden = $initiallyvisible ? '' : ' page-mod-englishcentral-hide';
         return html_writer::tag(
             'div',
-            $image . $removeIcon . $removeText . $help,
+            $image . $removeicon . $removetext . $help,
             ['class' => 'videoicon ' . $type . 'video' . $hidden]
         );
     }

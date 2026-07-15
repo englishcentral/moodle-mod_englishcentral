@@ -81,9 +81,9 @@ class auth {
     /** @var object|null The EC activity. */
     protected $ec = null; // EC activity.
     /** @var string|null The JWT token. */
-    protected $jwt_token = null; // JWT token.
+    protected $jwttoken = null; // JWT token.
     /** @var string|null The SDK token. */
-    protected $sdk_token = null; // SDK token.
+    protected $sdktoken = null; // SDK token.
     /** @var string|null The authorization HTTP header. */
     protected $authorization = null; // HTTP header.
 
@@ -248,24 +248,24 @@ class auth {
      * @return string the JWT token
      */
     public function get_jwt_token() {
-        if ($this->jwt_token === null) {
+        if ($this->jwttoken === null) {
             $payload = ['userID' => $this->get_uniqueid(),
                              'consumerKey' => $this->consumerkey,
                              'exp' => round((microtime(true) + 10000) * 1000)];
             $secret = \mod_englishcentral\jwt\JWT::urlsafeB64Decode($this->encryptedsecret);
-            $this->jwt_token = \mod_englishcentral\jwt\JWT::encode($payload, $secret);
+            $this->jwttoken = \mod_englishcentral\jwt\JWT::encode($payload, $secret);
         }
-        return $this->jwt_token;
+        return $this->jwttoken;
     }
 
     /**
      * Set the SDK token.
      *
-     * @param string $sdk_token the SDK token
+     * @param string $sdktoken the SDK token
      * @return void
      */
-    public function set_sdk_token($sdk_token) {
-        $this->sdk_token = $sdk_token;
+    public function set_sdk_token($sdktoken) {
+        $this->sdktoken = $sdktoken;
     }
 
     /**
@@ -274,7 +274,7 @@ class auth {
      * @return string the SDK token
      */
     public function get_sdk_token() {
-        if ($this->sdk_token === null) {
+        if ($this->sdktoken === null) {
             $url = $this->get_url('bridge', 'rest/identity/authorize');
 
             $fields = ['partnerID' => $this->partnerid,
@@ -288,9 +288,9 @@ class auth {
                             'Content-Length: ' . strlen($fields),
                             'Content-Type: application/x-www-form-urlencoded'];
 
-            $this->sdk_token = $this->doCurl($url, $header, false, true, $fields);
+            $this->sdktoken = $this->docall_curl($url, $header, false, true, $fields);
         }
-        return $this->sdk_token;
+        return $this->sdktoken;
     }
 
     /**
@@ -334,9 +334,9 @@ class auth {
      */
     public function get_authorization() {
         if ($this->authorization === null) {
-            if ($sdk_token = $this->get_sdk_token()) {
+            if ($sdktoken = $this->get_sdk_token()) {
                 $consumersecret = \mod_englishcentral\jwt\JWT::urlsafeB64Decode($this->encryptedsecret);
-                $payload = \mod_englishcentral\jwt\JWT::decode($sdk_token, $consumersecret, ['HS256']);
+                $payload = \mod_englishcentral\jwt\JWT::decode($sdktoken, $consumersecret, ['HS256']);
                 $payload = ['accessToken' => $payload->accessToken,
                                  'consumerKey' => $this->consumerkey];
                 $this->authorization = 'JWT ' . \mod_englishcentral\jwt\JWT::encode($payload, $consumersecret);
@@ -363,9 +363,9 @@ class auth {
      */
     public function create_accountid() {
         if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
-            $isTeacher = 1;
+            $isteacher = 1;
         } else {
-            $isTeacher = 0;
+            $isteacher = 0;
         }
         $subdomain = 'bridge';
         $endpoint = 'rest/identity/account';
@@ -373,10 +373,10 @@ class auth {
                         'partnerAccountID' => $this->get_uniqueid(),
                         'nativeLanguage' => $this->get_user_language(),
                         'siteLanguage' => $this->get_site_language(),
-                        'isTeacher' => $isTeacher,
+                        'isTeacher' => $isteacher,
                         'timezone' => \core_date::get_user_timezone(),
                         'fields' => 'accountID'];
-        $response = $this->doPost($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        $response = $this->docall_post($subdomain, $endpoint, $fields, self::ACCEPT_V1);
         return $this->return_value($response, 'accountID', 0);
     }
 
@@ -391,7 +391,7 @@ class auth {
         $fields = ['partnerID' => $this->partnerid,
                         'partnerAccountID' => $this->get_uniqueid(),
                         'fields' => 'accountID'];
-        $response = $this->doPost($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        $response = $this->docall_post($subdomain, $endpoint, $fields, self::ACCEPT_V1);
         return $this->return_value($response, 'accountID', 0);
     }
 
@@ -404,7 +404,7 @@ class auth {
         $subdomain = 'bridge';
         $endpoint = 'rest/content/goal';
         $fields = [];
-        return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        return $this->docall_get($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
     /**
@@ -423,7 +423,7 @@ class auth {
             'pageSize' => 25,
             'fields' => 'courseID,name,description,difficulty',
         ];
-        return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        return $this->docall_get($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
     /**
@@ -443,7 +443,7 @@ class auth {
             'fields' => 'dialogID,title,difficulty,duration,dialogURL,thumbnailURL,' .
                 'videoDetailsURL,demoPictureURL,description,topics',
         ];
-        $dialoglist = $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        $dialoglist = $this->docall_get($subdomain, $endpoint, $fields, self::ACCEPT_V1);
 
         // Cache the dialogs listings for later use in reports, and here eventually
         // Ideally we should do this when add a video. TO DO do that.
@@ -477,7 +477,7 @@ class auth {
         $subdomain = 'bridge';
         $endpoint = 'rest/content/course/' . $courseid;
         $fields = ['siteLanguage' => $this->get_site_language()];
-        return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        return $this->docall_get($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
     /**
@@ -490,23 +490,23 @@ class auth {
         $subdomain = 'bridge';
         $endpoint = "rest/content/dialog/$videoid";
         $fields = ['siteLanguage' => $this->get_site_language()];
-        return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        return $this->docall_get($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
     /**
      * Fetch the progress for a dialog.
      *
      * @param int $videoid the video/dialog ID
-     * @param string $sdk_token an optional SDK token to use
+     * @param string $sdktoken an optional SDK token to use
      * @return mixed the dialog progress response
      */
-    public function fetch_dialog_progress($videoid, $sdk_token = '') {
-        if ($sdk_token) {
-            $this->set_sdk_token($sdk_token);
+    public function fetch_dialog_progress($videoid, $sdktoken = '') {
+        if ($sdktoken) {
+            $this->set_sdk_token($sdktoken);
         }
         $subdomain = 'reportcard';
         $endpoint = "rest/report/dialog/$videoid/progress";
-        return $this->doGet($subdomain, $endpoint, [], self::ACCEPT_V2);
+        return $this->docall_get($subdomain, $endpoint, [], self::ACCEPT_V2);
     }
 
     // This method is not used and does not seem to work, but
@@ -517,12 +517,12 @@ class auth {
      * Fetch the chat progress for a dialog.
      *
      * @param int $videoid the video/dialog ID
-     * @param string $sdk_token an optional SDK token to use
+     * @param string $sdktoken an optional SDK token to use
      * @return mixed the chat progress response
      */
-    public function fetch_chat_progress($videoid, $sdk_token = '') {
-        if ($sdk_token) {
-            $this->set_sdk_token($sdk_token);
+    public function fetch_chat_progress($videoid, $sdktoken = '') {
+        if ($sdktoken) {
+            $this->set_sdk_token($sdktoken);
         }
         $subdomain = 'chat';
         $endpoint = 'rest/conversation/list';
@@ -531,7 +531,7 @@ class auth {
             'accountId' => $this->get_accountid(),
             'dialogId' => $videoid,
         ];
-        return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
+        return $this->docall_get($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
     /**
@@ -543,10 +543,10 @@ class auth {
      * @param string $accept the Accept header value
      * @return mixed the API response
      */
-    public function doGet($subdomain, $endpoint, $fields, $accept) {
+    public function docall_get($subdomain, $endpoint, $fields, $accept) {
         $url = $this->get_url($subdomain, $endpoint, $fields);
         $header = $this->get_header($accept);
-        return $this->doCurl($url, $header, true, false);
+        return $this->docall_curl($url, $header, true, false);
     }
 
     /**
@@ -558,10 +558,10 @@ class auth {
      * @param string $accept the Accept header value
      * @return mixed the API response
      */
-    public function doPost($subdomain, $endpoint, $fields, $accept) {
+    public function docall_post($subdomain, $endpoint, $fields, $accept) {
         $url = $this->get_url($subdomain, $endpoint, $fields);
         $header = $this->get_header($accept);
-        return $this->doCurl($url, $header, true, true);
+        return $this->docall_curl($url, $header, true, true);
     }
 
     /**
@@ -569,12 +569,12 @@ class auth {
      *
      * @param string $url the request URL
      * @param array $header the request header lines
-     * @param bool $json_decode whether to JSON decode the response
+     * @param bool $jsondecode whether to JSON decode the response
      * @param bool $post whether to perform a POST request
      * @param array $fields the request fields
      * @return mixed the API response
      */
-    public function doCurl($url, $header, $json_decode = false, $post = null, $fields = null) {
+    public function docall_curl($url, $header, $jsondecode = false, $post = null, $fields = null) {
         global $CFG;
 
         // Use Moodle Curl to ensure we use a proxy if Moodle server is using one.
@@ -595,7 +595,7 @@ class auth {
         }
 
         // If its JSON, process that before returning.
-        if ($json_decode && $this->is_json($response)) {
+        if ($jsondecode && $this->is_json($response)) {
             $response = json_decode($response);
         }
         return $response;
@@ -741,21 +741,21 @@ class auth {
      * @return string an empty string if valid, otherwise an error message
      */
     public function invalid_config() {
-        $sdk_token = $this->get_sdk_token();
+        $sdktoken = $this->get_sdk_token();
         // The token is usually 189 chars long and split into 3 parts delimited by [\.].
         // Parts 1 & 2 contain [0-9a-zA-Z]. The 3rd part can additionally contain [_-].
-        if (preg_match('/^[0-9a-zA-Z\._-]{180,200}$/', $sdk_token)) {
+        if (preg_match('/^[0-9a-zA-Z\._-]{180,200}$/', $sdktoken)) {
             return ''; // Token is valid - YAY!
         }
-        if ($this->is_json($sdk_token)) {
+        if ($this->is_json($sdktoken)) {
             // JSON error message from EC server.
-            return json_decode($sdk_token)->log;
+            return json_decode($sdktoken)->log;
         }
-        if (strpos($sdk_token, '<!DOCTYPE html>') === 0) {
+        if (strpos($sdktoken, '<!DOCTYPE html>') === 0) {
             // HTML error message, maybe a wrong URL or invalid data was sent to EC.
-            return preg_replace('/^(.*?<body[^>]*>)|(<\/body>.*$)/', '', $sdk_token);
+            return preg_replace('/^(.*?<body[^>]*>)|(<\/body>.*$)/', '', $sdktoken);
         }
         // Some other problematic token.
-        return $sdk_token;
+        return $sdktoken;
     }
 }

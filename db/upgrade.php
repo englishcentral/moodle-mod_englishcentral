@@ -404,12 +404,12 @@ function xmldb_englishcentral_upgrade($oldversion) {
         $configname = 'updategrades';
         $configvalue = get_config('mod_englishcentral', $configname);
         if (is_numeric($configvalue)) {
-            $i_min = intval($configvalue);
+            $imin = intval($configvalue);
         } else {
-            $i_min = 0;
+            $imin = 0;
         }
 
-        if ($i_max = $DB->count_records_sql("SELECT COUNT('x') FROM $from WHERE $where", $params)) {
+        if ($imax = $DB->count_records_sql("SELECT COUNT('x') FROM $from WHERE $where", $params)) {
             if ($rs = $DB->get_recordset_sql("SELECT $select FROM $from WHERE $where", $params)) {
                 if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
                     $bar = false;
@@ -419,7 +419,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
                 $i = 0;
                 foreach ($rs as $ec) {
                     // Update grade.
-                    if ($i >= $i_min) {
+                    if ($i >= $imin) {
                         upgrade_set_timeout(); // Apply for more time (3 mins).
                         englishcentral_update_grades($ec);
                     }
@@ -427,11 +427,11 @@ function xmldb_englishcentral_upgrade($oldversion) {
                     // Update progress bar.
                     $i++;
                     if ($bar) {
-                        $bar->update($i, $i_max, $strupdating . ": ($i/$i_max)");
+                        $bar->update($i, $imax, $strupdating . ": ($i/$imax)");
                     }
 
                     // Update record index.
-                    if ($i > $i_min) {
+                    if ($i > $imin) {
                         set_config($configname, $i, 'mod_englishcentral');
                     }
                 }

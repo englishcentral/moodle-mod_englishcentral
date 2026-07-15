@@ -141,7 +141,7 @@ function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod
 
     // Add/update record in main EC table.
     $table = 'englishcentral';
-    $update_grades = false;
+    $updategrades = false;
     if (empty($data->instance)) {
         // Add new instance.
         $data->timecreated = time();
@@ -155,12 +155,12 @@ function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod
 
         $params = ['id' => $data->instance];
         $grade = $DB->get_field($table, 'grade', $params);
-        $update_grades = ($data->grade == $grade ? false : true);
+        $updategrades = ($data->grade == $grade ? false : true);
     }
 
     englishcentral_grade_item_update($data);
 
-    if ($update_grades) {
+    if ($updategrades) {
         englishcentral_update_grades($data, 0, false);
     }
 
@@ -683,14 +683,14 @@ function englishcentral_get_completion_state($course, $cm, $userid, $type) {
                 'itemmodule' => 'englishcentral',
                 'iteminstance' => $cm->instance,
             ];
-            if ($grade_item = grade_item::fetch($params)) {
-                $grades = grade_grade::fetch_users_grades($grade_item, [$userid], false);
+            if ($gradeitem = grade_item::fetch($params)) {
+                $grades = grade_grade::fetch_users_grades($gradeitem, [$userid], false);
                 if (isset($grades[$userid])) {
                     $grade = $grades[$userid];
                 }
                 unset($grades);
             }
-            unset($grade_item);
+            unset($gradeitem);
         }
 
         // The EnglishCentral completion conditions.
