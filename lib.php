@@ -41,8 +41,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 define('MOD_ENGLISHCENTRAL_GRADEHIGHEST', 0);
 define('MOD_ENGLISHCENTRAL_GRADELOWEST', 1);
 define('MOD_ENGLISHCENTRAL_GRADELATEST', 2);
@@ -217,8 +215,6 @@ function englishcentral_grade_item_update($englishcentral, $grades = null) {
     require_once($CFG->dirroot . '/lib/gradelib.php');
 
     $params = ['itemname' => $englishcentral->name];
-    // isset($englishcentral->cmidnumber)
-    // property_exists($englishcentral, 'cmidnumber')
     if (array_key_exists('cmidnumber', (array) $englishcentral)) {
         $params['idnumber'] = $englishcentral->cmidnumber;
     }
@@ -297,12 +293,15 @@ function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone 
 
     if (empty($englishcentral->grade)) {
         $grades = null;
-    } else if ($grades = englishcentral_get_user_grades($englishcentral, $userid)) {
-        // do nothing
-    } else if ($userid && $nullifnone) {
-        $grades = (object) ['userid' => $userid, 'rawgrade' => null];
     } else {
-        $grades = null;
+        $grades = englishcentral_get_user_grades($englishcentral, $userid);
+        if (!$grades) {
+            if ($userid && $nullifnone) {
+                $grades = (object) ['userid' => $userid, 'rawgrade' => null];
+            } else {
+                $grades = null;
+            }
+        }
     }
 
     englishcentral_grade_item_update($englishcentral, $grades);
@@ -550,7 +549,7 @@ function englishcentral_scale_used($ecid, $scaleid) {
     global $DB;
 
     /** @example */
-    if ($scaleid and $DB->record_exists('englishcentral', ['id' => $ecid, 'grade' => -$scaleid])) {
+    if ($scaleid && $DB->record_exists('englishcentral', ['id' => $ecid, 'grade' => -$scaleid])) {
         return true;
     } else {
         return false;
@@ -569,7 +568,7 @@ function englishcentral_scale_used_anywhere($scaleid) {
     global $DB;
 
     /** @example */
-    if ($scaleid and $DB->record_exists('englishcentral', ['grade' => -$scaleid])) {
+    if ($scaleid && $DB->record_exists('englishcentral', ['grade' => -$scaleid])) {
         return true;
     } else {
         return false;
@@ -684,10 +683,10 @@ function englishcentral_extend_settings_navigation(settings_navigation $settings
 function englishcentral_get_completion_state($course, $cm, $userid, $type) {
     global $CFG, $DB;
 
-    // set default return $state
+    // Set the default return state.
     $state = $type;
 
-    // get the englishcentral record
+    // Get the englishcentral record.
     if ($ec = $DB->get_record('englishcentral', ['id' => $cm->instance])) {
         $ec = \mod_englishcentral\activity::create($ec, $cm, $course);
 
@@ -774,7 +773,8 @@ function englishcentral_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, intro, introformat, completionmingrade, completionpass, completiongoals, activityopen, activityclose, watchgoal,learngoal,speakgoal';
+    $fields = 'id, name, intro, introformat, completionmingrade, completionpass, completiongoals, ' .
+        'activityopen, activityclose, watchgoal,learngoal,speakgoal';
     if (!$ec = $DB->get_record('englishcentral', $dbparams, $fields)) {
         return false;
     }

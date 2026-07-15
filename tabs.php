@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 use mod_englishcentral\constants;
 
 if (empty($moduleinstance)) {
-    print_error('cannotcallscript');
+    throw new moodle_exception('cannotcallscript');
 }
 
 if (! isset($currenttab)) {

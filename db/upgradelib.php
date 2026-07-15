@@ -24,7 +24,6 @@
  */
 
 /** Prevent direct access to this script */
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Replaces an old database table with a new one during plugin upgrade.

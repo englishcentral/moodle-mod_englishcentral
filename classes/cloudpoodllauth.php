@@ -21,7 +21,6 @@
  */
 
 namespace mod_englishcentral;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Stub retained for upgrade compatibility. The Cloud Poodll relay has been removed;

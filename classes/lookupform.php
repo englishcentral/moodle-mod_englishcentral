@@ -45,6 +45,8 @@
 
 namespace mod_englishcentral;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/lib/formslib.php');
 
 /**
@@ -103,10 +105,6 @@ class lookupform extends \moodleform {
 
         // add the action buttons
         $this->add_action_buttons(true, get_string('search'));
-    }
-
-    final public function definition_after_data() {
-        parent::definition_after_data();
     }
 
     /**

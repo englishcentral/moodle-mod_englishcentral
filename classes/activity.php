@@ -27,8 +27,6 @@
 
 namespace mod_englishcentral;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Authentication class to access EnglishCentral API
  * originally used OAuth, modified to use JWT
@@ -98,7 +96,7 @@ class activity {
     /**
      * construct English Central activity instance
      */
-    function __construct($instance = null, $cm = null, $course = null, $context = null) {
+    public function __construct($instance = null, $cm = null, $course = null, $context = null) {
         global $COURSE;
 
         $this->plugintype = 'mod';
@@ -282,7 +280,6 @@ class activity {
 
             default:
                 return 'https://www.englishcentral.com/videodetails';
-            // 'https://www.englishcentral.com/videodetails?setLanguage='.$lang;
         }
     }
 
@@ -403,9 +400,9 @@ class activity {
         $params = ['ecid' => $this->id,
                     'userid' => $USER->id,
                     'videoid' => $dialog->dialogID];
-        if ($attempt = $DB->get_record($table, $params)) {
-            // $USER has attempted this video before
-        } else {
+        // Reuse the existing attempt if $USER has attempted this video before, otherwise create one.
+        $attempt = $DB->get_record($table, $params);
+        if (!$attempt) {
             $attempt = (object)$params;
             $attempt->timecreated = $this->time;
         }
@@ -498,7 +495,8 @@ class activity {
             }
         }
 
-        // Dialog activities should not be empty, but oddly occasionally it is, so we try to fallback gradefully without killing it for students
+        // Dialog activities should not be empty, but oddly occasionally it is,
+        // so we try to fall back gracefully without killing it for students.
         if (!empty($dialog->activities)) {
             foreach ($dialog->activities as $activity) {
                 // activityType     : watchActivity / speakActivity

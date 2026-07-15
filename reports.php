@@ -71,7 +71,7 @@ $config = get_config(constants::M_COMPONENT);
 if ($config->reportstable == constants::M_USE_DATATABLES) {
     $paging = false;
 } else if ($paging->perpage == -1) {
-    $paging->perpage = 20; // $config->attemptsperpage;
+    $paging->perpage = 20;
 }
 
 
@@ -192,13 +192,6 @@ switch ($showreport) {
         echo $renderer->footer();
         return;
 }
-
-/*
-1) load the class
-2) call report->process_raw_data
-3) call $rows=report->fetch_formatted_records($withlinks=true(html) false(print/excel))
-5) call $reportrenderer->render_report_tabular($sectiontitle, $report->name, $report->get_head, $rows, $report->fields);
-*/
 
 $groupmenu = '';
 if (isset($formdata->groupmenu)) {

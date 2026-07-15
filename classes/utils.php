@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_englishcentral;
-defined('MOODLE_INTERNAL') || die();
 
 use mod_englishcentral\constants;
 
@@ -128,10 +127,8 @@ class utils {
             'chatgoal'  => 5,
             'studygoal' => 70,
         ];
-        if ($ec->chatmode_enabled() && $auth->mimichat_enabled()) {
-            // Keep the chat goal.
-        } else {
-            // Remove the chat goal.
+        // Remove the chat goal unless both chat mode and mimic chat are enabled.
+        if (!($ec->chatmode_enabled() && $auth->mimichat_enabled())) {
             unset($goals['chatgoal']);
         }
         foreach ($goals as $goal => $default) {
@@ -183,7 +180,7 @@ class utils {
         $mform->addElement('select', $name, $label, $options);
         $mform->addHelpButton($name, $name, $plugin);
         $mform->setDefault($name, 3);
-    } //end of add_mform_elements
+    }
 
     /**
      * set_type_default_advanced
@@ -220,9 +217,8 @@ class utils {
             $table = 'englishcentral_videos';
             $record = ['ecid' => $ecid,
                 'videoid' => $videoid];
-            if ($record['videoid'] == $DB->get_field($table, 'videoid', $record)) {
-                // video is already in our database - unexpected !!
-            } else {
+            // Only insert the video if it is not already in our database.
+            if ($record['videoid'] != $DB->get_field($table, 'videoid', $record)) {
                 if ($sortorder = $DB->get_field($table, 'MAX(sortorder)', ['ecid' => $ecid])) {
                     $sortorder++;
                 } else {

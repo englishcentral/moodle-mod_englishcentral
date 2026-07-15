@@ -120,8 +120,6 @@ if ($CFG->version < 2022041900) {
     echo $renderer->show_intro();
 }
 
-// echo $renderer->show_dates_available();
-
 // Because of the limit on the number of options passed,
 // more options are passed via "getoptions" in view.ajax.php
 $opts = ['cmid'          => $ec->cm->id,
@@ -137,10 +135,6 @@ if ($config->progressdials == constants::M_PROGRESSDIALS_TOP && !$ismobile) {
 }
 
 if ($ec->viewable) {
-    /*
-    $firstthumbnail = 'https://cdna.englishcentral.com/dialogs/12320/thumb_99214_20120928134621.jpg';
-    echo $renderer->show_player($firstthumbnail);
-    */
     if ($ec->get_videoids()) {
         $hidden = false;
     } else {

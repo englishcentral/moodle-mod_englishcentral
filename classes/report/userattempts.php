@@ -141,7 +141,7 @@ class userattempts extends basereport {
                 }
         }
         return $ret;
-    } //end of function
+    }
 
     public function fetch_chart($renderer, $showdatasource = true) {
         global $CFG;
@@ -223,5 +223,5 @@ class userattempts extends basereport {
             $this->rawdata = $emptydata;
         }
         return true;
-    }//end of function
+    }
 }

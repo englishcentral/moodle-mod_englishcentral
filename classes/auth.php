@@ -27,8 +27,6 @@
 
 namespace mod_englishcentral;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Authentication class to access EnglishCentral API
  * originally used OAuth, modified to use JWT
@@ -197,9 +195,6 @@ class auth {
             if (empty($this->accountid)) {
                 $this->accountid = $this->create_accountid();
                 $DB->set_field($table, 'accountid', $this->accountid, $params);
-            } else {
-                // next line is not necessary, because we already know accountID
-                // $this->accountid = $this->fetch_accountid();
             }
         }
         return $this->accountid;
@@ -316,7 +311,12 @@ class auth {
     public function fetch_course_list($goalid, $difficulty) {
         $subdomain = 'bridge';
         $endpoint = 'rest/content/course';
-        $fields = ['goalID' => $goalid, 'difficulty' => $difficulty, 'pageSize' => 25, 'fields' => 'courseID,name,description,difficulty'];
+        $fields = [
+            'goalID' => $goalid,
+            'difficulty' => $difficulty,
+            'pageSize' => 25,
+            'fields' => 'courseID,name,description,difficulty',
+        ];
         return $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
     }
 
@@ -325,9 +325,12 @@ class auth {
 
         $subdomain = 'bridge';
         $endpoint = 'rest/content/dialog';
-        $fields = ['dialogIDs' => implode(',', $videoids),
-                        'siteLanguage' => $this->get_site_language(),
-                        'fields' => 'dialogID,title,difficulty,duration,dialogURL,thumbnailURL,videoDetailsURL,demoPictureURL,description,topics'];
+        $fields = [
+            'dialogIDs' => implode(',', $videoids),
+            'siteLanguage' => $this->get_site_language(),
+            'fields' => 'dialogID,title,difficulty,duration,dialogURL,thumbnailURL,' .
+                'videoDetailsURL,demoPictureURL,description,topics',
+        ];
         $dialoglist = $this->doGet($subdomain, $endpoint, $fields, self::ACCEPT_V1);
 
         // Cache the dialogs listings for later use in reports, and here eventually

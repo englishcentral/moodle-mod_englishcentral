@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 
@@ -197,12 +195,21 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('tr', html_writer::tag('th', get_string('phone1')) . html_writer::tag('td', $USER->phone1));
         }
         if ($institution) {
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('institution')) . html_writer::tag('td', $institution));
+            $output .= html_writer::tag(
+                'tr',
+                html_writer::tag('th', get_string('institution')) . html_writer::tag('td', $institution)
+            );
         }
 
         if ($signup == self::SIGNUP_STANDARD) {
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('subject', 'forum')) . html_writer::tag('td', $subject));
-            $output .= html_writer::tag('tr', html_writer::tag('th', get_string('description')) . html_writer::tag('td', $description));
+            $output .= html_writer::tag(
+                'tr',
+                html_writer::tag('th', get_string('subject', 'forum')) . html_writer::tag('td', $subject)
+            );
+            $output .= html_writer::tag(
+                'tr',
+                html_writer::tag('th', get_string('description')) . html_writer::tag('td', $description)
+            );
 
             $url = 'https://www.englishcentral.com/support/contact-school-support';
             $params = ['name' => $fullname,
@@ -215,7 +222,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         } else {
             if ($signup == self::SIGNUP_CORPORATE) {
                 $url = 'https://corporate.englishcentral.com/moodle-signup-gordon';
-            } else { // self::SIGNUP_SOLUTIONS is default
+            } else { // Default to the solutions signup URL.
                 $url = 'https://solutions.englishcentral.com/moodle-signup-gordon';
             }
             $anchor = 'moodle-cta';
@@ -529,7 +536,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
             $initially_visible = $videoids;
             $output .= $this->show_removevideo_icon($initially_visible);
-            // $output .= $this->show_addvideo_icon();
         }
 
         if ($connection_available == false) {
@@ -693,7 +699,11 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $help = $this->ec->get_string($type . 'videohelp');
         $help = html_writer::tag('span', $help, ['class' => 'videohelp']);
         $hidden = $initially_visible ? '' : ' page-mod-englishcentral-hide';
-        return html_writer::tag('div', $image . $removeIcon . $removeText . $help, ['class' => 'videoicon ' . $type . 'video' . $hidden]);
+        return html_writer::tag(
+            'div',
+            $image . $removeIcon . $removeText . $help,
+            ['class' => 'videoicon ' . $type . 'video' . $hidden]
+        );
     }
 
     public function show_progress_report($dayslimit = 0) {
@@ -805,7 +815,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $fullname = html_writer::tag('span', $fullname, ['class' => 'fullname']);
 
         $type = 'percent';
-        $percent = '%'; // get_string($type, 'grades');
+        $percent = '%';
         $percent .= $this->get_sort_icon($url, $type);
         $percent = html_writer::tag('span', $percent, ['class' => 'percent']);
 
@@ -981,8 +991,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     }
 
     protected function get_sort_icon($url, $sort) {
-        global $OUTPUT;
-
         if ($sort == $this->sort) {
             $order = $this->order;
         } else {
@@ -1002,6 +1010,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             case ($sort == 'lastname'):
                 $text = "sortby$sort";
                 $icon = 't/sort';
+                // Deliberate fall-through to the default case.
             default:
                 $text = 'sort';
                 $icon = 't/sort';
@@ -1025,7 +1034,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
         $text = get_string($text, 'grades');
         $params = ['class' => 'sorticon'];
-        $icon = $OUTPUT->pix_icon($icon, $text, 'moodle', $params);
+        $icon = $this->output->pix_icon($icon, $text, 'moodle', $params);
 
         return html_writer::link($url, $icon, ['title' => $text]);
     }
@@ -1036,7 +1045,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     public function show_search() {
         $output = '';
         if (has_capability('mod/englishcentral:manage', $this->ec->context)) {
-            // start settings/form
+            // Start the settings form.
             $output .= html_writer::start_tag('form', ['class' => 'search-form']);
             $output .= html_writer::tag('dt', $this->ec->get_string('videosearch'), ['class' => 'visible', 'id' => 'search-label']);
             $output .= html_writer::start_tag('dl', ['class' => 'search-fields']);
@@ -1048,10 +1057,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= $this->show_search_button('searchbutton');
             $output .= html_writer::end_tag('div');
             $output .= html_writer::start_tag('div', ['id' => 'search-fields-advanced']);
-            $output .= $this->show_search_level('level'); // =difficulty
-            // $output .= $this->show_search_topics('topics', $size);
-            // $output .= $this->show_search_duration('duration');
-            // $output .= $this->show_search_copyright('copyright', $size);
+            $output .= $this->show_search_level('level'); // Level maps to difficulty.
             $output .= html_writer::end_tag('div');
 
             // end settings/form
@@ -1180,17 +1186,8 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
 
     /**
-     * create a container for the EC player
+     * Create a container for the EC player.
      */
-
-    // fetch modal content
-    /*
-    public function show_player($firstthumbnail){
-        $data=[];
-        $data['firstthumbnail']=$firstthumbnail;
-        return $this->render_from_template('mod_englishcentral/showplayer', $data);
-    }
-    */
     public function show_player($hidden = false, $mimichat = false) {
         $data = [];
         $data['mimichat'] = $mimichat;

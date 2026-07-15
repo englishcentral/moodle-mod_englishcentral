@@ -24,8 +24,6 @@
 
 namespace mod_englishcentral\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_englishcentral report viewed event class.
  *

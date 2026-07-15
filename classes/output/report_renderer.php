@@ -36,14 +36,6 @@ class report_renderer extends \plugin_renderer_base {
             constants::M_URL . '/reports.php',
             ['id' => $cm->id, 'n' => $moduleinstance->id, 'dayslimit' => $dayslimit, 'format' => $format]
         );
-        /*
-        $basic = new \single_button(
-                new \moodle_url(constants::M_URL . '/reports.php',
-                        ['report' => 'basic', 'id' => $cm->id, 'n' => $moduleinstance->id]),
-                get_string('basicreport', constants::M_COMPONENT), 'get');
-        $reports[] = ['button' => $this->render($basic),
-        'text' => get_string('attemptssummary_explanation', constants::M_COMPONENT)];
-        */
         $theurl->param('report', 'attemptssummary');
         $graphicalattempts = new \single_button(
             $theurl,
@@ -233,31 +225,41 @@ class report_renderer extends \plugin_renderer_base {
         return $html;
     }
 
-    function show_reports_footer($moduleinstance, $cm, $formdata, $showreport) {
-        // a return to reports top link
+    public function show_reports_footer($moduleinstance, $cm, $formdata, $showreport) {
+        // A return to reports top link.
         $link = new \moodle_url(
             constants::M_URL . '/reports.php',
-            ['report' => 'menu', 'id' => $cm->id, 'n' => $moduleinstance->id, 'dayslimit' => $formdata->dayslimit, 'format' => $formdata->format]
+            [
+                'report' => 'menu',
+                'id' => $cm->id,
+                'n' => $moduleinstance->id,
+                'dayslimit' => $formdata->dayslimit,
+                'format' => $formdata->format,
+            ]
         );
-        $ret = \html_writer::link($link, get_string('returntoreports', constants::M_COMPONENT), ['class' => 'mod_ec_returntoreports']);
+        $ret = \html_writer::link(
+            $link,
+            get_string('returntoreports', constants::M_COMPONENT),
+            ['class' => 'mod_ec_returntoreports']
+        );
         $ret .= $this->render_exportbuttons_html($cm, $formdata, $showreport);
         return $ret;
     }
 
-    function show_perpage_selector($url, $paging) {
+    public function show_perpage_selector($url, $paging) {
         $options = ['5' => 5, '10' => 10, '20' => 20, '40' => 40, '80' => 80, '150' => 150];
         $selector = new \single_select($url, 'perpage', $options, $paging->perpage);
         $selector->set_label(get_string('attemptsperpage', constants::M_COMPONENT));
         return $this->render($selector);
     }
 
-    function show_user_report_options($url, $currentdayslimit, $currentformat) {
+    public function show_user_report_options($url, $currentdayslimit, $currentformat) {
         $dayslimitselector = $this->fetch_dayslimit_selector($url, $currentdayslimit);
         $formatselector = $this->fetch_format_selector($url, $currentformat);
         return \html_writer::div($formatselector . $dayslimitselector, 'mod_ec_user_report_opts float-right');
     }
 
-    function fetch_dayslimit_selector($url, $currentselection) {
+    public function fetch_dayslimit_selector($url, $currentselection) {
         $options = ['0' => get_string('nodayslimit', constants::M_COMPONENT),
             '7' => get_string('xdayslimit', constants::M_COMPONENT, 7),
             '14' => get_string('xdayslimit', constants::M_COMPONENT, 14),
@@ -272,7 +274,7 @@ class report_renderer extends \plugin_renderer_base {
         return $widget;
     }
 
-    function fetch_format_selector($url, $currentselection) {
+    public function fetch_format_selector($url, $currentselection) {
         $params = [];
         $theurl = clone $url;
 
@@ -309,14 +311,14 @@ class report_renderer extends \plugin_renderer_base {
      * @param string|moodle_url $baseurl url of the current page, the $pagevar parameter is added
      * @return string the HTML to output.
      */
-    function show_paging_bar($totalcount, $paging, $baseurl) {
+    public function show_paging_bar($totalcount, $paging, $baseurl) {
         $pagevar = "pageno";
         // add paging params to url (NOT pageno)
         $baseurl->params(['perpage' => $paging->perpage, 'sort' => $paging->sort]);
         return $this->output->paging_bar($totalcount, $paging->pageno, $paging->perpage, $baseurl, $pagevar);
     }
 
-    function show_export_buttons($cm, $formdata, $showreport) {
+    public function show_export_buttons($cm, $formdata, $showreport) {
         switch ($showreport) {
             case 'grading':
                 return $this->render_grading_exportbuttons_html($cm, $formdata, $showreport);

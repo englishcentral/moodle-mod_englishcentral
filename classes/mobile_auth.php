@@ -25,8 +25,6 @@
 
 namespace mod_englishcentral;
 
-defined('MOODLE_INTERNAL') || die();
-
 use mod_englishcentral\constants;
 use mod_englishcentral\utils;
 

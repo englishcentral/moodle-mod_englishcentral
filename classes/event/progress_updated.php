@@ -23,7 +23,6 @@
  */
 
 namespace mod_englishcentral\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_englishcentral course module viewed event class.
@@ -68,6 +67,7 @@ class progress_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' progressed in the EnglishCentral activity with course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' progressed in the EnglishCentral activity " .
+            "with course module id '$this->contextinstanceid'.";
     }
 }

@@ -26,8 +26,6 @@
 
 namespace mod_englishcentral;
 
-    defined('MOODLE_INTERNAL') || die();
-
 class constants
 {
     // component name, db tables, things that define app

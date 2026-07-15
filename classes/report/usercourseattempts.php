@@ -156,7 +156,6 @@ class usercourseattempts extends basereport {
         $chart = new \core\chart_bar();
         $chart->set_horizontal(false);
         $chart->set_stacked(false);
-        // $yzeroaxis = $chart->get_yaxis(0, true);
         $yaxis = $chart->get_yaxis(0, true);
         $yaxis->set_stepsize(10);
         $yaxis->set_min(0);

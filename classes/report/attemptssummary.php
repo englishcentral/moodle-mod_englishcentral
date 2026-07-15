@@ -126,7 +126,7 @@ class attemptssummary extends basereport
         $fullname = \html_writer::tag('span', $fullname, ['class' => 'fullname']);
 
         $type = 'percent';
-        $percent = '%'; // get_string($type, 'grades');
+        $percent = '%';
         $percent .= $this->get_sort_icon($url, $type);
         $percent = \html_writer::tag('span', $percent, ['class' => 'percent']);
 
@@ -234,6 +234,7 @@ class attemptssummary extends basereport
             case ($sort == 'lastname'):
                 $text = "sortby$sort";
                 $icon = 't/sort';
+                // Deliberate fall-through to the default case.
             default:
                 $text = 'sort';
                 $icon = 't/sort';

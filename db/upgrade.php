@@ -31,8 +31,6 @@
 
 use mod_englishcentral\constants;
 
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Execute englishcentral upgrade from the given old version
@@ -307,9 +305,8 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
         // add sortorder field
         $field = new xmldb_field('sortorder', XMLDB_TYPE_INTEGER, '6', null, XMLDB_NOTNULL, null, '0', 'visible');
-        if ($dbman->field_exists($table, $field)) {
-            // do nothing
-        } else {
+        // Add the field only if it does not already exist.
+        if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
 
             // define new index on sortorder field
@@ -410,7 +407,7 @@ function xmldb_englishcentral_upgrade($oldversion) {
 
     $newversion = 2018022735;
     if ($oldversion < $newversion) {
-        require_once $CFG->dirroot . '/mod/englishcentral/lib.php';
+        require_once($CFG->dirroot . '/mod/englishcentral/lib.php');
 
         // update/create grades for all EC activities
 

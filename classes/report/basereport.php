@@ -24,8 +24,6 @@
 
 namespace mod_englishcentral\report;
 
-defined('MOODLE_INTERNAL') || die();
-
 use mod_englishcentral\constants;
 
 /**
@@ -50,8 +48,8 @@ abstract class basereport {
     protected $mod;
     protected $context;
 
-    abstract function process_raw_data($formdata);
-    abstract function fetch_formatted_heading();
+    abstract public function process_raw_data($formdata);
+    abstract public function fetch_formatted_heading();
 
     public function fetch_formatted_description() {
 
@@ -59,9 +57,7 @@ abstract class basereport {
     }
 
     public function __construct($cm) {
-        global $DB;
         $this->cm = $cm;
-        // $this->mod = $DB->get_record(constants::M_TABLE, ['id' => $cm->instance], '*', MUST_EXIST);
         $this->context = \context_module::instance($cm->id);
     }
 

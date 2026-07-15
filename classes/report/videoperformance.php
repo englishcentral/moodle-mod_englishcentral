@@ -139,7 +139,8 @@ class videoperformance extends basereport {
         $this->rawdata = [];
         $emptydata = [];
 
-        $selectsql = 'SELECT vid.videoid as videoid, vid.name as videoname, vid.detailsjson, COUNT(watchcomplete) as totalwatches,' .
+        $selectsql = 'SELECT vid.videoid as videoid, vid.name as videoname, vid.detailsjson, ' .
+        'COUNT(watchcomplete) as totalwatches,' .
         'ROUND(AVG(COALESCE(learncount, 0)),1) AS averagelearn,' .
         'ROUND(AVG(COALESCE(speakcount, 0)),1) AS averagespeak,' .
         'ROUND(AVG(COALESCE(chatcount, 0)),1) AS averagechat ' .

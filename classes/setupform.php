@@ -25,7 +25,8 @@
 
 namespace mod_englishcentral;
 
-// why do we need to include this?
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir . '/formslib.php');
 
 use mod_englishcentral\constants;
@@ -121,8 +122,13 @@ class setupform extends \moodleform {
         if ($label === null) {
             $label = get_string('response', constants::M_COMPONENT);
         }
-        // edoptions = array('noclean'=>true)
-        $this->_form->addElement('editor', constants::TEXTANSWER . $count . '_editor', $label, ['rows' => '4', 'columns' => '80'], $this->editoroptions);
+        $this->_form->addElement(
+            'editor',
+            constants::TEXTANSWER . $count . '_editor',
+            $label,
+            ['rows' => '4', 'columns' => '80'],
+            $this->editoroptions
+        );
         $this->_form->setDefault(constants::TEXTANSWER . $count . '_editor', ['text' => '', 'format' => FORMAT_MOODLE]);
         if ($required) {
             $this->_form->addRule(constants::TEXTANSWER . $count . '_editor', get_string('required'), 'required', null, 'client');

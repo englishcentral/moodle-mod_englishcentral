@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 // This is for pre M4.0 and post M4.0 to work on same code base
 require_once($CFG->libdir . '/externallib.php');
