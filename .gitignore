@@ -1,0 +1,19 @@
+# OS junk files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Editor/IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local tool dependencies (not part of the plugin itself)
+/node_modules/
+/vendor/
