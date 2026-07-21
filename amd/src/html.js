@@ -31,7 +31,7 @@ define([], function() {
     HTML.nonalphanumeric = new RegExp("[^a-zA-Z0-9_-]+", "g");
 
     HTML.htmlescape = function(value) {
-        value += ""; // convert to String
+        value += ""; // Convert to String.
         return value.replace(new RegExp("&", "g"), "&amp;")
             .replace(new RegExp("'", "g"), "&apos;")
             .replace(new RegExp('"', "g"), "&quot;")
@@ -124,7 +124,7 @@ define([], function() {
                 "value": value
             };
             if (value == selected) {
-                a["selected"] = "selected";
+                a.selected = "selected";
             }
             html += HTML.tag("option", options[value], a);
         }

@@ -32,15 +32,15 @@ define(["jquery"], function($) {
         $("#id_studygoal").prop("type", "hidden");
         $("#id_studygoal").after('<span id="id_studygoaltext"></span>');
 
-        $("#id_watchgoal, #id_learngoal, #id_speakgoal, #id_chatgoal").change(function(){
+        $("#id_watchgoal, #id_learngoal, #id_speakgoal, #id_chatgoal").change(function() {
             var watch = $("#id_watchgoal").val();
             var learn = $("#id_learngoal").val();
             var speak = $("#id_speakgoal").val();
             var chat = $("#id_chatgoal").val();
-            var mins = (isNaN(watch) ? 0 : parseInt(watch) * 6) // 6 mins per video watched
-                     + (isNaN(learn) ? 0 : parseInt(learn))     // 1 min per word learned
-                     + (isNaN(speak) ? 0 : parseInt(speak))     // 1 min per word spoken
-                     + (isNaN(chat) ? 0 : parseInt(chat) * 4);  // 4 mins per chat question
+            var mins = (isNaN(watch) ? 0 : parseInt(watch) * 6) // 6 mins per video watched.
+                     + (isNaN(learn) ? 0 : parseInt(learn)) // 1 min per word learned.
+                     + (isNaN(speak) ? 0 : parseInt(speak)) // 1 min per word spoken.
+                     + (isNaN(chat) ? 0 : parseInt(chat) * 4); // 4 mins per chat question.
             $("#id_studygoal").val(mins);
             $("#id_studygoaltext").text(mins);
         });
@@ -70,24 +70,24 @@ define(["jquery"], function($) {
         if (goals) {
             if (goals.querySelector(".form-group") === null) {
                 var s = '[id^=fgroup_id][id$=group]';
-                goals.querySelectorAll(s).forEach(function(fgroup){
+                goals.querySelectorAll(s).forEach(function(fgroup) {
                     if (fgroup.id.indexOf("_error_") > 0) {
                         return;
                     }
                     fgroup.classList.add("d-inline-block", "rounded", "px-2", "pb-2", "mx-0");
                     // The "form-group" selector seems to have been deprecated
                     // and replaced by "mb-3" in the "Classic" and "Boost" themes.
-                    fgroup.querySelectorAll(".mb-3.fitem").forEach(function(fitem){
+                    fgroup.querySelectorAll(".mb-3.fitem").forEach(function(fitem) {
                         fitem.classList.remove("mb-3");
                         fitem.classList.add("d-inline-block");
                     });
                 });
             } else {
-                goals.querySelectorAll(".form-group").forEach(function(fgroup){
+                goals.querySelectorAll(".form-group").forEach(function(fgroup) {
                     fgroup.classList.remove("form-group");
                     fgroup.classList.add("d-inline-block");
                 });
-                goals.querySelectorAll(".row").forEach(function(row){
+                goals.querySelectorAll(".row").forEach(function(row) {
                     row.classList.remove("row");
                     row.classList.add("rounded", "px-2", "mb-2", "align-top");
                     row.style.minHeight = "80px";
@@ -99,15 +99,15 @@ define(["jquery"], function($) {
                 "col-md-3", "col-md-9", "d-flex",
                 "align-items-start", "align-self-start",
             ];
-            selectors.forEach(function(s){
-                goals.querySelectorAll("." + s).forEach(function(elm){
+            selectors.forEach(function(s) {
+                goals.querySelectorAll("." + s).forEach(function(elm) {
                     elm.classList.remove(s);
                 });
             });
 
             // Embolden all the label text
-            goals.querySelectorAll(".col-form-label").forEach(function(elm){
-                for (var i=0; i < elm.children.length; i++) {
+            goals.querySelectorAll(".col-form-label").forEach(function(elm) {
+                for (var i = 0; i < elm.children.length; i++) {
                     var child = elm.children[i];
                     child.classList.add("d-inline-block");
                     if (child.matches("[id^='fgroup_'][id$='_label']")) {

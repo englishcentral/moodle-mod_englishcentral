@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-/* eslint-disable no-console */
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,7 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since       2.9
  */
-define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral/html"], function ($, JUI, LOG, STR, HTML) {
+define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral/html"], function($, JUI, LOG, STR, HTML) {
 
     /** @alias module:mod_englishcentral/view */
     var VIEW = {};
@@ -48,30 +47,30 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
 
     // Set up strings
     STR.get_strings([
-        { "key": "addthisvideo", "component": VIEW.plugin },
-        { "key": "advanced", "component": VIEW.plugin },
-        { "key": "beginner", "component": VIEW.plugin },
-        { "key": "confirmremovevideo", "component": VIEW.plugin },
-        { "key": "copyright", "component": VIEW.plugin },
-        { "key": "description", "component": VIEW.plugin },
-        { "key": "duration", "component": "search" },
-        { "key": "error", "component": "error" },
-        { "key": "goals", "component": VIEW.plugin },
-        { "key": "hideadvanced", "component": "form" },
-        { "key": "info", "component": "moodle" },
-        { "key": "intermediate", "component": VIEW.plugin },
-        { "key": "level", "component": VIEW.plugin },
-        { "key": "noitemsfound", "component": VIEW.plugin },
-        { "key": "ok", "component": "moodle" },
-        { "key": "search", "component": "moodle" },
-        { "key": "showadvanced", "component": "form" },
-        { "key": "topics", "component": VIEW.plugin },
-        { "key": "transcript", "component": VIEW.plugin },
-        { "key": "videosearch", "component": VIEW.plugin },
-        { "key": "videosearchhelp", "component": VIEW.plugin },
-        { "key": "videosearchprompt", "component": VIEW.plugin },
-        { "key": "videodetails", "component": VIEW.plugin }
-    ]).done(function (s) {
+        {"key": "addthisvideo", "component": VIEW.plugin},
+        {"key": "advanced", "component": VIEW.plugin},
+        {"key": "beginner", "component": VIEW.plugin},
+        {"key": "confirmremovevideo", "component": VIEW.plugin},
+        {"key": "copyright", "component": VIEW.plugin},
+        {"key": "description", "component": VIEW.plugin},
+        {"key": "duration", "component": "search"},
+        {"key": "error", "component": "error"},
+        {"key": "goals", "component": VIEW.plugin},
+        {"key": "hideadvanced", "component": "form"},
+        {"key": "info", "component": "moodle"},
+        {"key": "intermediate", "component": VIEW.plugin},
+        {"key": "level", "component": VIEW.plugin},
+        {"key": "noitemsfound", "component": VIEW.plugin},
+        {"key": "ok", "component": "moodle"},
+        {"key": "search", "component": "moodle"},
+        {"key": "showadvanced", "component": "form"},
+        {"key": "topics", "component": VIEW.plugin},
+        {"key": "transcript", "component": VIEW.plugin},
+        {"key": "videosearch", "component": VIEW.plugin},
+        {"key": "videosearchhelp", "component": VIEW.plugin},
+        {"key": "videosearchprompt", "component": VIEW.plugin},
+        {"key": "videodetails", "component": VIEW.plugin}
+    ]).done(function(s) {
         var i = 0;
         VIEW.str.addthisvideo = s[i++];
         VIEW.str.advanced = s[i++];
@@ -98,7 +97,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         VIEW.str.videodetails = s[i++];
     });
 
-    VIEW.init = function (opts) {
+    VIEW.init = function(opts) {
 
         // Cache basic options received from Moodle, e.g. cmid, sesskey, ajax URL.
         // These give us just enough information to get more options asynchronously.
@@ -117,7 +116,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 "sesskey": VIEW.moodlesesskey
             },
             "dataType": "json",
-            "success": function (opts) {
+            "success": function(opts) {
                 for (var i in opts) {
                     VIEW[i] = opts[i];
                 }
@@ -127,7 +126,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
 
         // Ensure ECSDK is fully loaded before it is used
         VIEW.ECSDK = $.Deferred();
-        $.when(VIEW.getoptions).done(function () {
+        $.when(VIEW.getoptions).done(function() {
             // Set appropriate SDK url for specified SDK version
             if (VIEW.sdkmode == 1) {
                 // Development mode
@@ -147,11 +146,11 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 url: VIEW.sdkurl,
                 dataType: "script",
                 cache: true
-            }).done(function () {
+            }).done(function() {
                 VIEW.ECSDK.resolve(window.ECSDK);
             });
 
-            $(".activity-title").each(function () {
+            $(".activity-title").each(function() {
                 var url = this.dataset.videoDetailsUrl;
                 if (url) {
                     // Create the icon
@@ -168,25 +167,25 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                         "href": url,
                         "style": "position: absolute;"
                     }));
-                    icon.click(function (evt) {
-                        VIEW.open_window(this.href);
+                    icon.click(function(evt) {
+                        VIEW.openWindow(this.href);
                         evt.stopPropagation();
                         evt.preventDefault();
                         return false;
                     });
                     // Make room for the icon, and then insert it.
-                    $(this).css({ "margin-left": "0px" }).before(icon);
+                    $(this).css({"margin-left": "0px"}).before(icon);
                 }
             });
         });
 
-        VIEW.init_big_player_placeholder();
+        VIEW.initBigPlayerPlaceholder();
 
 
         $('body').on('click',
             '.activity-title, .englishcentral_videos .thumb-frame, .video-placeholder-video-image, .video-placeholder-video-big-play-button, .video-placeholder-text-social, .video-placeholder-text-progress',
-            function (evt) {
-                VIEW.play_video(evt, this);
+            function(evt) {
+                VIEW.playVideo(evt, this);
                 $(".video-placeholder").hide();
                 $(".faux-loader").show();
                 $(".faux-loader").delay(2000).fadeOut('slow');
@@ -199,10 +198,10 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         $(".englishcentral_videos").sortable({
             "cursor": "grabbing",
             "items": ".activity-thumbnail",
-            "update": function (evt, ui) {
+            "update": function(evt, ui) {
                 var url = ui.item.find(".activity-title").data("url");
                 var data = {
-                    "dialogId": VIEW.get_videoid_from_url(url),
+                    "dialogId": VIEW.getVideoIdFromUrl(url),
                     "sortorder": ui.item.index() + 1
                 };
                 $.ajax({
@@ -215,7 +214,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                         "sesskey": VIEW.moodlesesskey
                     },
                     "dataType": "html",
-                    "success": function (html) {
+                    "success": function(html) {
                         if (html) {
                             // Probably an error message
                             $("#" + VIEW.playercontainer).html(html);
@@ -230,12 +229,13 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         // });
 
         $(".removevideo").droppable({
-            "drop": function (evt, ui) {
+            "drop": function(evt, ui) {
+                // eslint-disable-next-line no-alert
                 if (confirm(VIEW.str.confirmremovevideo)) {
                     ui.draggable.remove();
                     var url = ui.draggable.find(".activity-title").data("url");
                     var data = {
-                        "dialogId": VIEW.get_videoid_from_url(url)
+                        "dialogId": VIEW.getVideoIdFromUrl(url)
                     };
                     $.ajax({
                         "url": VIEW.viewajaxurl,
@@ -247,7 +247,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                             "sesskey": VIEW.moodlesesskey
                         },
                         "dataType": "html",
-                        "success": function (html) {
+                        "success": function(html) {
                             if (html) {
                                 // Probably an error message
                                 $("#" + VIEW.playercontainer).html(html);
@@ -259,30 +259,30 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         });
 
         // Override standard form submit action
-        $("#" + VIEW.searchcontainer + " .search-form").submit(function (evt) {
+        $("#" + VIEW.searchcontainer + " .search-form").submit(function(evt) {
 
             // Remove player and previous search results
-            VIEW.clear_searchresults();
+            VIEW.clearSearchResults();
 
             // RegExp to match a list of comma-separated values
-            var list = new RegExp("^\s*[0-9]+([, \\t\\r\\n]+[0-9]+)*\s*$");
+            var list = new RegExp("^\\s*[0-9]+([, \\t\\r\\n]+[0-9]+)*\\s*$");
 
             var term = $("#id_searchterm").val();
-            var level = $("[name='level[]']:checked").map(function () {
+            var level = $("[name='level[]']:checked").map(function() {
                 return this.value;
             }).get().join(',');
             if (term == "") {
                 $(".search-results").html(VIEW.str.videosearchhelp);
             } else if (term.match(list)) {
-                VIEW.fetch_videos(null, null, term, level);
+                VIEW.fetchVideos(null, null, term, level);
             } else {
-                VIEW.search_videos(null, null, term, level);
+                VIEW.searchVideos(null, null, term, level);
             }
             evt.preventDefault();
         });
 
         // Add event event handler to show/hide advanced settings
-        $("#" + VIEW.searchcontainer + " .search-advanced").click(function () {
+        $("#" + VIEW.searchcontainer + " .search-advanced").click(function() {
             if ($(this).text() == VIEW.str.showadvanced) {
                 $(this).text(VIEW.str.hideadvanced);
             } else {
@@ -301,18 +301,18 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         if (fauxsearchButton || closeSearchButton) {
 
             // When clicking on the "Add video" button, it displays the full search view.
-            fauxsearchButton.click(function () {
+            fauxsearchButton.click(function() {
                 searchBox.css("display", "flex");
                 searchResults.css("display", "flex");
-                idSearchContainer.css({ "width": "auto", "height": "auto" });
+                idSearchContainer.css({"width": "auto", "height": "auto"});
                 fauxsearchButton.css("display", "none");
                 closeSearchButton.css("display", "flex");
             });
             // When clicking on the times closing button, it hides the full search view and returns to the initial state.
-            closeSearchButton.click(function () {
+            closeSearchButton.click(function() {
                 searchBox.css("display", "none");
                 searchResults.css("display", "none");
-                idSearchContainer.css({ "width": "178px", "height": "110px" });
+                idSearchContainer.css({"width": "178px", "height": "110px"});
                 fauxsearchButton.css("display", "flex");
                 closeSearchButton.css("display", "none");
             });
@@ -320,7 +320,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
 
     };
 
-    VIEW.init_big_player_placeholder = function(){
+    VIEW.initBigPlayerPlaceholder = function() {
         // Composing video placeholder on initial load
         // by getting data from the first element loaded
         // in the video thumbnails
@@ -396,14 +396,14 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
 
     };
 
-    VIEW.play_video = function (evt, elm) {
+    VIEW.playVideo = function(evt, elm) {
 
         // Make sure the ECSDK object is available
         // and also pass through evt and elm
-        $.when(VIEW.ECSDK, evt, elm).done(function (ecsdk, evt, elm) {
+        $.when(VIEW.ECSDK, evt, elm).done(function(ecsdk, evt, elm) {
 
             // Remove player and previous search results
-            VIEW.clear_player_and_searchresults();
+            VIEW.clearPlayerAndSearchResults();
 
             // Set handler for end of mode
             var setHandler = "";
@@ -414,7 +414,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 setHandler = "setOnModeEndHandler";
             }
             if (setHandler) {
-                ecsdk[setHandler](function (data) {
+                ecsdk[setHandler](function(data) {
                     // TODO: remove use of LOG in production sites.
                     LOG.debug(data);
                     switch (data.eventType) {
@@ -472,7 +472,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                             "sesskey": VIEW.moodlesesskey
                         },
                         "dataType": "html"
-                    }).done(function (html) {
+                    }).done(function(html) {
 
                         // Is this a PHP error reported as a JSON string?
                         // e.g. a session timeout.
@@ -492,7 +492,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                                 }
                             } else {
                                 VIEW.dialog = $("<div></div>").addClass("dialog");
-                                VIEW.dialog.dialog({ "autoOpen": false });
+                                VIEW.dialog.dialog({"autoOpen": false});
                             }
                             VIEW.dialog.html(html);
 
@@ -500,7 +500,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                             VIEW.dialog.dialog("option", "buttons", [{
                                 "text": VIEW.str.ok,
                                 // "icon": "ui-icon-check",
-                                "click": function () {
+                                "click": function() {
                                     $(this).dialog("close");
                                     var href = VIEW.viewajaxurl.replace(".ajax", "");
                                     window.location.href = href + "?id=" + VIEW.cmid;
@@ -532,16 +532,18 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                                 "sesskey": VIEW.moodlesesskey
                             },
                             "dataType": "html"
-                        }).done(function (html) {
+                        }).done(function(html) {
                             var thumb = $(".thumb-frame[data-url$=" + data.dialogID + "]");
                             thumb.find(".watch-status, .learn-status, .speak-status, .chat-status").remove();
                             thumb.find(".play-icon").after(html);
                         });
+                        return undefined;
                     });
+                    return undefined;
                 });
             }
 
-            var dialogId = VIEW.get_videoid(elm);
+            var dialogId = VIEW.getVideoId(elm);
             var completed = ".thumb-frame[data-url$=" + dialogId + "] .watch-status.completed";
 
             // Set player options (JSDK2 and JSDK3)
@@ -585,19 +587,19 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         });
     };
 
-    VIEW.clear_searchresults = function () {
+    VIEW.clearSearchResults = function() {
         $("#" + VIEW.searchcontainer + " .search-results").html("");
     };
 
-    VIEW.clear_player_and_searchresults = function () {
+    VIEW.clearPlayerAndSearchResults = function() {
         $("#" + VIEW.playercontainer).html("");
         $("#" + VIEW.searchcontainer + " .search-results").html("");
     };
 
-    VIEW.fetch_videos = function (page, size, term, level) {
+    VIEW.fetchVideos = function(page, size, term, level) {
         var spacer = new RegExp("[, \\t\\r\\n]+", "g");
         var ids = term.replace(spacer, ",");
-        VIEW.set_search_params(page, size, ids, level);
+        VIEW.setSearchParams(page, size, ids, level);
         var data = {
             "dialogIDs": ids,
             "page": VIEW.searchpage,
@@ -614,26 +616,26 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 "Authorization": VIEW.authorization,
                 "Content-Type": "application/json"
             },
-            "success": function (dialogs) {
+            "success": function(dialogs) {
                 var info = false;
                 // If we have results, format as view expects and list them up
                 if (dialogs && dialogs.length > 0) {
-                    info = { count: dialogs.length, results: [] };
+                    info = {count: dialogs.length, results: []};
                     for (var i = 0; i < dialogs.length; i++) {
                         var highlights = {};
-                        highlights.en_name = ["<em>" + dialogs[i].title + "</em>"];
-                        highlights.en_topic = ["<em>" + dialogs[i].topics[0].name + "</em>"];
-                        highlights.en_description = [dialogs[i].description];
-                        info.results.push({ score: 150, value: dialogs[i], highlights: highlights });
+                        highlights.enName = ["<em>" + dialogs[i].title + "</em>"];
+                        highlights.enTopic = ["<em>" + dialogs[i].topics[0].name + "</em>"];
+                        highlights.enDescription = [dialogs[i].description];
+                        info.results.push({score: 150, value: dialogs[i], highlights: highlights});
                     }
                 }
-                VIEW.format_results(info);
+                VIEW.formatResults(info);
             }
         });
     };
 
-    VIEW.search_videos = function (page, size, term, level) {
-        VIEW.set_search_params(page, size, term, level);
+    VIEW.searchVideos = function(page, size, term, level) {
+        VIEW.setSearchParams(page, size, term, level);
         var data = {
             "term": VIEW.searchterm,
             "page": VIEW.searchpage,
@@ -653,18 +655,18 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                     "Authorization": VIEW.authorization,
                     "Content-Type": "application/json"
                 },
-                "success": function (info) {
-                    VIEW.format_results(info);
+                "success": function(info) {
+                    VIEW.formatResults(info);
                 },
-                "error" : function () {
-                    var html = VIEW.format_noresult();
+                "error": function() {
+                    var html = VIEW.formatNoResult();
                     $(".search-results").html(html);
                 }
             });
         }
     };
 
-    VIEW.set_search_params = function (page, size, term, level) {
+    VIEW.setSearchParams = function(page, size, term, level) {
         if (VIEW.isNotNum(page)) {
             VIEW.searchpage = 0;
             VIEW.searchterm = "";
@@ -683,13 +685,13 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         }
     };
 
-    VIEW.format_results = function (info) {
+    VIEW.formatResults = function(info) {
         var html = "";
 
         // Finish early if there are no results
         if ((!info) || (!info.results) || info.results.length == 0) {
              // Populate search results
-             html += VIEW.format_noresult();
+             html += VIEW.formatNoResult();
              $(".search-results").html(html);
              return;
         }
@@ -699,12 +701,12 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
 
 
         // Add results
-        var videoids = VIEW.get_videoids();
+        var videoids = VIEW.getVideoIds();
         for (var i = 0; i < info.results.length; i++) {
             // Skip videos that are already displayed
-            var id = info.results[i].value.dialogID.toString();
-            if (videoids.indexOf(id) < 0) {
-                html += VIEW.format_result(info.results[i]);
+            var videoId = info.results[i].value.dialogID.toString();
+            if (videoids.indexOf(videoId) < 0) {
+                html += VIEW.formatResult(info.results[i]);
             }
         }
 
@@ -715,13 +717,13 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         $(".search-results").html(html);
 
         // Add number of items found
-        STR.get_string("xitemsfound", VIEW.plugin, VIEW.formatnumber(info.count)).done(function (s) {
-            $(".search-results").prepend(HTML.tag("div", s, { "class": "itemsfound" }));
+        STR.get_string("xitemsfound", VIEW.plugin, VIEW.formatnumber(info.count)).done(function(s) {
+            $(".search-results").prepend(HTML.tag("div", s, {"class": "itemsfound"}));
         });
 
         // Add click handlers for "+" and thumbnail
-        for (var i = 0; i < info.results.length; i++) {
-            var v = info.results[i].value;
+        for (var j = 0; j < info.results.length; j++) {
+            var v = info.results[j].value;
             var data = {
                 "dialogId": v.dialogID,
                 "title": v.title,
@@ -733,55 +735,55 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 "description": v.description,
                 "topics": JSON.stringify(v.topics),
             };
-            var id = "#id_add_video_" + data.dialogId;
-            $(id).data(data);
-            $(id).parent().click(function (evt) {
+            var selector = "#id_add_video_" + data.dialogId;
+            $(selector).data(data);
+            $(selector).parent().click(function(evt) {
                 if ($(evt.target).closest('.result-info').length) {
                     return; // Exit the function early
                 }
                 // Run your add_video function
-                VIEW.add_video(evt, this);
+                VIEW.addVideo(evt, this);
             });
-            $(id).siblings(".result-thumb").click(function () {
-                // VIEW.open_window($(this).data("url"));
+            $(selector).siblings(".result-thumb").click(function() {
+                // VIEW.openWindow($(this).data("url"));
             });
-            $(id).siblings(".result-info").find(".video-info").click(function () {
-                var id = $(this).closest(".result-info").siblings(".result-add").prop("id");
-                VIEW.open_window(VIEW.videoinfourl + "/" + VIEW.get_videoid_from_id(id));
+            $(selector).siblings(".result-info").find(".video-info").click(function() {
+                var elementid = $(this).closest(".result-info").siblings(".result-add").prop("id");
+                VIEW.openWindow(VIEW.videoinfourl + "/" + VIEW.getVideoIdFromId(elementid));
             });
         }
 
         // Add click handlers for page numbers on paging-bar
-        $(".pagingbar").find(".pagenumber:not(.currentpage)").click(function () {
+        $(".pagingbar").find(".pagenumber:not(.currentpage)").click(function() {
             var page = $(this).text() - 1;
-            VIEW.search_videos(page);
+            VIEW.searchVideos(page);
         });
     };
 
-    VIEW.get_videoids = function () {
+    VIEW.getVideoIds = function() {
         var videoids = [];
-        $(".englishcentral_videos .activity-title").each(function () {
-            videoids.push(VIEW.get_videoid(this));
+        $(".englishcentral_videos .activity-title").each(function() {
+            videoids.push(VIEW.getVideoId(this));
         });
         return videoids;
     };
 
-    VIEW.get_videoid = function (elm) {
+    VIEW.getVideoId = function(elm) {
         var url = $(elm).data("url");
-        return VIEW.get_videoid_from_url(url);
+        return VIEW.getVideoIdFromUrl(url);
     };
 
-    VIEW.get_videoid_from_url = function (url) {
+    VIEW.getVideoIdFromUrl = function(url) {
         // Sample href: https://www.qaenglishcentral.com/video/28864
         return url.replace(new RegExp("^.*/"), "");
     };
 
-    VIEW.get_videoid_from_id = function (id) {
+    VIEW.getVideoIdFromId = function(id) {
         // Sample id: id_add_video_27323
         return id.replace(new RegExp("^.*_"), "");
     };
 
-    VIEW.open_window = function (url) {
+    VIEW.openWindow = function(url) {
         var w = Math.min(640, window.innerWidth);
         var h = Math.min(480, window.innerHeight);
         var x = window.outerWidth / 2 + window.screenX - (w / 2);
@@ -793,7 +795,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         }
     };
 
-    VIEW.pagingbar = function (count) {
+    VIEW.pagingbar = function(count) {
         var html = "";
         if (count) {
             var size = VIEW.searchsize;
@@ -802,37 +804,37 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 var firstpage = 0;
 
                 var page = VIEW.searchpage;
-                var p_min = Math.max(firstpage, VIEW.searchpage - 4);
-                var p_max = Math.min(lastpage, Math.max(9, VIEW.searchpage + 4));
+                var pmin = Math.max(firstpage, VIEW.searchpage - 4);
+                var pmax = Math.min(lastpage, Math.max(9, VIEW.searchpage + 4));
 
-                if (firstpage < p_min) {
-                    html += HTML.tag("span", (firstpage + 1), { "class": "pagenumber" });
-                    if ((p_min - firstpage) > 1) {
-                        html += HTML.tag("span", "...", { "class": "pageseparator" });
+                if (firstpage < pmin) {
+                    html += HTML.tag("span", (firstpage + 1), {"class": "pagenumber"});
+                    if ((pmin - firstpage) > 1) {
+                        html += HTML.tag("span", "...", {"class": "pageseparator"});
                     }
                 }
-                for (var p = p_min; p <= p_max; p++) {
+                for (var p = pmin; p <= pmax; p++) {
                     var s = "pagenumber";
                     if (p == page) {
                         s += " currentpage";
                     }
-                    html += HTML.tag("span", (p + 1), { "class": s });
+                    html += HTML.tag("span", (p + 1), {"class": s});
                 }
-                if (p_max < lastpage) {
-                    if ((lastpage - p_max) > 1) {
-                        html += HTML.tag("span", "...", { "class": "pageseparator" });
+                if (pmax < lastpage) {
+                    if ((lastpage - pmax) > 1) {
+                        html += HTML.tag("span", "...", {"class": "pageseparator"});
                     }
-                    html += HTML.tag("span", (lastpage + 1), { "class": "pagenumber" });
+                    html += HTML.tag("span", (lastpage + 1), {"class": "pagenumber"});
                 }
             }
         }
         if (html) {
-            html = HTML.tag("div", html, { "class": "pagingbar" });
+            html = HTML.tag("div", html, {"class": "pagingbar"});
         }
         return html;
     };
 
-    VIEW.formatnumber = function (n, separator) {
+    VIEW.formatnumber = function(n, separator) {
         if (typeof (separator) == "undefined") {
             separator = ",";
         }
@@ -844,7 +846,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         return n.replace(regexp, separator);
     };
 
-    VIEW.add_video = function (evt, elm) {
+    VIEW.addVideo = function(evt, elm) {
         $.ajax({
             "url": VIEW.viewajaxurl,
             "type": "POST",
@@ -855,9 +857,9 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                 "sesskey": VIEW.moodlesesskey
             },
             "dataType": "html",
-            "success": function (html) {
-                $(html).insertBefore(".removevideo").find(".thumb-frame").click(function (evt) {
-                    VIEW.play_video(evt, this);
+            "success": function(html) {
+                $(html).insertBefore(".removevideo").find(".thumb-frame").click(function(evt) {
+                    VIEW.playVideo(evt, this);
                     $(".video-placeholder").hide();
                     $(".faux-loader").show();
                     $(".faux-loader").delay(2000).fadeOut('slow');
@@ -865,21 +867,21 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
                     evt.preventDefault();
                     return false;
                 });
-                //show the remove button if it is hidden
+                // Show the remove button if it is hidden.
                 $(".videoicon.removevideo").removeClass('page-mod-englishcentral-hide');
-                //show the preview panel if it is hidden
+                // Show the preview panel if it is hidden.
                 $(".player-container-class").removeClass('page-mod-englishcentral-hide');
-                //hide the no videos link if it is showing, and also set the big player placeholder
-                if($(".ec-novideos-label").hasClass('page-mod-englishcentral-hide')==false){
+                // Hide the no videos link if it is showing, and also set the big player placeholder.
+                if ($(".ec-novideos-label").hasClass('page-mod-englishcentral-hide') == false) {
                     $(".ec-novideos-label").addClass('page-mod-englishcentral-hide');
-                    VIEW.init_big_player_placeholder();
+                    VIEW.initBigPlayerPlaceholder();
                 }
             }
         });
 
         // Remove this "result-item" from "search-results"
-        $(elm).closest(".result-item").fadeTo(1000, 0.01, function () {
-            $(this).slideUp(150, function () {
+        $(elm).closest(".result-item").fadeTo(1000, 0.01, function() {
+            $(this).slideUp(150, function() {
                 $(this).remove();
             });
         });
@@ -887,7 +889,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
     };
 
     // If no search results were returned we send back a message about that.
-    VIEW.format_noresult = function() {
+    VIEW.formatNoResult = function() {
         return HTML.tag("div", VIEW.str.noitemsfound, {
             "class": "itemsfound"
         });
@@ -914,7 +916,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
     // "largeVideoURL": "https://cdna.qaenglishcentral.com/dialogs/11875/videoh264_11875_20130527081953.mp4",
     // "promotionalDialog": false,
 
-    VIEW.format_result = function (r) {
+    VIEW.formatResult = function(r) {
         if (VIEW.isNotNum(r.value.difficulty) || r.value.difficulty < 1 || r.value.difficulty > 7) {
             r.value.difficulty = 0;
             r.difficulty = "unknown";
@@ -926,15 +928,15 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
             }
         }
         var html = "";
-        html += VIEW.format_add(r);
-        html += VIEW.format_thumb(r);
-        html += VIEW.format_info(r);
+        html += VIEW.formatAdd(r);
+        html += VIEW.formatThumb(r);
+        html += VIEW.formatInfo(r);
         return HTML.tag("div", html, {
             "class": "result-item"
         });
     };
 
-    VIEW.format_add = function (r) {
+    VIEW.formatAdd = function(r) {
         var src = $(".removevideo img").prop("src").replace("removevideo", "add");
         var html = HTML.emptytag("img", {
             "src": src,
@@ -946,7 +948,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         });
     };
 
-    VIEW.format_thumb = function (r) {
+    VIEW.formatThumb = function(r) {
         var duration = r.value.duration.replace(new RegExp("^00:"), "");
         var html = "";
         html += HTML.starttag("div", {
@@ -966,14 +968,14 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         });
     };
 
-    VIEW.format_info = function (r) {
+    VIEW.formatInfo = function(r) {
         var html = "";
         var src = $(".removevideo img").prop("src")
             .replace("removevideo", "i/info")
             .replace("mod_englishcentral", "core");
         var title = r.value.title;
-        if (r.highlights.en_name) {
-            title = r.highlights.en_name[0];
+        if (r.highlights.enName) {
+            title = r.highlights.enName[0];
         }
         html += HTML.tag("h2", title, {
             "class": "result-title"
@@ -985,31 +987,31 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
             "data-placement": "left",
             "title": VIEW.str.videodetails
         });
-        html += VIEW.format_details(r);
+        html += VIEW.formatDetails(r);
         return HTML.tag("div", html, {
             "class": "result-info"
         });
     };
 
-    VIEW.format_details = function (r) {
+    VIEW.formatDetails = function(r) {
         var html = "";
-        // Html += VIEW.format_copyright(r.value.copyright);
-        html += VIEW.format_goalstopics(r.value.goals, r.value.topics, r.difficulty);
-        html += VIEW.format_description(r.value.description);
-        html += VIEW.format_transcript(r.highlights.transcript);
+        // Html += VIEW.formatCopyright(r.value.copyright);
+        html += VIEW.formatGoalsTopics(r.value.goals, r.value.topics, r.difficulty);
+        html += VIEW.formatDescription(r.value.description);
+        html += VIEW.formatTranscript(r.highlights.transcript);
         return HTML.tag("dl", html, {
             "class": "result-details"
         });
     };
 
-    VIEW.format_copyright = function (copyright) {
+    VIEW.formatCopyright = function(copyright) {
         if (copyright && copyright.length) {
-            return VIEW.format_detail("copyright", copyright);
+            return VIEW.formatDetail("copyright", copyright);
         }
         return "";
     };
 
-    VIEW.format_goalstopics = function (goals, topics, difficulty) {
+    VIEW.formatGoalsTopics = function(goals, topics, difficulty) {
         var txt = [];
         if (goals && goals.length) {
             for (var i = 0; i < goals.length; i++) {
@@ -1017,8 +1019,8 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
             }
         }
         if (topics && topics.length) {
-            for (var i = 0; i < topics.length; i++) {
-                txt.push(topics[i].name);
+            for (var j = 0; j < topics.length; j++) {
+                txt.push(topics[j].name);
             }
         }
         if (txt.length == 0) {
@@ -1028,26 +1030,26 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         txt += HTML.tag("span", VIEW.str[difficulty], {
             "class": "result-level " + difficulty
         });
-        return VIEW.format_detail("topics", txt);
+        return VIEW.formatDetail("topics", txt);
     };
 
-    VIEW.format_description = function (description) {
+    VIEW.formatDescription = function(description) {
         if (description && description.length) {
-            return VIEW.format_detail("description", description);
+            return VIEW.formatDetail("description", description);
         }
         return "";
     };
 
-    VIEW.format_transcript = function (transcript) {
+    VIEW.formatTranscript = function(transcript) {
         if (transcript && transcript.length) {
             var dots = "...";
             var slashes = new RegExp("//", "g");
-            return VIEW.format_detail("transcript", dots + transcript[0].replace(slashes, dots) + dots);
+            return VIEW.formatDetail("transcript", dots + transcript[0].replace(slashes, dots) + dots);
         }
         return "";
     };
 
-    VIEW.format_detail = function (type, value) {
+    VIEW.formatDetail = function(type, value) {
         var html = "";
         html += HTML.tag("dt", VIEW.str[type], {
             "class": "result-label " + type
@@ -1058,7 +1060,7 @@ define(["jquery", "js/jquery-ui.js", "core/log", "core/str", "mod_englishcentral
         return html;
     };
 
-    VIEW.isNotNum = function (n) {
+    VIEW.isNotNum = function(n) {
         switch (typeof (n)) {
             case "number": return false;
             case "string": return (!n.match(new RegExp("^[0-9]+$")));
