@@ -24,6 +24,12 @@ use mod_englishcentral\utils;
  * @package    mod_englishcentral
  * @copyright COPYRIGHTNOTICE
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods) A Moodle output renderer,
+ *   exposing one small rendering method per widget/section; this is the
+ *   standard shape for this base class.
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class mod_englishcentral_renderer extends plugin_renderer_base {
     /** @var object The englishcentral activity object. */
@@ -63,66 +69,105 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param string $extrapagetitle String to append to the page title.
      * @param bool $hidetabs Whether to hide the activity tabs.
      * @return string
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function header($extrapagetitle = null, $hidetabs = false) {
         global $CFG;
 
-        if (isset($this->ec->id)) {
-            $activityname = format_string($this->ec->name, true, $this->ec->course->id);
-            $title = $this->ec->course->shortname . ': ' . $activityname;
-            if ($extrapagetitle) {
-                $title .= ': ' . $extrapagetitle;
-            }
-            $this->page->set_title($title);
-            $this->page->set_heading($this->ec->course->fullname);
-        }
+        $activityname = $this->set_page_title_and_heading($extrapagetitle);
 
         $output = $this->output->header();
 
         if (isset($this->ec->ecinstance)) {
-            if (
-                (has_capability('mod/englishcentral:manage', $this->ec->context) ||
-                    has_capability('mod/englishcentral:viewreports', $this->ec->context) ||
-                    has_capability('mod/englishcentral:viewdevelopertools', $this->ec->context)) &&
-                    !$hidetabs
-            ) {
-                if ($this->page->url == $this->ec->get_view_url()) {
-                    $icon = $this->pix_icon('i/preview', 'view', 'moodle', ['class' => 'icon']);
-                    $icon = html_writer::link($this->ec->get_view_url(), $icon);
-                    // Tabs.php uses the $currenttab var.
-                    $currenttab = 'view';
-                } else if (strpos($this->page->url, $this->ec->get_report_url(false)) === 0) {
-                    $icon = $this->pix_icon('i/report', 'reports', 'moodle', ['class' => 'icon']);
-                    $icon = html_writer::link($this->ec->get_report_url(), $icon);
-                    // Tabs.php uses the $currenttab var.
-                    $currenttab = 'reports';
-                } else if (strpos($this->page->url, $this->ec->get_developertools_url(false)) === 0) {
-                    $icon = $this->pix_icon('i/settings', 'developertools', constants::M_COMPONENT, ['class' => 'icon']);
-                    $icon = html_writer::link($this->ec->get_developertools_url(), $icon);
-                    // Tabs.php uses the $currenttab var.
-                    $currenttab = 'developer';
-                } else {
-                    $icon = '';
-                }
-
-                // Set up tabs.
-                $moduleinstance = $this->ec;
-                ob_start();
-                include($CFG->dirroot . '/mod/englishcentral/tabs.php');
-                $output .= ob_get_contents();
-                ob_end_clean();
-
-                // Dont show the heading in an iframe, it will be outside this anyway.
-                if (!$this->ec->foriframe && $CFG->version < 4.0) {
-                    $help = $this->help_icon('overview', $this->ec->plugin);
-                    $output .= $this->heading($activityname . $help . $icon);
-                }
-            } else {
-                if (!$this->ec->foriframe && $CFG->version < 4.0) {
-                    $output .= $this->output->heading($activityname);
-                }
+            if (!$hidetabs && $this->can_view_tabs()) {
+                $output .= $this->show_tabs_and_heading($activityname);
+            } else if (!$this->ec->foriframe && $CFG->version < 4.0) {
+                $output .= $this->output->heading($activityname);
             }
         }
+        return $output;
+    }
+
+    /**
+     * Set the page title and heading for the englishcentral activity, if one is attached.
+     *
+     * @param string $extrapagetitle String to append to the page title.
+     * @return string|null The formatted activity name, or null if no activity is attached.
+     */
+    private function set_page_title_and_heading($extrapagetitle) {
+        if (!isset($this->ec->id)) {
+            return null;
+        }
+        $activityname = format_string($this->ec->name, true, $this->ec->course->id);
+        $title = $this->ec->course->shortname . ': ' . $activityname;
+        if ($extrapagetitle) {
+            $title .= ': ' . $extrapagetitle;
+        }
+        $this->page->set_title($title);
+        $this->page->set_heading($this->ec->course->fullname);
+        return $activityname;
+    }
+
+    /**
+     * Whether the current user can see the view/reports/developer-tools tabs.
+     *
+     * @return bool
+     */
+    private function can_view_tabs() {
+        return has_capability('mod/englishcentral:manage', $this->ec->context)
+            || has_capability('mod/englishcentral:viewreports', $this->ec->context)
+            || has_capability('mod/englishcentral:viewdevelopertools', $this->ec->context);
+    }
+
+    /**
+     * Determine the current tab (view/reports/developer) from the page URL, and the
+     * icon linking to it, for use by the included tabs.php.
+     *
+     * @return array [$currenttab, $icon]
+     */
+    private function determine_current_tab() {
+        if ($this->page->url == $this->ec->get_view_url()) {
+            $icon = $this->pix_icon('i/preview', 'view', 'moodle', ['class' => 'icon']);
+            return ['view', html_writer::link($this->ec->get_view_url(), $icon)];
+        }
+        if (strpos($this->page->url, $this->ec->get_report_url(false)) === 0) {
+            $icon = $this->pix_icon('i/report', 'reports', 'moodle', ['class' => 'icon']);
+            return ['reports', html_writer::link($this->ec->get_report_url(), $icon)];
+        }
+        if (strpos($this->page->url, $this->ec->get_developertools_url(false)) === 0) {
+            $icon = $this->pix_icon('i/settings', 'developertools', constants::M_COMPONENT, ['class' => 'icon']);
+            return ['developer', html_writer::link($this->ec->get_developertools_url(), $icon)];
+        }
+        return [null, ''];
+    }
+
+    /**
+     * Render the view/reports/developer-tools tabs, plus the activity heading (unless
+     * in an iframe on a pre-4.0 Moodle site, where the heading is shown outside).
+     *
+     * @param string $activityname The formatted activity name.
+     * @return string The rendered HTML.
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable) $currenttab and $moduleinstance are
+     *   consumed by tabs.php, which this method include()s into its own scope.
+     */
+    private function show_tabs_and_heading($activityname) {
+        global $CFG;
+
+        [$currenttab, $icon] = $this->determine_current_tab();
+
+        // Set up tabs.
+        $moduleinstance = $this->ec;
+        ob_start();
+        include($CFG->dirroot . '/mod/englishcentral/tabs.php');
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        // Dont show the heading in an iframe, it will be outside this anyway.
+        if (!$this->ec->foriframe && $CFG->version < 4.0) {
+            $help = $this->help_icon('overview', $this->ec->plugin);
+            $output .= $this->heading($activityname . $help . $icon);
+        }
+
         return $output;
     }
 
@@ -391,10 +436,24 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
        * Show the EC progress element
        */
     public function show_progress() {
-
         $progress = $this->ec->get_progress();
+        $percent = $this->compute_overall_progress_percent($progress);
 
-        // Calculate total percent.
+        $output = '';
+        $output .= $this->output->box_start('englishcentral_progress', 'id_progresscontainer');
+        $output .= $this->show_progress_timing();
+        $output .= $this->show_progress_titlecharts($percent, $progress);
+        $output .= $this->output->box_end();
+        return $output;
+    }
+
+    /**
+     * Compute the overall progress percentage across all goals that have been set.
+     *
+     * @param object $progress The progress data object.
+     * @return int The overall progress percentage.
+     */
+    private function compute_overall_progress_percent($progress) {
         $percent = 0;
         $divisor = 0;
         if ($this->ec->watchgoal_set()) {
@@ -416,10 +475,15 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         if ($percent) {
             $percent = round(100 * $percent / $divisor, 0);
         }
+        return $percent;
+    }
 
-        $output = '';
-        $output .= $this->output->box_start('englishcentral_progress', 'id_progresscontainer');
-
+    /**
+     * Show the "your progress" heading and the activity/video open/close timing.
+     *
+     * @return string
+     */
+    private function show_progress_timing() {
         $timing = '';
         if ($open = ($this->ec->videoopen ? $this->ec->videoopen : $this->ec->activityopen)) {
             $timing .= html_writer::tag('dt', $this->ec->get_string('from'));
@@ -433,10 +497,18 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $timing = html_writer::tag('dl', $timing);
         }
         $timing = html_writer::tag('h4', $this->ec->get_string('yourprogress'), ['class' => 'title']) . $timing;
-        $output .= html_writer::tag('div', $timing, ['class' => 'timing']);
+        return html_writer::tag('div', $timing, ['class' => 'timing']);
+    }
 
-        // Format titlecharts.
-        $output .= html_writer::start_tag('div', ['class' => 'titlechart-container']);
+    /**
+     * Show the overall-progress titlechart and one per goal that has been set.
+     *
+     * @param int $percent The overall progress percentage.
+     * @param object $progress The progress data object.
+     * @return string
+     */
+    private function show_progress_titlecharts($percent, $progress) {
+        $output = html_writer::start_tag('div', ['class' => 'titlechart-container']);
         $output .= $this->show_titlechart('total', $percent, '%', 'achieved', $percent);
         if ($this->ec->watchgoal_set()) {
             $output .= $this->show_titlechart_type('watch', $progress);
@@ -451,7 +523,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $output .= $this->show_titlechart_type('chat', $progress);
         }
         $output .= html_writer::end_tag('div');
-        $output .= $this->output->box_end();
         return $output;
     }
 
@@ -568,8 +639,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * Show the EC videos element
      */
     public function show_videos() {
-        global $DB, $USER;
-
         $output = '';
         $output .= $this->output->box_start('englishcentral_videos');
 
@@ -631,20 +700,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      */
     public function show_video($video) {
         $output = '';
-
-        switch (true) {
-            case ($video->difficulty <= 2):
-                $difficulty = 'beginner';
-                break;
-            case ($video->difficulty <= 4):
-                $difficulty = 'intermediate';
-                break;
-            case ($video->difficulty >= 5):
-                $difficulty = 'advanced';
-                break;
-            default:
-                $difficulty = '';
-        }
+        $difficulty = $this->determine_video_difficulty($video);
 
         // Remove leading 00: from duration.
         if (substr($video->duration, 0, 3) == '00:') {
@@ -656,23 +712,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', ['class' => 'thumb-outline']);
 
         $params = ['class' => 'activity-title', 'data-url' => $video->dialogURL];
-        $showdetails = false;
-        if ($this->ec->showdetails) {
-            $isstudent = has_capability('mod/englishcentral:view', $this->ec->context);
-            $isteacher = has_capability('mod/englishcentral:addinstance', $this->ec->context);
-            switch ($this->ec->showdetails) {
-                case 1:
-                    $showdetails = ($isstudent && ($isteacher == false));
-                    break;
-                case 2:
-                    $showdetails = (($isstudent == false) && $isteacher);
-                    break;
-                case 3:
-                    $showdetails = ($isstudent || $isteacher);
-                    break;
-            }
-        }
-        if ($showdetails && isset($video->videoDetailsURL)) {
+        if ($this->should_show_video_details() && isset($video->videoDetailsURL)) {
             $params['data-video-details-url'] = $video->videoDetailsURL;
         }
         $output .= html_writer::tag('span', $video->title, $params);
@@ -682,27 +722,8 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                         'data-demopicurl' => $video->demoPictureURL,
                         'style' => 'background-image: url("' . $video->thumbnailURL . '");',
                         'description' => $video->description,
+                        'topics' => $this->extract_first_video_topic($video),
                     ];
-
-        $topicslist = ['topics' => $video->topics];
-
-        $newtopicslist = [];
-
-        if (is_array($topicslist['topics'][0])) {
-            foreach ($topicslist['topics'][0] as $key => $value) {
-                array_push($newtopicslist, $value);
-            }
-        } else {
-            foreach ($topicslist['topics'] as $thetopic) {
-                array_push($newtopicslist, $thetopic->name);
-            }
-        }
-
-        if (count($newtopicslist) > 0) {
-            $params['topics'] = $newtopicslist[0];
-        } else {
-            $params['topics'] = '';
-        }
 
         $output .= html_writer::start_tag('span', $params);
 
@@ -744,6 +765,68 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     }
 
     /**
+     * Determine the difficulty band ('beginner'/'intermediate'/'advanced') for a video.
+     *
+     * @param object $video The video data object.
+     * @return string
+     */
+    private function determine_video_difficulty($video) {
+        switch (true) {
+            case ($video->difficulty <= 2):
+                return 'beginner';
+            case ($video->difficulty <= 4):
+                return 'intermediate';
+            case ($video->difficulty >= 5):
+                return 'advanced';
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Whether video details should be shown to the current user, based on the
+     * activity's "showdetails" setting (nobody/students only/teachers only/both)
+     * and the current user's role.
+     *
+     * @return bool
+     */
+    private function should_show_video_details() {
+        if (!$this->ec->showdetails) {
+            return false;
+        }
+        $isstudent = has_capability('mod/englishcentral:view', $this->ec->context);
+        $isteacher = has_capability('mod/englishcentral:addinstance', $this->ec->context);
+        switch ($this->ec->showdetails) {
+            case 1:
+                return $isstudent && !$isteacher;
+            case 2:
+                return !$isstudent && $isteacher;
+            case 3:
+                return $isstudent || $isteacher;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Extract the first topic name from a video's topics data, which may be a
+     * plain array of topic objects or (in some API responses) a nested array.
+     *
+     * @param object $video The video data object.
+     * @return string The first topic name, or an empty string if there are none.
+     */
+    private function extract_first_video_topic($video) {
+        $topics = $video->topics;
+        if (empty($topics)) {
+            return '';
+        }
+        if (is_array($topics[0])) {
+            return reset($topics[0]);
+        }
+        return $topics[0]->name;
+    }
+
+    /**
      * Show the status indicators for a video.
      *
      * @param object $video The video data object.
@@ -780,6 +863,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      *
      * @param bool $initiallyvisible Whether the icon is initially visible.
      * @return string
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function show_removevideo_icon($initiallyvisible = true) {
         return $this->show_videos_icon('remove', $initiallyvisible);
@@ -791,6 +875,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param string $type The icon type (add or remove).
      * @param bool $initiallyvisible Whether the icon is initially visible.
      * @return string
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function show_videos_icon($type, $initiallyvisible = true) {
         $text = $this->ec->get_string($type . 'video');
@@ -820,26 +905,56 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @return string
      */
     public function show_progress_report($dayslimit = 0) {
-        global $DB, $CFG;
-        $output = '';
-
         $this->setup_sort();
         $url = $this->ec->get_report_url();
 
-        // Fetch groupmode/menu/id for this activity.
-        if ($groupmode = groups_get_activity_groupmode($this->ec->cm)) {
-            $groupmenu = groups_print_activity_menu($this->ec->cm, $url, true);
-            $groupid = groups_get_activity_group($this->ec->cm);
-        } else {
-            $groupmenu = '';
-            $groupid = 0;
+        [$groupmenu, $groupid] = $this->fetch_progress_report_groupinfo($url);
+        $items = $this->fetch_progress_report_items($dayslimit, $groupid);
+        $goals = $this->compute_progress_report_goals($items);
+        $items = $this->finalize_progress_report_items($items, $goals);
+
+        $output = $this->show_progress_report_heading($url, $goals);
+        foreach ($items as $item) {
+            $output .= $this->show_progress_report_item($item, $goals);
         }
 
-        // Initialize study goals.
-        $goals = (object)['watch' => 0,
-                               'learn' => 0,
-                               'speak' => 0,
-                               'chat' => 0];
+        if (count($items)) {
+            $output = html_writer::tag('dl', $output, ['class' => 'userbars']);
+        } else {
+            $output = html_writer::tag('p', $this->ec->get_string('noprogressreport'));
+        }
+
+        if ($groupmenu) {
+            $output = $groupmenu . $output;
+        }
+
+        return $output;
+    }
+
+    /**
+     * Fetch the group menu HTML and currently-selected group id for the progress report.
+     *
+     * @param \moodle_url $url The report page URL.
+     * @return array [$groupmenu, $groupid]
+     */
+    private function fetch_progress_report_groupinfo($url) {
+        if (!groups_get_activity_groupmode($this->ec->cm)) {
+            return ['', 0];
+        }
+        $groupmenu = groups_print_activity_menu($this->ec->cm, $url, true);
+        $groupid = groups_get_activity_group($this->ec->cm);
+        return [$groupmenu, $groupid];
+    }
+
+    /**
+     * Fetch the per-user aggregate attempt totals for the progress report.
+     *
+     * @param int $dayslimit Limit results to attempts within this many days.
+     * @param int $groupid Limit results to this group, or 0 for no group restriction.
+     * @return array Aggregate items keyed by userid.
+     */
+    private function fetch_progress_report_items($dayslimit, $groupid) {
+        global $DB, $CFG;
 
         // Create SQL to fetch aggregate items from the EC attempts table.
         $select = 'userid,' .
@@ -891,16 +1006,25 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $order .= ' ' . $this->order;
         }
 
+        return $DB->get_records_sql("SELECT $select FROM $from WHERE $where ORDER BY $order", $params) ?: [];
+    }
+
+    /**
+     * Compute the study goals for the progress report: the maximum earned in the
+     * given items, overridden by the teacher-specified goals if any are set.
+     *
+     * @param array $items Aggregate items keyed by userid, as fetched by fetch_progress_report_items().
+     * @return object The goals object, with watch/learn/speak/chat/total properties.
+     */
+    private function compute_progress_report_goals($items) {
+        $goals = (object)['watch' => 0, 'learn' => 0, 'speak' => 0, 'chat' => 0];
+
         // Set goals to maximum in these aggregate items.
-        if ($items = $DB->get_records_sql("SELECT $select FROM $from WHERE $where ORDER BY $order", $params)) {
-            foreach ($items as $userid => $item) {
-                $goals->watch = max($goals->watch, $item->watch);
-                $goals->learn = max($goals->learn, $item->learn);
-                $goals->speak = max($goals->speak, $item->speak);
-                $goals->chat = max($goals->chat, $item->chat);
-            }
-        } else {
-            $items = [];
+        foreach ($items as $item) {
+            $goals->watch = max($goals->watch, $item->watch);
+            $goals->learn = max($goals->learn, $item->learn);
+            $goals->speak = max($goals->speak, $item->speak);
+            $goals->chat = max($goals->chat, $item->chat);
         }
 
         // Override goals with teacher-specified goals, if available.
@@ -911,11 +1035,19 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             $goals->chat = intval($this->ec->chatgoal);
         }
 
-        $goals->total = ($goals->watch +
-                         $goals->learn +
-                         $goals->speak +
-                         $goals->chat);
+        $goals->total = ($goals->watch + $goals->learn + $goals->speak + $goals->chat);
+        return $goals;
+    }
 
+    /**
+     * Show the progress report's heading row: sortable fullname/percent columns and
+     * the proportional watch/learn/speak/chat goal bars.
+     *
+     * @param \moodle_url $url The report page URL.
+     * @param object $goals The goals object, as returned by compute_progress_report_goals().
+     * @return string
+     */
+    private function show_progress_report_heading($url, $goals) {
         $type = 'firstname';
         $fullname = get_string($type, 'moodle');
         $fullname .= $this->get_sort_icon($url, $type);
@@ -932,7 +1064,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         $percent .= $this->get_sort_icon($url, $type);
         $percent = html_writer::tag('span', $percent, ['class' => 'percent']);
 
-        $output .= html_writer::tag('dt', $fullname . $percent, ['class' => 'user title']);
+        $output = html_writer::tag('dt', $fullname . $percent, ['class' => 'user title']);
 
         $title = '';
         $left = 0;
@@ -948,7 +1080,18 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             }
         }
         $output .= html_writer::tag('dd', $title, ['class' => 'bars title']);
+        return $output;
+    }
 
+    /**
+     * Compute each item's total/percent against the goals, and sort by percent if
+     * that is the currently selected sort field.
+     *
+     * @param array $items Aggregate items keyed by userid.
+     * @param object $goals The goals object, as returned by compute_progress_report_goals().
+     * @return array The updated (and possibly re-sorted) items.
+     */
+    private function finalize_progress_report_items($items, $goals) {
         foreach ($items as $userid => $item) {
             $item->total = (min($goals->watch, $item->watch) +
                             min($goals->learn, $item->learn) +
@@ -966,21 +1109,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
             uasort($items, [$this, 'uasort_percent']);
         }
 
-        foreach ($items as $userid => $item) {
-            $output .= $this->show_progress_report_item($item, $goals);
-        }
-
-        if (count($items)) {
-            $output = html_writer::tag('dl', $output, ['class' => 'userbars']);
-        } else {
-            $output = html_writer::tag('p', $this->ec->get_string('noprogressreport'));
-        }
-
-        if ($groupmenu) {
-            $output = $groupmenu . $output;
-        }
-
-        return $output;
+        return $items;
     }
 
 
@@ -1012,7 +1141,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      */
     protected function show_progress_report_item($item, $goals) {
         $output = '';
-        $output .= html_writer::tag('dt', $this->show_progress_report_user($item, $goals), ['class' => 'user']);
+        $output .= html_writer::tag('dt', $this->show_progress_report_user($item), ['class' => 'user']);
         $output .= html_writer::tag('dd', $this->show_progress_report_bars($item, $goals), ['class' => 'bars']);
         return $output;
     }
@@ -1021,10 +1150,9 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * Show the user name and percentage for a progress report row.
      *
      * @param object $item The user item data.
-     * @param object $goals The goals data object.
      * @return string
      */
-    protected function show_progress_report_user($item, $goals) {
+    protected function show_progress_report_user($item) {
         $output = '';
         $output .= html_writer::tag('span', fullname($item), ['class' => 'fullname']);
         $output .= html_writer::tag('span', $item->percent, ['class' => 'percent']);
@@ -1147,32 +1275,51 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function get_sort_icon($url, $sort) {
-        if ($sort == $this->sort) {
-            $order = $this->order;
-        } else {
-            $order = ''; // Unsorted.
-        }
+        $order = ($sort == $this->sort) ? $this->order : ''; // '' means unsorted.
 
+        [$text, $icon] = $this->determine_sort_icon_details($sort, $order);
+        $this->apply_sort_link_params($url, $sort, $order);
+
+        $text = get_string($text, 'grades');
+        $icon = $this->output->pix_icon($icon, $text, 'moodle', ['class' => 'sorticon']);
+
+        return html_writer::link($url, $icon, ['title' => $text]);
+    }
+
+    /**
+     * Determine the language string key and icon to show for a report column's sort
+     * indicator, given the column and its current sort order (if any).
+     *
+     * @param string $sort The sort field this icon represents.
+     * @param string $order The current sort order for this field ('ASC', 'DESC' or '').
+     * @return array [$text, $icon]
+     */
+    private function determine_sort_icon_details($sort, $order) {
         switch (true) {
             case ($order == 'ASC'):
-                $text = 'sortdesc';
-                $icon = 't/sort_asc';
-                break;
+                return ['sortdesc', 't/sort_asc'];
             case ($order == 'DESC'):
-                $text = 'sortasc';
-                $icon = 't/sort_desc';
-                break;
+                return ['sortasc', 't/sort_desc'];
             case ($sort == 'firstname'):
             case ($sort == 'lastname'):
-                $text = "sortby$sort";
-                $icon = 't/sort';
-                // Deliberate fall-through to the default case.
+                // Note: this branch's ["sortby$sort", 't/sort'] is never actually
+                // returned - it always falls through to the identical-looking
+                // default case below, since neither branch has its own `break`.
+                // Preserved as-is; not part of this cleanup's scope.
             default:
-                $text = 'sort';
-                $icon = 't/sort';
-                break;
+                return ['sort', 't/sort'];
         }
+    }
 
+    /**
+     * Apply the sort/order params to the given URL for a report column's sort link.
+     *
+     * @param \moodle_url $url The base URL for the sort link, updated in place.
+     * @param string $sort The sort field this icon represents.
+     * @param string $order The current sort order for this field ('ASC', 'DESC' or '').
+     * @return void
+     */
+    private function apply_sort_link_params($url, $sort, $order) {
         $params = [];
         if ($sort) {
             $params['sort'] = $sort;
@@ -1187,12 +1334,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
         if (count($params)) {
             $url->params($params);
         }
-
-        $text = get_string($text, 'grades');
-        $params = ['class' => 'sorticon'];
-        $icon = $this->output->pix_icon($icon, $text, 'moodle', $params);
-
-        return html_writer::link($url, $icon, ['title' => $text]);
     }
 
     /**
@@ -1386,6 +1527,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param bool $hidden whether the player container starts hidden
      * @param bool $mimichat whether mimichat mode is enabled
      * @return string
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function show_player($hidden = false, $mimichat = false) {
         $data = [];

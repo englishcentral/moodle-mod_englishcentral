@@ -400,7 +400,6 @@ class activity {
      */
     public function get_accountids($groupid = 0) {
         global $DB;
-        $groupid = 0;
         if ($userids = $this->get_userids($groupid)) {
             [$select, $params] = $DB->get_in_or_equal($userids);
             return $DB->get_records_select_menu('englishcentral_accountids', "userid $select", $params, 'userid, accountid');
