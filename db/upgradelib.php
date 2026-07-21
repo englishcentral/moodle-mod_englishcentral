@@ -70,6 +70,11 @@ function xmldb_englishcentral_replace_table($dbman, $table, $fields, $oldname) {
  * @param xmldb_manager $dbman  The database manager object used for schema operations.
  * @param xmldb_table   $table  The table definition.
  * @param array         $fields Optional associative array mapping old field names to new field names.
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity) Upgrade-time DB schema manipulation
+ *   (drop/re-add indexes, rename/add/change fields); each branch mirrors a
+ *   distinct xmldb_manager operation with no local test coverage to verify
+ *   a restructuring against.
  */
 function xmldb_englishcentral_create_table($dbman, $table, $fields = []) {
     global $DB;
@@ -140,6 +145,14 @@ function xmldb_englishcentral_create_table($dbman, $table, $fields = []) {
  * @param array $pluginname (optional, default=mod_englishcentral) the full frakenstyle name of this plugin e.g. mod_englishcentral
  * @param array $plugindir (optional, default=mod/englishcentral) the relative path to main folder for this plugin's directory
  * @return void (but may update database structure)
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @SuppressWarnings(PHPMD.ExitExpression) Upgrade-time DB schema verification/repair
+ *   against the plugin's install.xml; each branch reconciles one specific kind of
+ *   drift (missing table, missing field, mismatched type) with no local test
+ *   coverage to verify a restructuring against, and the exit() guards against
+ *   continuing an upgrade against a schema that couldn't be repaired.
  */
 function xmldb_englishcentral_check_structure(
     $dbman,

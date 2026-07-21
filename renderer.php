@@ -1302,10 +1302,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
                 return ['sortasc', 't/sort_desc'];
             case ($sort == 'firstname'):
             case ($sort == 'lastname'):
-                // Note: this branch's ["sortby$sort", 't/sort'] is never actually
-                // returned - it always falls through to the identical-looking
-                // default case below, since neither branch has its own `break`.
-                // Preserved as-is; not part of this cleanup's scope.
+                return ["sortby$sort", 't/sort'];
             default:
                 return ['sort', 't/sort'];
         }
