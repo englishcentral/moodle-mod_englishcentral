@@ -1264,7 +1264,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @return string
      */
     protected function get_sort_icon($url, $sort) {
-        $order = ($sort == $this->sort) ? $this->order : ''; // '' means unsorted.
+        $order = ($sort == $this->sort) ? $this->order : ''; // Empty string means unsorted.
 
         [$text, $icon] = $this->determine_sort_icon_details($sort, $order);
         $this->apply_sort_link_params($url, $sort, $order);

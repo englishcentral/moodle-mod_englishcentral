@@ -87,5 +87,4 @@ class setupform extends \moodleform {
         // Add the action buttons.
         $this->add_action_buttons(get_string('cancel'), get_string('savechangesanddisplay'));
     }
-
 }
