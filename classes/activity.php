@@ -34,10 +34,6 @@ namespace mod_englishcentral;
  * @package    mod_englishcentral
  * @copyright  2018 Gordon Bateson
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @SuppressWarnings(PHPMD.TooManyPublicMethods) A facade over the activity
- *   instance/course/context/config, exposing many small single-purpose
- *   accessors; splitting it would just relocate the same public surface.
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class activity {
     /**
@@ -709,7 +705,6 @@ class activity {
      *
      * @param bool $addvideoid Whether to include the videoid field.
      * @return string The comma-separated field list.
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function get_attempts_fields($addvideoid = true) {
         $fields = 'watchcount,watchcomplete,' .

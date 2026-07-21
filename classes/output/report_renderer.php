@@ -32,8 +32,6 @@ use mod_englishcentral\utils;
 /**
  * Renderer for englishcentral reports.
  *
- * @SuppressWarnings(PHPMD.TooManyPublicMethods) A renderer class exposing one small,
- *   focused public method per report widget; that's the standard Moodle renderer shape.
  */
 class report_renderer extends \plugin_renderer_base {
     /**
@@ -185,8 +183,6 @@ class report_renderer extends \plugin_renderer_base {
      * @param array $rows The formatted report rows.
      * @param array $fields The list of fields to output for each row.
      * @return void
-     * @SuppressWarnings(PHPMD.ExitExpression) A CSV download must terminate the script
-     *   before any further page output is sent.
      */
     public function render_report_csv($sectiontitle, $head, $rows, $fields) {
 

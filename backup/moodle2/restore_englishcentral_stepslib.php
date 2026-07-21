@@ -25,8 +25,6 @@
 /**
  * Structure step to restore one englishcentral activity
  *
- * @SuppressWarnings(PHPMD.LongClassName) Name follows Moodle's mandatory
- *   restore_{component}_activity_structure_step convention.
  */
 class restore_englishcentral_activity_structure_step extends restore_activity_structure_step {
     /**

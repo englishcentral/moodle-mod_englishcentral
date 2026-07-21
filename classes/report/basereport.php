@@ -209,7 +209,6 @@ abstract class basereport {
      * @param bool $withlinks Whether to include links in the output.
      * @param object|bool $paging The paging information, or false for no paging.
      * @return array The formatted rows.
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_formatted_rows($withlinks = true, $paging = false) {
         $records = $this->rawdata;
@@ -243,7 +242,6 @@ abstract class basereport {
      * @param bool $withlinks Unused by this default implementation; kept so subclasses
      *             overriding fetch_formatted_field() share an identical signature.
      * @return string The formatted field value.
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
         switch ($field) {

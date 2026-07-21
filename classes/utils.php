@@ -40,8 +40,6 @@ class utils {
      * @param \context $context The module context.
      * @param bool $setuptab Whether this is being added to the setup tab form.
      * @return void
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag) Mirrors the two form contexts
-     *   (activity settings vs. the developer setup tab) this shared builder supports.
      */
     public static function add_mform_elements($mform, $instance, $cm, $course, $context, $setuptab = false) {
         global $PAGE;

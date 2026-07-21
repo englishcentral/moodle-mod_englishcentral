@@ -95,7 +95,6 @@ class lookupform extends \moodleform {
      * @param int $itemid
      * @param bool $pchat
      * @return bool
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function construction_override($itemid, $pchat) {
         return true;

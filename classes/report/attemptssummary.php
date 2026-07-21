@@ -124,7 +124,6 @@ class attemptssummary extends basereport
             return '-';
         }
         return $record->chat . '/' . $this->goals->chat;
-        return $ret;
     }
 
     /**
@@ -150,8 +149,6 @@ class attemptssummary extends basereport
      *               fetch_chart() interface implemented by all report classes.
      * @param bool $showdatasource Unused, for the same reason as $renderer.
      * @return string The chart HTML.
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
         global $PAGE;

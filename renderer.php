@@ -24,12 +24,6 @@ use mod_englishcentral\utils;
  * @package    mod_englishcentral
  * @copyright COPYRIGHTNOTICE
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @SuppressWarnings(PHPMD.TooManyPublicMethods) A Moodle output renderer,
- *   exposing one small rendering method per widget/section; this is the
- *   standard shape for this base class.
- * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.ExcessiveClassLength)
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class mod_englishcentral_renderer extends plugin_renderer_base {
     /** @var object The englishcentral activity object. */
@@ -69,7 +63,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param string $extrapagetitle String to append to the page title.
      * @param bool $hidetabs Whether to hide the activity tabs.
      * @return string
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function header($extrapagetitle = null, $hidetabs = false) {
         global $CFG;
@@ -147,8 +140,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      *
      * @param string $activityname The formatted activity name.
      * @return string The rendered HTML.
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable) $currenttab and $moduleinstance are
-     *   consumed by tabs.php, which this method include()s into its own scope.
      */
     private function show_tabs_and_heading($activityname) {
         global $CFG;
@@ -863,7 +854,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      *
      * @param bool $initiallyvisible Whether the icon is initially visible.
      * @return string
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function show_removevideo_icon($initiallyvisible = true) {
         return $this->show_videos_icon('remove', $initiallyvisible);
@@ -875,7 +865,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param string $type The icon type (add or remove).
      * @param bool $initiallyvisible Whether the icon is initially visible.
      * @return string
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     protected function show_videos_icon($type, $initiallyvisible = true) {
         $text = $this->ec->get_string($type . 'video');
@@ -1524,7 +1513,6 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * @param bool $hidden whether the player container starts hidden
      * @param bool $mimichat whether mimichat mode is enabled
      * @return string
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function show_player($hidden = false, $mimichat = false) {
         $data = [];

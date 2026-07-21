@@ -55,9 +55,6 @@ define('MOD_ENGLISHCENTRAL_GRADENONE', 4);
  * @see plugin_supports() in lib/moodlelib.php
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
- * @SuppressWarnings(PHPMD.CyclomaticComplexity) A flat feature-flag switch,
- *   as used by every Moodle activity module; splitting it would not make
- *   it any easier to read.
  */
 function englishcentral_supports($feature) {
     switch ($feature) {
@@ -111,7 +108,7 @@ function englishcentral_supports($feature) {
  * of the new instance.
  *
  * @param stdClass $formdata An object from the form in mod_form.php
- * @param mod_englishcentral_mod_form $mform
+ * @param mod_englishcentral_mod_form|null $mform The form instance, if available.
  * @return int The id of the newly inserted englishcentral record
  */
 function englishcentral_add_instance(stdClass $formdata, ?mod_englishcentral_mod_form $mform = null) {
@@ -126,7 +123,7 @@ function englishcentral_add_instance(stdClass $formdata, ?mod_englishcentral_mod
  * will update an existing instance with new data.
  *
  * @param stdClass $data An object from the form in mod_form.php
- * @param mod_englishcentral_mod_form $mform
+ * @param mod_englishcentral_mod_form|null $mform The form instance, if available.
  * @return boolean Success/Fail
  */
 function englishcentral_update_instance(stdClass $data, ?mod_englishcentral_mod_form $mform = null) {
@@ -137,10 +134,8 @@ function englishcentral_update_instance(stdClass $data, ?mod_englishcentral_mod_
  * update fields in recently submitted form data
  *
  * @param stdClass $data recently submitted formdata
- * @param mod_englishcentral_mod_form $mform Unused; accepted only so add_instance()/
- *              update_instance() can forward the $mform Moodle passes them.
+ * @param mod_englishcentral_mod_form|null $mform Unused; accepted so add_instance/update_instance can forward it.
  * @return boolean Success/Failure
- * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod_form $mform = null) {
     global $DB;
@@ -315,7 +310,6 @@ function englishcentral_normalize_grades($grades, &$params) {
  * @param object $englishcentral
  * @param int $userid specific user only, 0 means all
  * @param bool $nullifnone
- * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
  */
 function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone = true) {
     global $CFG;
@@ -401,7 +395,6 @@ function englishcentral_reset_course_form_definition(&$mform) {
  * Course reset form defaults.
  * @param object $course Unused; part of Moodle's mandatory course-reset API signature.
  * @return array
- * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 function englishcentral_reset_course_form_defaults($course) {
     return ['reset_englishcentral' => 1];
@@ -412,7 +405,6 @@ function englishcentral_reset_course_form_defaults($course) {
  *
  * @param int $courseid
  * @param string $type Unused; part of Moodle's mod_{component}_reset_gradebook() convention.
- * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 function englishcentral_reset_gradebook($courseid, $type = '') {
     global $DB;
@@ -479,7 +471,6 @@ function englishcentral_reset_userdata($data) {
  * @param cm_info $mod course module info
  * @param stdClass $englishcentral the module instance record
  * @return stdClass|null
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory user-report API.
  */
 function englishcentral_user_outline($course, $user, $mod, $englishcentral) {
     $return = new stdClass();
@@ -497,7 +488,6 @@ function englishcentral_user_outline($course, $user, $mod, $englishcentral) {
  * @param cm_info $mod course module info
  * @param stdClass $englishcentral the module instance record
  * @return void, is supposed to echp directly
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory user-report API.
  */
 function englishcentral_user_complete($course, $user, $mod, $englishcentral) {
 }
@@ -511,7 +501,6 @@ function englishcentral_user_complete($course, $user, $mod, $englishcentral) {
  * @param bool $viewfullnames whether the current user can view full names
  * @param int $timestart print activity since this time
  * @return boolean
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory recent-activity API.
  */
 function englishcentral_print_recent_activity($course, $viewfullnames, $timestart) {
     return false;  // True if anything was printed, otherwise false.
@@ -532,7 +521,6 @@ function englishcentral_print_recent_activity($course, $viewfullnames, $timestar
  * @param int $userid check for a particular user's activity only, defaults to 0 (all users)
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  * @return void adds items into $activities and increases $index
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory recent-activity API.
  */
 function englishcentral_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
 }
@@ -546,7 +534,6 @@ function englishcentral_get_recent_mod_activity(&$activities, &$index, $timestar
  * @param array $modnames Array of module names.
  * @param bool $viewfullnames Whether the current user can view full names.
  * @return void
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory recent-activity API.
  */
 function englishcentral_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
 }
@@ -625,7 +612,6 @@ function englishcentral_scale_used_anywhere($scaleid) {
  * @param stdClass $cm
  * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory file API.
  */
 function englishcentral_get_file_areas($course, $cm, $context) {
     return [];
@@ -647,7 +633,6 @@ function englishcentral_get_file_areas($course, $cm, $context) {
  * @param string $filepath
  * @param string $filename
  * @return file_info instance or null if not found
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory file API.
  */
 function englishcentral_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     return null;
@@ -666,8 +651,6 @@ function englishcentral_get_file_info($browser, $areas, $course, $cm, $context, 
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) $filearea/$args/$forcedownload/$options are
- *   part of Moodle's mandatory file-serving API; this plugin has no downloadable files.
  */
 function englishcentral_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = []) {
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -690,7 +673,6 @@ function englishcentral_pluginfile($course, $cm, $context, $filearea, array $arg
  * @param stdClass $course
  * @param stdClass $module
  * @param cm_info $cm
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory navigation API.
  */
 function englishcentral_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
 }
@@ -702,8 +684,7 @@ function englishcentral_extend_navigation(navigation_node $navref, stdClass $cou
  * so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav the settings navigation object
- * @param navigation_node $englishcentralnode the node to add module settings to
- * @SuppressWarnings(PHPMD.UnusedFormalParameter) Part of Moodle's mandatory navigation API.
+ * @param navigation_node|null $englishcentralnode the node to add module settings to
  */
 function englishcentral_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $englishcentralnode = null) {
 }

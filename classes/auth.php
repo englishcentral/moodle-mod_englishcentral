@@ -35,11 +35,6 @@ namespace mod_englishcentral;
  * @package    englishcentral
  * @copyright  2014 Justin Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @SuppressWarnings(PHPMD.TooManyPublicMethods) A facade over EC's
- *   authentication/API surface, exposing many small single-purpose
- *   accessors and API-call wrappers; splitting it would just relocate
- *   the same public surface.
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class auth {
     // Accepted media types used by EC's API.
@@ -574,7 +569,6 @@ class auth {
      * @param bool $post whether to perform a POST request
      * @param array $fields the request fields
      * @return mixed the API response
-     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function docall_curl($url, $header, $jsondecode = false, $post = null, $fields = null) {
         global $CFG;

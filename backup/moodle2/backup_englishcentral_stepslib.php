@@ -26,8 +26,6 @@
 /**
  * Defines the complete webquest structure for backup, with file and id annotations
  *
- * @SuppressWarnings(PHPMD.LongClassName) Name follows Moodle's mandatory
- *   backup_{component}_activity_structure_step convention.
  */
 class backup_englishcentral_activity_structure_step extends backup_activity_structure_step {
     /**

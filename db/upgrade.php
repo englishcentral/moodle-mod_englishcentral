@@ -37,15 +37,6 @@ use mod_englishcentral\constants;
  *
  * @param int $oldversion
  * @return bool
- * @SuppressWarnings(PHPMD.CyclomaticComplexity)
- * @SuppressWarnings(PHPMD.NPathComplexity)
- * @SuppressWarnings(PHPMD.ExcessiveMethodLength) A standard Moodle upgrade.php:
- *   one sequential, historically-ordered "if ($oldversion < $newversion) { ...
- *   upgrade_mod_savepoint(...); }" block per past release. Each block only ever
- *   runs once, in this exact order, against real production data with no local
- *   test coverage to verify a restructuring against; splitting it into per-version
- *   functions would add risk without any future readability benefit, since past
- *   upgrade steps are never revisited once released.
  */
 function xmldb_englishcentral_upgrade($oldversion) {
     global $CFG, $DB;
