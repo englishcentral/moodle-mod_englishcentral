@@ -67,58 +67,63 @@ class attemptssummary extends basereport
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB, $CFG, $OUTPUT;
-
         switch ($field) {
             case 'firstname':
             case 'lastname':
-                if ($withlinks) {
-                    $link = new \moodle_url(
-                        constants::M_URL . '/reports.php',
-                        [
-                            'format' => $this->formdata->format,
-                            'report' => 'userattempts',
-                            'id' => $this->cm->id,
-                            'userid' => $record->userid,
-                            'dayslimit' => $this->formdata->dayslimit,
-                        ]
-                    );
-                    $ret = \html_writer::link($link, $record->{$field});
-                } else {
-                    $ret = $record->{$field};
-                }
-                break;
+                return $this->format_name_field($field, $record, $withlinks);
 
             case 'learn':
             case 'speak':
             case 'watch':
-                $goalvalue = $this->goals->{$field};
-                $ret = $record->{$field}  . '/' . $goalvalue;
-                break;
+                return $record->{$field} . '/' . $this->goals->{$field};
 
             case 'total_p':
-                $ret = $record->percent . "%";
-                break;
+                return $record->percent . "%";
 
             case 'chat':
-                if (
-                    get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chat) > 0
-                ) {
-                    $goalvalue = $this->goals->chat;
-                    $ret = $record->chat . '/' . $goalvalue;
-                } else {
-                    $ret = '-';
-                }
-                break;
+                return $this->format_chat_field($record);
 
             default:
-                if (property_exists($record, $field)) {
-                    $ret = $record->{$field};
-                } else {
-                    $ret = '';
-                }
+                return property_exists($record, $field) ? $record->{$field} : '';
         }
+    }
+
+    /**
+     * Format the firstname/lastname field, optionally linked to that user's individual report.
+     *
+     * @param string $field The field name (firstname or lastname).
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_name_field($field, $record, $withlinks) {
+        if (!$withlinks) {
+            return $record->{$field};
+        }
+        $link = new \moodle_url(
+            constants::M_URL . '/reports.php',
+            [
+                'format' => $this->formdata->format,
+                'report' => 'userattempts',
+                'id' => $this->cm->id,
+                'userid' => $record->userid,
+                'dayslimit' => $this->formdata->dayslimit,
+            ]
+        );
+        return \html_writer::link($link, $record->{$field});
+    }
+
+    /**
+     * Format the chat field, taking chat mode availability into account.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_chat_field($record) {
+        if (!get_config(constants::M_COMPONENT, 'chatmode') && intval($record->chat) <= 0) {
+            return '-';
+        }
+        return $record->chat . '/' . $this->goals->chat;
         return $ret;
     }
 
@@ -140,12 +145,16 @@ class attemptssummary extends basereport
     /**
      * Fetch the chart output for the report.
      *
-     * @param object $renderer The renderer.
-     * @param bool $showdatasource Whether to show the data source.
+     * @param object $renderer Unused; this report renders its own bars rather than delegating
+     *               to the chart renderer, but the parameter is required to satisfy the shared
+     *               fetch_chart() interface implemented by all report classes.
+     * @param bool $showdatasource Unused, for the same reason as $renderer.
      * @return string The chart HTML.
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
-        global $PAGE, $CFG;
+        global $PAGE;
         $PAGE->requires->js_call_amd($this->ec->plugin . "/report", 'init');
         $items = $this->rawdata;
         $output = '';
@@ -188,7 +197,7 @@ class attemptssummary extends basereport
         }
 
         foreach ($items as $userid => $item) {
-            $output .= $this->show_progress_report_item($item, $this->goals);
+            $output .= $this->show_progress_report_item($item);
         }
 
         if (count($items)) {
@@ -329,13 +338,12 @@ class attemptssummary extends basereport
      * Render a single user's progress report item.
      *
      * @param object $item The user's progress data.
-     * @param object $goals The activity goals.
      * @return string The rendered HTML.
      */
-    protected function show_progress_report_item($item, $goals) {
+    protected function show_progress_report_item($item) {
         $output = '';
-        $output .= \html_writer::tag('dt', $this->show_progress_report_user($item, $goals), ['class' => 'user']);
-        $output .= \html_writer::tag('dd', $this->show_progress_report_bars($item, $goals), ['class' => 'bars']);
+        $output .= \html_writer::tag('dt', $this->show_progress_report_user($item), ['class' => 'user']);
+        $output .= \html_writer::tag('dd', $this->show_progress_report_bars($item), ['class' => 'bars']);
         return $output;
     }
 
@@ -343,10 +351,9 @@ class attemptssummary extends basereport
      * Render the user's name and overall percentage for a progress report item.
      *
      * @param object $item The user's progress data.
-     * @param object $goals The activity goals.
      * @return string The rendered HTML.
      */
-    protected function show_progress_report_user($item, $goals) {
+    protected function show_progress_report_user($item) {
         $output = '';
         $output .= \html_writer::tag('span', fullname($item), ['class' => 'fullname']);
         $output .= \html_writer::tag('span', $item->percent . '%', ['class' => 'percent']);
@@ -357,15 +364,14 @@ class attemptssummary extends basereport
      * Render all progress bars (watch/learn/speak/chat) for a progress report item.
      *
      * @param object $item The user's progress data.
-     * @param object $goals The activity goals.
      * @return string The rendered HTML.
      */
-    protected function show_progress_report_bars($item, $goals) {
+    protected function show_progress_report_bars($item) {
         $output = '';
-        $output .= $this->show_progress_report_bar($item, $goals, 'watch');
-        $output .= $this->show_progress_report_bar($item, $goals, 'learn');
-        $output .= $this->show_progress_report_bar($item, $goals, 'speak');
-        $output .= $this->show_progress_report_bar($item, $goals, 'chat');
+        $output .= $this->show_progress_report_bar($item, 'watch');
+        $output .= $this->show_progress_report_bar($item, 'learn');
+        $output .= $this->show_progress_report_bar($item, 'speak');
+        $output .= $this->show_progress_report_bar($item, 'chat');
         return $output;
     }
 
@@ -373,11 +379,10 @@ class attemptssummary extends basereport
      * Render a single progress bar for the given goal type.
      *
      * @param object $item The user's progress data.
-     * @param object $goals The activity goals.
      * @param string $type The goal type (watch/learn/speak/chat).
      * @return string The rendered HTML, or an empty string if the goal is not set.
      */
-    protected function show_progress_report_bar($item, $goals, $type) {
+    protected function show_progress_report_bar($item, $type) {
         if (empty($this->goals->$type)) {
             return '';
         }
@@ -421,7 +426,7 @@ class attemptssummary extends basereport
      * @return bool True on success.
      */
     public function process_raw_data($formdata) {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB;
 
         // Save form data for later.
         $this->formdata = $formdata;

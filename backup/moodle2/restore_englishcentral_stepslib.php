@@ -24,6 +24,9 @@
 
 /**
  * Structure step to restore one englishcentral activity
+ *
+ * @SuppressWarnings(PHPMD.LongClassName) Name follows Moodle's mandatory
+ *   restore_{component}_activity_structure_step convention.
  */
 class restore_englishcentral_activity_structure_step extends restore_activity_structure_step {
     /**
@@ -74,9 +77,6 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
 
         // Convert $data to object.
         $data = (object)$data;
-
-        // Save $oldid.
-        $oldid = $data->id;
 
         // Fix fields (e.g. convert fields names from OLD to NEW).
         if (! $data->course = $this->get_courseid()) {
@@ -134,21 +134,7 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
 
         // We should only restore the accountids if the backup.
         // And restore sites have the same partnerID.
-        static $partnerid = null;
-
-        // Fetch $partnerid of restore site (first time only).
-        if ($partnerid === null) {
-            // Only site admin has access to the partnerid on the Moodle site.
-            if (has_capability('moodle/site:config', context_system::instance())) {
-                $partnerid = get_config('mod_englishcentral', 'partnerid');
-            }
-            if ($partnerid && is_numeric($partnerid)) {
-                $partnerid = intval($partnerid);
-            } else {
-                $partnerid = 0;
-            }
-        }
-
+        $partnerid = $this->get_restore_site_partnerid();
         if ($partnerid == 0) {
             return false; // Current user does have access to partnerID.
         }
@@ -173,10 +159,32 @@ class restore_englishcentral_activity_structure_step extends restore_activity_st
 
         // Add new record, if necessary.
         if (! $DB->record_exists('englishcentral_accountids', ['userid' => $data->userid])) {
-            if (! $newid = $DB->insert_record('englishcentral_accountids', $data)) {
+            if (! $DB->insert_record('englishcentral_accountids', $data)) {
                 return false; // Could not add new record - shouldn't happen !!
             }
         }
+    }
+
+    /**
+     * Fetch the partnerID configured on the restore site, caching it for the
+     * lifetime of the restore. Only site admins have access to this setting.
+     *
+     * @return int The partnerID, or 0 if the current user cannot access it.
+     */
+    protected function get_restore_site_partnerid() {
+        static $partnerid = null;
+
+        if ($partnerid === null) {
+            $partnerid = 0;
+            if (has_capability('moodle/site:config', context_system::instance())) {
+                $configvalue = get_config('mod_englishcentral', 'partnerid');
+                if ($configvalue && is_numeric($configvalue)) {
+                    $partnerid = intval($configvalue);
+                }
+            }
+        }
+
+        return $partnerid;
     }
 
     /**

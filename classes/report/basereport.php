@@ -192,10 +192,10 @@ abstract class basereport {
             return '';
         }
 
-        $s = $date = new \DateTime();
+        $s = new \DateTime();
         $s->setTimestamp($starttimestamp);
 
-        $e = $date = new \DateTime();
+        $e = new \DateTime();
         $e->setTimestamp($endtimestamp);
 
         $diff = $e->diff($s);
@@ -209,6 +209,7 @@ abstract class basereport {
      * @param bool $withlinks Whether to include links in the output.
      * @param object|bool $paging The paging information, or false for no paging.
      * @return array The formatted rows.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_formatted_rows($withlinks = true, $paging = false) {
         $records = $this->rawdata;
@@ -239,11 +240,12 @@ abstract class basereport {
      *
      * @param string $field The field name.
      * @param object $record The data record.
-     * @param bool $withlinks Whether to include links in the output.
+     * @param bool $withlinks Unused by this default implementation; kept so subclasses
+     *             overriding fetch_formatted_field() share an identical signature.
      * @return string The formatted field value.
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB;
         switch ($field) {
             case 'timecreated':
                 $ret = date("Y-m-d H:i:s", $record->timecreated);

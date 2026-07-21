@@ -54,87 +54,81 @@ class usercourseattempts extends basereport {
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB, $CFG, $OUTPUT;
-
         switch ($field) {
             case 'activityname':
-                $ec = $this->fetch_cache(constants::M_TABLE, $record->ecid);
-                $ret = $record->name;
-                if ($withlinks) {
-                        $link = new \moodle_url(
-                            constants::M_URL . '/reports.php',
-                            ['format' => $this->formdata->format, 'report' => 'userattempts',
-                            'id' => $this->cm->id,
-                            'userid' => $this->formdata->userid]
-                        );
-                        $ret = \html_writer::link($link, $ret);
-                }
-                break;
+                return $this->format_activityname_field($record, $withlinks);
 
             // Not necessary here . Since Watch = the same details.
             case 'attempts':
-                    $ret = $record->attemptcount;
-                break;
+                return $record->attemptcount;
 
             case 'watch':
-                $watchgoal = intval($record->watchgoal);
-                if ($watchgoal > 0) {
-                    $ret = $record->watch . '/' . $watchgoal;
-                } else {
-                    $ret = $record->watch;
-                }
-                break;
-
             case 'learn':
-                $learngoal = intval($record->learngoal);
-                if ($learngoal > 0) {
-                    $ret = $record->learn . '/' . $learngoal;
-                } else {
-                    $ret = $record->learn;
-                }
-                break;
-
             case 'speak':
-                $speakgoal = intval($record->speakgoal);
-                if ($speakgoal > 0) {
-                    $ret = $record->speak . '/' . $speakgoal;
-                } else {
-                    $ret = $record->speak;
-                }
-                break;
+                return $this->format_goal_field($record, $field);
 
             case 'chat':
-                if (
-                    get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chat) > 0
-                ) {
-                        $chatgoal = intval($record->chatgoal);
-                    if ($chatgoal > 0) {
-                        $ret = $record->chat . '/' . $chatgoal;
-                    } else {
-                        $ret = $record->chat;
-                    }
-                } else {
-                    $ret = '-';
-                }
-                break;
+                return $this->format_chat_field($record);
 
             case 'total_p':
-                $ret = $record->total_p . "% (" . $record->total . ")";
-                break;
+                return $record->total_p . "% (" . $record->total . ")";
 
             case 'firstattempt':
-                $ret = date("Y-m-d H:i:s", $record->firstattempt);
-                break;
+                return date("Y-m-d H:i:s", $record->firstattempt);
 
             default:
-                if (property_exists($record, $field)) {
-                    $ret = $record->{$field};
-                } else {
-                    $ret = '';
-                }
+                return property_exists($record, $field) ? $record->{$field} : '';
+        }
+    }
+
+    /**
+     * Format the activityname field, optionally linked to that user's report for the activity.
+     *
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_activityname_field($record, $withlinks) {
+        $this->fetch_cache(constants::M_TABLE, $record->ecid);
+        $ret = $record->name;
+        if ($withlinks) {
+            $link = new \moodle_url(
+                constants::M_URL . '/reports.php',
+                ['format' => $this->formdata->format, 'report' => 'userattempts',
+                'id' => $this->cm->id,
+                'userid' => $this->formdata->userid]
+            );
+            $ret = \html_writer::link($link, $ret);
         }
         return $ret;
+    }
+
+    /**
+     * Format a watch/learn/speak field as "count/goal", or just "count" if no goal is set.
+     *
+     * @param \stdClass $record The data record.
+     * @param string $field The goal type (watch, learn or speak).
+     * @return string The formatted field value.
+     */
+    private function format_goal_field($record, $field) {
+        $goal = intval($record->{$field . 'goal'});
+        if ($goal > 0) {
+            return $record->{$field} . '/' . $goal;
+        }
+        return $record->{$field};
+    }
+
+    /**
+     * Format the chat field, taking chat mode availability into account.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_chat_field($record) {
+        if (!get_config(constants::M_COMPONENT, 'chatmode') && intval($record->chat) <= 0) {
+            return '-';
+        }
+        return $this->format_goal_field($record, 'chat');
     }
 
     /**
@@ -162,9 +156,9 @@ class usercourseattempts extends basereport {
      * @param \renderer_base $renderer The output renderer.
      * @param bool $showdatasource Whether to show the data source table.
      * @return string The rendered chart HTML.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
-        global $CFG;
         $records = $this->rawdata;
         // Build the series data.
         $watchseries = [];
@@ -221,7 +215,7 @@ class usercourseattempts extends basereport {
      * @return bool True on success.
      */
     public function process_raw_data($formdata) {
-        global $DB, $USER;
+        global $DB;
 
         // Save form data for later.
         $this->formdata = $formdata;

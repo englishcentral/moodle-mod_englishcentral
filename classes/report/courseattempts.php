@@ -53,59 +53,79 @@ class courseattempts extends basereport {
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB, $CFG, $OUTPUT;
         switch ($field) {
             case 'username':
-                $user = $this->fetch_cache('user', $record->userid);
-                $ret = fullname($user);
-                if ($withlinks) {
-                        $link = new \moodle_url(
-                            constants::M_URL . '/reports.php',
-                            ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
-                            'id' => $this->cm->id,
-                            'userid' => $record->userid,
-                            'dayslimit' => $this->formdata->dayslimit]
-                        );
-                        $ret = \html_writer::link($link, $ret);
-                }
-                break;
+                return $this->format_username($record, $withlinks);
 
             case 'firstname':
             case 'lastname':
-                $user = $this->fetch_cache('user', $record->userid);
-                if ($withlinks) {
-                    $link = new \moodle_url(
-                        constants::M_URL . '/reports.php',
-                        ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
-                        'id' => $this->cm->id,
-                        'userid' => $record->userid,
-                        'dayslimit' => $this->formdata->dayslimit]
-                    );
-                    $ret = \html_writer::link($link, $user->{$field});
-                } else {
-                    $ret = $user->{$field};
-                }
-                break;
+                return $this->format_name_field($field, $record, $withlinks);
 
             case 'chat':
-                if (
-                    get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chat) > 0
-                ) {
-                    $ret = $record->chat;
-                } else {
-                    $ret = '-';
-                }
-                break;
+                return $this->format_chat_field($record);
 
             default:
-                if (property_exists($record, $field)) {
-                    $ret = $record->{$field};
-                } else {
-                    $ret = '';
-                }
+                return property_exists($record, $field) ? $record->{$field} : '';
+        }
+    }
+
+    /**
+     * Format the username field, optionally linked to that user's individual report.
+     *
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_username($record, $withlinks) {
+        $user = $this->fetch_cache('user', $record->userid);
+        $ret = fullname($user);
+        if ($withlinks) {
+            $link = new \moodle_url(
+                constants::M_URL . '/reports.php',
+                ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
+                'id' => $this->cm->id,
+                'userid' => $record->userid,
+                'dayslimit' => $this->formdata->dayslimit]
+            );
+            $ret = \html_writer::link($link, $ret);
         }
         return $ret;
+    }
+
+    /**
+     * Format the firstname/lastname field, optionally linked to that user's individual report.
+     *
+     * @param string $field The field name (firstname or lastname).
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_name_field($field, $record, $withlinks) {
+        $user = $this->fetch_cache('user', $record->userid);
+        if (!$withlinks) {
+            return $user->{$field};
+        }
+        $link = new \moodle_url(
+            constants::M_URL . '/reports.php',
+            ['format' => $this->formdata->format, 'report' => 'usercourseattempts',
+            'id' => $this->cm->id,
+            'userid' => $record->userid,
+            'dayslimit' => $this->formdata->dayslimit]
+        );
+        return \html_writer::link($link, $user->{$field});
+    }
+
+    /**
+     * Format the chat field, taking chat mode availability into account.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_chat_field($record) {
+        if (!get_config(constants::M_COMPONENT, 'chatmode') && intval($record->chat) <= 0) {
+            return '-';
+        }
+        return $record->chat;
     }
 
     /**
@@ -129,9 +149,9 @@ class courseattempts extends basereport {
      * @param \renderer_base $renderer The output renderer.
      * @param bool $showdatasource Whether to show the data source table.
      * @return string The rendered chart HTML.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
-        global $CFG;
         $records = $this->rawdata;
         // Build the series data.
         $watchseries = [];
@@ -165,7 +185,7 @@ class courseattempts extends basereport {
      * @return bool True on success.
      */
     public function process_raw_data($formdata) {
-        global $DB, $USER;
+        global $DB;
 
         // Save form data for later.
         $this->formdata = $formdata;

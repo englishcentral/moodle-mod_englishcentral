@@ -73,95 +73,102 @@ class userattempts extends basereport {
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB, $CFG, $OUTPUT;
-
         switch ($field) {
             case 'videoid':
-                $ret = $record->videoid;
-                break;
+                return $record->videoid;
 
             case 'videoname':
-                if ($withlinks && !empty($record->videoname)) {
-                    $link = new \moodle_url(
-                        constants::M_URL . '/reports.php',
-                        ['format' => $this->formdata->format, 'report' => 'videoperformance',
-                        'id' => $this->cm->id,
-                        'videoid' => $record->videoid,
-                        'dayslimit' => $this->formdata->dayslimit]
-                    );
-                    $ret = \html_writer::link($link, $record->videoname);
-                    if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
-                        $details = json_decode($record->detailsjson);
-                        if (isset($details->thumbnailURL)) {
-                            $ret .= '<br/>' . \html_writer::img($details->thumbnailURL, '$record->videoname');
-                        }
-                    }
-                } else {
-                    if (empty($record->videoname)) {
-                        $ret = get_string('deletedvideo', constants::M_COMPONENT);
-                    } else {
-                        $ret = $record->videoname;
-                    }
-                }
-                break;
+                return $this->format_videoname_field($record, $withlinks);
 
             case 'difficulty':
-                    $ret = '-';
-                if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
-                    $details = json_decode($record->detailsjson);
-                    if (isset($details->difficulty)) {
-                        $ret = $details->difficulty;
-                    }
-                }
-                break;
+                return $this->format_difficulty_field($record);
 
             case 'watch':
-                $ret = $record->watchcount;
-                break;
+                return $record->watchcount;
 
             case 'learn':
-                $ret = $record->learncount;
-                break;
+                return $record->learncount;
 
             case 'speak':
-                $ret = $record->speakcount;
-                break;
+                return $record->speakcount;
 
             case 'chat':
-                if (
-                    get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chatcount) > 0
-                ) {
-                    $ret = $record->chatcount;
-                } else {
-                    $ret = '-';
-                }
-                break;
+                return $this->format_chat_field($record);
 
             case 'activetime':
-                $ret = $record->activetime;
-                break;
+                return $record->activetime;
 
             case 'totaltime':
-                $ret = $record->totaltime;
-                break;
+                return $record->totaltime;
 
             case 'timecreated':
-                $ret = date("Y-m-d H:i:s", $record->timecreated);
-                break;
+                return date("Y-m-d H:i:s", $record->timecreated);
 
             case 'timecompleted':
-                $ret = date("Y-m-d H:i:s", $record->timecompleted);
-                break;
+                return date("Y-m-d H:i:s", $record->timecompleted);
 
             default:
-                if (property_exists($record, $field)) {
-                    $ret = $record->{$field};
-                } else {
-                    $ret = '';
-                }
+                return property_exists($record, $field) ? $record->{$field} : '';
+        }
+    }
+
+    /**
+     * Format the videoname field, optionally linked to the video performance report.
+     *
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_videoname_field($record, $withlinks) {
+        if (!$withlinks || empty($record->videoname)) {
+            return empty($record->videoname)
+                ? get_string('deletedvideo', constants::M_COMPONENT)
+                : $record->videoname;
+        }
+        $link = new \moodle_url(
+            constants::M_URL . '/reports.php',
+            ['format' => $this->formdata->format, 'report' => 'videoperformance',
+            'id' => $this->cm->id,
+            'videoid' => $record->videoid,
+            'dayslimit' => $this->formdata->dayslimit]
+        );
+        $ret = \html_writer::link($link, $record->videoname);
+        if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
+            $details = json_decode($record->detailsjson);
+            if (isset($details->thumbnailURL)) {
+                $ret .= '<br/>' . \html_writer::img($details->thumbnailURL, '$record->videoname');
+            }
         }
         return $ret;
+    }
+
+    /**
+     * Format the difficulty field, extracted from the video's cached details JSON.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_difficulty_field($record) {
+        if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
+            $details = json_decode($record->detailsjson);
+            if (isset($details->difficulty)) {
+                return $details->difficulty;
+            }
+        }
+        return '-';
+    }
+
+    /**
+     * Format the chat field, taking chat mode availability into account.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_chat_field($record) {
+        if (!get_config(constants::M_COMPONENT, 'chatmode') && intval($record->chatcount) <= 0) {
+            return '-';
+        }
+        return $record->chatcount;
     }
 
     /**
@@ -170,9 +177,9 @@ class userattempts extends basereport {
      * @param \renderer_base $renderer The output renderer.
      * @param bool $showdatasource Whether to show the data source table.
      * @return string The rendered chart HTML.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
-        global $CFG;
         $records = $this->rawdata;
         // Build the series data.
         $learnseries = [];

@@ -52,7 +52,6 @@ class basic extends basereport {
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB;
         switch ($field) {
             case 'id':
                 $ret = $record->id;
