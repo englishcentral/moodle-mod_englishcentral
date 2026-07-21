@@ -92,6 +92,8 @@ class lookupform extends \moodleform {
      * This can be used to process an immediate action if required. Currently it
      * is only used in special cases by non-standard item types.
      *
+     * @param int $itemid
+     * @param bool $pchat
      * @return bool
      */
     public function construction_override($itemid, $pchat) {

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines {@link backup_englishcentral_activity_task} class
+ * Defines {@see backup_englishcentral_activity_task} class
  *
  * @package    mod_englishcentral
  * @category    backup

@@ -49,6 +49,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * attach the $ec & $auth objects so they are accessible throughout this class
      *
      * @param object $ec a \mod_englishcentral/activity Object.
+     * @param object $auth a \mod_englishcentral/auth Object.
      * @return void
      */
     public function attach_activity_and_auth($ec = null, $auth = null) {
@@ -60,6 +61,7 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
      * Returns the header for the englishcentral module
      *
      * @param string $extrapagetitle String to append to the page title.
+     * @param bool $hidetabs Whether to hide the activity tabs.
      * @return string
      */
     public function header($extrapagetitle = null, $hidetabs = false) {
@@ -134,6 +136,9 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     /**
      * Return HTML to display message about missing config settings
+     *
+     * @param array|string $msg the message(s) to display
+     * @return string
      */
     public function show_missingconfig($msg) {
         $output = '';
@@ -147,7 +152,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Return HTML to display message about missing config settings
+     * Return HTML to display message about invalid config settings
+     *
+     * @param string $msg the message to display
+     * @return string
      */
     public function show_invalidconfig($msg) {
         $output = '';
@@ -266,6 +274,9 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     /**
      * Show the  some text in a box
+     *
+     * @param string $boxtext the text to display in the box
+     * @return string
      */
     public function show_box_text($boxtext) {
         $output = '';
@@ -342,6 +353,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     /**
      * Show a list of timing restrictions
+     *
+     * @param string $type the type of dates (e.g. 'activity', 'viewable')
+     * @param array $suffixes the date field suffixes to show (e.g. 'open', 'close')
+     * @return string
      */
     public function show_dates($type, $suffixes) {
         $output = [];
@@ -1367,6 +1382,10 @@ class mod_englishcentral_renderer extends plugin_renderer_base {
 
     /**
      * Create a container for the EC player.
+     *
+     * @param bool $hidden whether the player container starts hidden
+     * @param bool $mimichat whether mimichat mode is enabled
+     * @return string
      */
     public function show_player($hidden = false, $mimichat = false) {
         $data = [];

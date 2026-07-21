@@ -129,7 +129,7 @@ class setupform extends \moodleform {
      * Convenience function: Adds an response editor
      *
      * @param int $count The count of the element to add
-     * @param string $label, null means default
+     * @param string $label Null means default
      * @param bool $required
      * @return void
      */

@@ -95,6 +95,11 @@ class activity {
 
     /**
      * construct English Central activity instance
+     *
+     * @param stdclass $instance a row from the englishcentral table
+     * @param stdclass $cm a row from the course_modules table
+     * @param stdclass $course a row from the course table
+     * @param \context $context the activity context
      */
     public function __construct($instance = null, $cm = null, $course = null, $context = null) {
         global $COURSE;
@@ -175,7 +180,8 @@ class activity {
      * @param stdclass $instance a row from the reader table
      * @param stdclass $cm a row from the course_modules table
      * @param stdclass $course a row from the course table
-     * @return reader the new reader object
+     * @param \context $context the activity context
+     * @return activity the new activity object
      */
     public static function create($instance = null, $cm = null, $course = null, $context = null) {
         return new activity($instance, $cm, $course, $context);

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines all the backup steps that will be used by {@link backup_englishcentral_activity_task}
+ * Defines all the backup steps that will be used by {@see backup_englishcentral_activity_task}
  *
  * @package    mod_englishcentral
  * @category    backup
@@ -165,6 +165,7 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
      * Get userids for all users who have attempted this EnglishCentral activity
      *
      * @uses $DB
+     * @param int $ecid the englishcentral activity instance id
      * @return array ($userids, $params) to extract accountids used in this EnglishCentral activity
      */
     protected function get_accountids_userids($ecid) {

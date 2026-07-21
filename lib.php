@@ -107,7 +107,7 @@ function englishcentral_supports($feature) {
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param object $englishcentral An object from the form in mod_form.php
+ * @param stdClass $formdata An object from the form in mod_form.php
  * @param mod_englishcentral_mod_form $mform
  * @return int The id of the newly inserted englishcentral record
  */
@@ -122,7 +122,7 @@ function englishcentral_add_instance(stdClass $formdata, ?mod_englishcentral_mod
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param object $formdata An object from the form in mod_form.php
+ * @param stdClass $data An object from the form in mod_form.php
  * @param mod_englishcentral_mod_form $mform
  * @return boolean Success/Fail
  */
@@ -134,6 +134,7 @@ function englishcentral_update_instance(stdClass $data, ?mod_englishcentral_mod_
  * update fields in recently submitted form data
  *
  * @param stdClass $data recently submitted formdata
+ * @param mod_englishcentral_mod_form $mform
  * @return boolean Success/Failure
  */
 function englishcentral_process_formdata(stdClass $data, ?mod_englishcentral_mod_form $mform = null) {
@@ -304,7 +305,7 @@ function englishcentral_update_grades($englishcentral, $userid = 0, $nullifnone 
 /**
  * Return grade for given user or all users.
  *
- * @param int $ecid id of englishcentral
+ * @param object $englishcentral instance of englishcentral
  * @param int $userid optional user id, 0 means all users
  * @return array array of grades, false if none
  */
@@ -354,7 +355,7 @@ function englishcentral_get_user_grades($englishcentral, $userid = 0) {
  * Implementation of the function for printing the form elements that control
  * whether the course reset functionality affects the englishcentral.
  *
- * @param $mform form passed by reference
+ * @param object $mform form passed by reference
  */
 function englishcentral_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'englishcentralheader', get_string('modulenameplural', 'englishcentral'));
@@ -374,7 +375,7 @@ function englishcentral_reset_course_form_defaults($course) {
  * Removes all grades from gradebook
  *
  * @param int $courseid
- * @param string optional type
+ * @param string $type optional type
  */
 function englishcentral_reset_gradebook($courseid, $type = '') {
     global $CFG, $DB;
@@ -436,6 +437,10 @@ function englishcentral_reset_userdata($data) {
  * $return->time = the time they did it
  * $return->info = a short text description
  *
+ * @param stdClass $course the current course record
+ * @param stdClass $user the record of the user we are generating report for
+ * @param cm_info $mod course module info
+ * @param stdClass $englishcentral the module instance record
  * @return stdClass|null
  */
 function englishcentral_user_outline($course, $user, $mod, $englishcentral) {
@@ -463,6 +468,9 @@ function englishcentral_user_complete($course, $user, $mod, $englishcentral) {
  * that has occurred in englishcentral activities and print it out.
  * Return true if there was output, or false is there was none.
  *
+ * @param stdClass $course the current course record
+ * @param bool $viewfullnames whether the current user can view full names
+ * @param int $timestart print activity since this time
  * @return boolean
  */
 function englishcentral_print_recent_activity($course, $viewfullnames, $timestart) {
@@ -474,7 +482,7 @@ function englishcentral_print_recent_activity($course, $viewfullnames, $timestar
  *
  * This callback function is supposed to populate the passed array with
  * custom activity records. These records are then rendered into HTML via
- * {@link englishcentral_print_recent_mod_activity()}.
+ * {@see englishcentral_print_recent_mod_activity()}.
  *
  * @param array $activities sequentially indexed array of objects with the 'cmid' property
  * @param int $index the index in the $activities to use for the next record
@@ -532,6 +540,7 @@ function englishcentral_get_extra_capabilities() {
  * as reference.
  *
  * @param int $ecid ID of an instance of this module
+ * @param int $scaleid ID of the scale
  * @return bool true if the scale is used by the given englishcentral instance
  */
 function englishcentral_scale_used($ecid, $scaleid) {
@@ -549,7 +558,7 @@ function englishcentral_scale_used($ecid, $scaleid) {
  *
  * This is used to find out if scale used anywhere.
  *
- * @param $scaleid int
+ * @param int $scaleid ID of the scale
  * @return boolean true if the scale is used by any englishcentral instance
  */
 function englishcentral_scale_used_anywhere($scaleid) {
@@ -568,7 +577,7 @@ function englishcentral_scale_used_anywhere($scaleid) {
  * Returns the lists of all browsable file areas within the given module context
  *
  * The file area 'intro' for the activity introduction field is added automatically
- * by {@link file_browser::get_file_info_context_module()}
+ * by {@see file_browser::get_file_info_context_module()}
  *
  * @param stdClass $course
  * @param stdClass $cm
@@ -638,7 +647,7 @@ function englishcentral_pluginfile($course, $cm, $context, $filearea, array $arg
  * @param stdClass $module
  * @param cm_info $cm
  */
-function englishcentral_extend_navigation(navigation_node $navref, stdclass $course, stdclass $module, cm_info $cm) {
+function englishcentral_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
 }
 
 /**
@@ -647,8 +656,8 @@ function englishcentral_extend_navigation(navigation_node $navref, stdclass $cou
  * This function is called when the context for the page is a englishcentral module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
- * @param settings_navigation $settingsnav {@link settings_navigation}
- * @param navigation_node $englishcentralnode {@link navigation_node}
+ * @param settings_navigation $settingsnav the settings navigation object
+ * @param navigation_node $englishcentralnode the node to add module settings to
  */
 function englishcentral_extend_settings_navigation(settings_navigation $settingsnav, ?navigation_node $englishcentralnode = null) {
 }

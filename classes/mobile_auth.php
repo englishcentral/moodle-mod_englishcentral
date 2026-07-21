@@ -86,7 +86,7 @@ class mobile_auth {
      * Check if provided user_id and token are valid for authenticating the user
      *
      * @param string $userid
-     * @param string $token
+     * @param string $secret
      *
      * @return bool True if token and user_id is valid
      * @throws \dml_exception
