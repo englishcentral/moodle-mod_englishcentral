@@ -56,84 +56,97 @@ class attempts extends basereport {
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB, $CFG, $OUTPUT;
-
         switch ($field) {
             case 'username':
-                $user = $this->fetch_cache('user', $record->userid);
-                $ret = fullname($user);
-                if ($withlinks) {
-                        $link = new \moodle_url(
-                            constants::M_URL . '/reports.php',
-                            ['format' => $this->formdata->format, 'report' => 'userattempts',
-                            'id' => $this->cm->id,
-                            'userid' => $record->userid,
-                            'dayslimit' => $this->formdata->dayslimit]
-                        );
-                        $ret = \html_writer::link($link, $ret);
-                }
-                break;
+                return $this->format_username($record, $withlinks);
 
             case 'firstname':
             case 'lastname':
-                $user = $this->fetch_cache('user', $record->userid);
-                if ($withlinks) {
-                    $link = new \moodle_url(
-                        constants::M_URL . '/reports.php',
-                        [
-                            'format' => $this->formdata->format,
-                            'report' => 'userattempts',
-                            'id' => $this->cm->id,
-                            'userid' => $record->userid,
-                            'dayslimit' => $this->formdata->dayslimit,
-                        ]
-                    );
-                    $ret = \html_writer::link($link, $user->{$field});
-                } else {
-                    $ret = $user->{$field};
-                }
-                break;
+                return $this->format_name_field($field, $record, $withlinks);
 
             // Not necessary here . Since Watch = the same details.
             case 'attempts':
-                    $ret = $record->attemptcount;
-                break;
+                return $record->attemptcount;
 
             case 'firstattempt':
-                $ret = date("Y-m-d H:i:s", $record->firstattempt);
-                break;
+                return date("Y-m-d H:i:s", $record->firstattempt);
 
             case 'learn':
             case 'speak':
             case 'watch':
-                $goalvalue = $this->goals[$field];
-                $ret = $record->{$field}  . '/' . $goalvalue;
-                break;
+                return $record->{$field} . '/' . $this->goals[$field];
 
             case 'total_p':
-                $ret = $record->total_p . "% (" . $record->total . ")";
-                break;
+                return $record->total_p . "% (" . $record->total . ")";
 
             case 'chat':
-                if (
-                    get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->chat) > 0
-                ) {
-                    $goalvalue = $this->goals[$field];
-                    $ret = $record->chat . '/' . $goalvalue;
-                } else {
-                    $ret = '-';
-                }
-                break;
+                return $this->format_chat_field($record);
 
             default:
-                if (property_exists($record, $field)) {
-                    $ret = $record->{$field};
-                } else {
-                    $ret = '';
-                }
+                return property_exists($record, $field) ? $record->{$field} : '';
+        }
+    }
+
+    /**
+     * Format the username field, optionally linked to that user's individual report.
+     *
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_username($record, $withlinks) {
+        $user = $this->fetch_cache('user', $record->userid);
+        $ret = fullname($user);
+        if ($withlinks) {
+            $link = new \moodle_url(
+                constants::M_URL . '/reports.php',
+                ['format' => $this->formdata->format, 'report' => 'userattempts',
+                'id' => $this->cm->id,
+                'userid' => $record->userid,
+                'dayslimit' => $this->formdata->dayslimit]
+            );
+            $ret = \html_writer::link($link, $ret);
         }
         return $ret;
+    }
+
+    /**
+     * Format the firstname/lastname field, optionally linked to that user's individual report.
+     *
+     * @param string $field The field name (firstname or lastname).
+     * @param \stdClass $record The data record.
+     * @param bool $withlinks Whether to include links in the output.
+     * @return string The formatted field value.
+     */
+    private function format_name_field($field, $record, $withlinks) {
+        $user = $this->fetch_cache('user', $record->userid);
+        if (!$withlinks) {
+            return $user->{$field};
+        }
+        $link = new \moodle_url(
+            constants::M_URL . '/reports.php',
+            [
+                'format' => $this->formdata->format,
+                'report' => 'userattempts',
+                'id' => $this->cm->id,
+                'userid' => $record->userid,
+                'dayslimit' => $this->formdata->dayslimit,
+            ]
+        );
+        return \html_writer::link($link, $user->{$field});
+    }
+
+    /**
+     * Format the chat field, taking chat mode availability into account.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_chat_field($record) {
+        if (!get_config(constants::M_COMPONENT, 'chatmode') && intval($record->chat) <= 0) {
+            return '-';
+        }
+        return $record->chat . '/' . $this->goals['chat'];
     }
 
     /**
@@ -157,10 +170,9 @@ class attempts extends basereport {
      * @param \renderer_base $renderer The output renderer.
      * @param bool $showdatasource Whether to show the data source table.
      * @return string The rendered chart HTML.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
-        global $CFG;
-
         $records = $this->rawdata;
         // Build the series data.
         $watchseries = [];
@@ -222,7 +234,7 @@ class attempts extends basereport {
      * @return bool True on success.
      */
     public function process_raw_data($formdata) {
-        global $DB, $USER;
+        global $DB;
 
         // Save form data for later.
         $this->formdata = $formdata;
@@ -232,8 +244,7 @@ class attempts extends basereport {
         // Groups stuff.
         $moduleinstance = $DB->get_record(constants::M_TABLE, ['id' => $formdata->ecid]);
         $course = $DB->get_record('course', ['id' => $moduleinstance->course], '*', MUST_EXIST);
-        $cm = get_coursemodule_from_instance(constants::M_TABLE, $moduleinstance->id, $course->id, false, MUST_EXIST);
-        $context = empty($cm) ? \context_course::instance($course->id) : \context_module::instance($cm->id);
+        get_coursemodule_from_instance(constants::M_TABLE, $moduleinstance->id, $course->id, false, MUST_EXIST);
 
         // Initialize study goals and save them for use later in when displaying data.
         $goals = ['watch' => 0, 'learn' => 0, 'speak' => 0, 'chat' => 0, 'total' => 0];

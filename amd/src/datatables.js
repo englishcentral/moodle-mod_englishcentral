@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-define(['jquery', 'core/log', 'require'], function ($, log, require) {
+define(['jquery', 'core/log', 'require'], function($, log, require) {
     "use strict"; // jshint ;_;
 
     /*
@@ -9,9 +8,9 @@ define(['jquery', 'core/log', 'require'], function ($, log, require) {
     log.debug('Poodll EnglishCentral Teacher Datatables helper: initialising');
 
     return {
-        //pass in config, amd set up table
-        init: function (props) {
-            //pick up opts from html
+        // Pass in config, amd set up table.
+        init: function(props) {
+            // Pick up opts from html.
             var that = this;
             // Load the locally bundled DataTables library at runtime. It is loaded
             // via requirejs (rather than as a static AMD dependency) so we can build
@@ -19,10 +18,10 @@ define(['jquery', 'core/log', 'require'], function ($, log, require) {
             // path. Because the library registers itself with define(['jquery'], ...),
             // requirejs binds it to Moodle's jQuery instance, so $().DataTable() works.
             var dturl = M.cfg.wwwroot + '/mod/englishcentral/thirdparty/datatables/jquery.dataTables.min.js';
-            require([dturl], function () {
+            require([dturl], function() {
                 var thetable = $('#' + props.tableid);
                 that.dt = thetable.DataTable(props.tableprops);
             });
         }
-    };//end of return value
+    }; // End of return value.
 });

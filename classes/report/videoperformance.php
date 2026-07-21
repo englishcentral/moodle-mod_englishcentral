@@ -54,64 +54,77 @@ class videoperformance extends basereport {
      * @return string The formatted field value.
      */
     public function fetch_formatted_field($field, $record, $withlinks) {
-        global $DB, $CFG, $OUTPUT;
-
         switch ($field) {
             case 'videoid':
-                $ret = $record->videoid;
-                break;
+                return $record->videoid;
 
             case 'videoname':
-                $ret = $record->videoname;
-                if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
-                    $details = json_decode($record->detailsjson);
-                    if (isset($details->thumbnailURL)) {
-                        $ret .= '<br/>' . \html_writer::img($details->thumbnailURL, '$record->videoname');
-                    }
-                }
-                break;
+                return $this->format_videoname_field($record);
 
             case 'difficulty':
-                $ret = '-';
-                if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
-                    $details = json_decode($record->detailsjson);
-                    if (isset($details->difficulty)) {
-                        $ret = $details->difficulty;
-                    }
-                }
-                break;
+                return $this->format_difficulty_field($record);
 
             case 'totalwatches':
-                $ret = $record->totalwatches;
-                break;
+                return $record->totalwatches;
 
             case 'averagelearn':
-                $ret = $record->averagelearn;
-                break;
+                return $record->averagelearn;
 
             case 'averagespeak':
-                    $ret = $record->averagespeak;
-                break;
+                return $record->averagespeak;
 
             case 'averagechat':
-                if (
-                    get_config(constants::M_COMPONENT, 'chatmode') ||
-                    intval($record->averagechat) > 0
-                ) {
-                    $ret = $record->averagechat;
-                } else {
-                    $ret = '-';
-                }
-                break;
+                return $this->format_averagechat_field($record);
 
             default:
-                if (property_exists($record, $field)) {
-                    $ret = $record->{$field};
-                } else {
-                    $ret = '';
-                }
+                return property_exists($record, $field) ? $record->{$field} : '';
+        }
+    }
+
+    /**
+     * Format the videoname field, appending a thumbnail if available.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_videoname_field($record) {
+        $ret = $record->videoname;
+        if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
+            $details = json_decode($record->detailsjson);
+            if (isset($details->thumbnailURL)) {
+                $ret .= '<br/>' . \html_writer::img($details->thumbnailURL, '$record->videoname');
+            }
         }
         return $ret;
+    }
+
+    /**
+     * Format the difficulty field, extracted from the video's cached details JSON.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_difficulty_field($record) {
+        if (!empty($record->detailsjson) && utils::is_json($record->detailsjson)) {
+            $details = json_decode($record->detailsjson);
+            if (isset($details->difficulty)) {
+                return $details->difficulty;
+            }
+        }
+        return '-';
+    }
+
+    /**
+     * Format the averagechat field, taking chat mode availability into account.
+     *
+     * @param \stdClass $record The data record.
+     * @return string The formatted field value.
+     */
+    private function format_averagechat_field($record) {
+        if (!get_config(constants::M_COMPONENT, 'chatmode') && intval($record->averagechat) <= 0) {
+            return '-';
+        }
+        return $record->averagechat;
     }
 
     /**
@@ -136,9 +149,9 @@ class videoperformance extends basereport {
      * @param \renderer_base $renderer The output renderer.
      * @param bool $showdatasource Whether to show the data source table.
      * @return string The rendered chart HTML.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function fetch_chart($renderer, $showdatasource = true) {
-        global $CFG;
         $records = $this->rawdata;
 
         // Build the series data.
@@ -165,7 +178,7 @@ class videoperformance extends basereport {
      * @return bool True on success.
      */
     public function process_raw_data($formdata) {
-        global $DB, $USER;
+        global $DB;
 
         // Save form data for later.
         $this->formdata = $formdata;

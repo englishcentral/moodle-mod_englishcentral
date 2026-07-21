@@ -216,7 +216,6 @@ switch ($format) {
         $reportrows = $report->fetch_formatted_rows(false);
         $reportrenderer->render_report_csv(
             $reportheading,
-            $report->fetch_name(),
             $report->fetch_head(),
             $reportrows,
             $report->fetch_fields()

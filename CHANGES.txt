@@ -1,6 +1,11 @@
 ========================================
 Change log for mod_englishcentral
 ========================================
+2026-07-21 (50)
+- Prepared plugin for Moodle Marketplace submission
+- Coding-standards (phpcs) cleanup: file headers, docblocks, comment style, naming conventions
+- Removed Poodll dependency
+
 2025-10-05 (48)
 - Improvements for new activity chooser (Moodle 5.1)
 - Chat on by default in settings

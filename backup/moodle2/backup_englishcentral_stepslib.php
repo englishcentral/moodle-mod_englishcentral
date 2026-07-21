@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines all the backup steps that will be used by {@link backup_englishcentral_activity_task}
+ * Defines all the backup steps that will be used by {@see backup_englishcentral_activity_task}
  *
  * @package    mod_englishcentral
  * @category    backup
@@ -26,6 +26,8 @@
 /**
  * Defines the complete webquest structure for backup, with file and id annotations
  *
+ * @SuppressWarnings(PHPMD.LongClassName) Name follows Moodle's mandatory
+ *   backup_{component}_activity_structure_step convention.
  */
 class backup_englishcentral_activity_structure_step extends backup_activity_structure_step {
     /**
@@ -34,13 +36,7 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
      * @return backup_nested_element
      */
     protected function define_structure() {
-
-        // We may need the EC partnerid, if we are backing up userinfo.
-        static $partnerid = null;
-
-        // Cache the $userinfo flag and $siteadmin flag.
         $userinfo = $this->get_setting_value('userinfo');
-        $siteadmin = has_capability('moodle/site:config', context_system::instance());
 
         // XML nodes declaration - non-user data.
 
@@ -53,41 +49,10 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
         $fieldnames = $this->get_fieldnames('englishcentral_videos', $fieldnames);
         $video = new backup_nested_element('video', ['id'], $fieldnames);
 
-        // XML nodes declaration - user data.
-
-        if ($userinfo) {
-            $accountids = new backup_nested_element('accountids');
-            $fieldnames = ['id']; // Excluded fields.
-            $fieldnames = $this->get_fieldnames('englishcentral_accountids', $fieldnames);
-            $fieldnames[] = 'partnerid'; // Additional field.
-            $accountid = new backup_nested_element('accountid', ['id'], $fieldnames);
-
-            $attempts = new backup_nested_element('attempts');
-            $fieldnames = ['id', 'ecid']; // Excluded fields.
-            $fieldnames = $this->get_fieldnames('englishcentral_attempts', $fieldnames);
-            $attempt = new backup_nested_element('attempt', ['id'], $fieldnames);
-
-            $phonemes = new backup_nested_element('phonemes');
-            $fieldnames = ['id', 'ecid']; // Excluded fields (keep attemptid).
-            $fieldnames = $this->get_fieldnames('englishcentral_phonemes', $fieldnames);
-            $phoneme = new backup_nested_element('phoneme', ['id'], $fieldnames);
-        }
-
         // Build the tree in the order needed for restore.
 
         $activity->add_child($videos);
         $videos->add_child($video);
-
-        if ($userinfo) {
-            $activity->add_child($accountids);
-            $accountids->add_child($accountid);
-
-            $activity->add_child($attempts);
-            $attempts->add_child($attempt);
-
-            $activity->add_child($phonemes);
-            $phonemes->add_child($phoneme);
-        }
 
         // Data sources.
 
@@ -95,45 +60,7 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
         $video->set_source_table('englishcentral_videos', ['ecid' => backup::VAR_PARENTID]);
 
         if ($userinfo) {
-            // Get partnerid (first time only).
-            if ($partnerid === null) {
-                if ($siteadmin) {
-                    $partnerid = get_config('mod_englishcentral', 'partnerid');
-                }
-                if ($partnerid && is_numeric($partnerid)) {
-                    $partnerid = intval($partnerid);
-                } else {
-                    $partnerid = 0;
-                }
-            }
-
-            // Accountids (include partnerid in each record).
-            if ($partnerid) {
-                [$sql, $params] = $this->get_accountids_userids($this->get_setting_value(backup::VAR_ACTIVITYID));
-                $sql = "SELECT *, $partnerid AS partnerid " .
-                       'FROM {englishcentral_accountids} ' .
-                       "WHERE accountid > 0 AND userid $sql";
-                $accountid->set_source_sql($sql, $params);
-            }
-
-            // Attempts.
-            $params = ['ecid' => backup::VAR_PARENTID];
-            $attempt->set_source_table('englishcentral_attempts', $params);
-
-            // Phonemes.
-            $params = ['ecid' => backup::VAR_PARENTID];
-            $phoneme->set_source_table('englishcentral_phonemes', $params);
-            // Note that a phoneme should probably be a child of an attempt
-            // but we put it as a child of an EC activity for legacy reasons
-            // I.e. that's how things were done in earlier versions of this module.
-        }
-
-        // Id annotations (foreign keys on non-parent tables).
-
-        if ($userinfo) {
-            $accountid->annotate_ids('user', 'userid');
-            $attempt->annotate_ids('user', 'userid');
-            $phoneme->annotate_ids('user', 'userid');
+            $this->define_user_data_structure($activity);
         }
 
         // File annotations.
@@ -143,6 +70,95 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
         // Return the root element, wrapped in a standard activity structure.
 
         return $this->prepare_activity_structure($activity);
+    }
+
+    /**
+     * Declares, wires up, sources and annotates the user-data elements
+     * (accountids, attempts, phonemes) of the englishcentral activity,
+     * as children of the given activity element.
+     *
+     * @param backup_nested_element $activity The root activity element.
+     */
+    protected function define_user_data_structure($activity) {
+        // XML nodes declaration - user data.
+
+        $accountids = new backup_nested_element('accountids');
+        $fieldnames = ['id']; // Excluded fields.
+        $fieldnames = $this->get_fieldnames('englishcentral_accountids', $fieldnames);
+        $fieldnames[] = 'partnerid'; // Additional field.
+        $accountid = new backup_nested_element('accountid', ['id'], $fieldnames);
+
+        $attempts = new backup_nested_element('attempts');
+        $fieldnames = ['id', 'ecid']; // Excluded fields.
+        $fieldnames = $this->get_fieldnames('englishcentral_attempts', $fieldnames);
+        $attempt = new backup_nested_element('attempt', ['id'], $fieldnames);
+
+        $phonemes = new backup_nested_element('phonemes');
+        $fieldnames = ['id', 'ecid']; // Excluded fields (keep attemptid).
+        $fieldnames = $this->get_fieldnames('englishcentral_phonemes', $fieldnames);
+        $phoneme = new backup_nested_element('phoneme', ['id'], $fieldnames);
+
+        // Build the tree in the order needed for restore.
+
+        $activity->add_child($accountids);
+        $accountids->add_child($accountid);
+
+        $activity->add_child($attempts);
+        $attempts->add_child($attempt);
+
+        $activity->add_child($phonemes);
+        $phonemes->add_child($phoneme);
+
+        // Data sources.
+
+        // Accountids (include partnerid in each record).
+        $partnerid = $this->get_backup_site_partnerid();
+        if ($partnerid) {
+            [$sql, $params] = $this->get_accountids_userids($this->get_setting_value(backup::VAR_ACTIVITYID));
+            $sql = "SELECT *, $partnerid AS partnerid " .
+                   'FROM {englishcentral_accountids} ' .
+                   "WHERE accountid > 0 AND userid $sql";
+            $accountid->set_source_sql($sql, $params);
+        }
+
+        // Attempts.
+        $params = ['ecid' => backup::VAR_PARENTID];
+        $attempt->set_source_table('englishcentral_attempts', $params);
+
+        // Phonemes.
+        $params = ['ecid' => backup::VAR_PARENTID];
+        $phoneme->set_source_table('englishcentral_phonemes', $params);
+        // Note that a phoneme should probably be a child of an attempt
+        // but we put it as a child of an EC activity for legacy reasons
+        // I.e. that's how things were done in earlier versions of this module.
+
+        // Id annotations (foreign keys on non-parent tables).
+
+        $accountid->annotate_ids('user', 'userid');
+        $attempt->annotate_ids('user', 'userid');
+        $phoneme->annotate_ids('user', 'userid');
+    }
+
+    /**
+     * Fetch the partnerID configured on the backup site, caching it for the
+     * lifetime of the backup. Only site admins have access to this setting.
+     *
+     * @return int The partnerID, or 0 if the current user cannot access it.
+     */
+    protected function get_backup_site_partnerid() {
+        static $partnerid = null;
+
+        if ($partnerid === null) {
+            $partnerid = 0;
+            if (has_capability('moodle/site:config', context_system::instance())) {
+                $configvalue = get_config('mod_englishcentral', 'partnerid');
+                if ($configvalue && is_numeric($configvalue)) {
+                    $partnerid = intval($configvalue);
+                }
+            }
+        }
+
+        return $partnerid;
     }
 
     /**
@@ -165,6 +181,7 @@ class backup_englishcentral_activity_structure_step extends backup_activity_stru
      * Get userids for all users who have attempted this EnglishCentral activity
      *
      * @uses $DB
+     * @param int $ecid the englishcentral activity instance id
      * @return array ($userids, $params) to extract accountids used in this EnglishCentral activity
      */
     protected function get_accountids_userids($ecid) {

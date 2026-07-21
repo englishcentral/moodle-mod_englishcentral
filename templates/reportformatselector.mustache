@@ -1,3 +1,34 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_englishcentral/reportformatselector
+
+    Buttons to switch a report between table, chart and combined views.
+
+    Example context (json):
+    {
+        "tableurl": "https://example.com/mod/englishcentral/report.php?format=table",
+        "charturl": "https://example.com/mod/englishcentral/report.php?format=chart",
+        "combiurl": "https://example.com/mod/englishcentral/report.php?format=combi",
+        "istable": true,
+        "ischart": false,
+        "iscombi": false
+    }
+}}
 <div class="btn-group mr-1" role="group" aria-label="Report Format Selector">
     <a href="{{{tableurl}}}" aria-label="{{#str}}table, mod_englishcentral{{/str}}" class="btn btn-secondary {{#istable}}active{{/istable}}"><i class="fa fa-table" aria-hidden="true"></i></a>
     <a href="{{{charturl}}}" aria-label="{{#str}}chart, mod_englishcentral{{/str}}" class="btn btn-secondary {{#ischart}}active{{/ischart}}"><i class="fa fa-bar-chart" aria-hidden="true"></i></a>

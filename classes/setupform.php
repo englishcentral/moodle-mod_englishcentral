@@ -80,8 +80,6 @@ class setupform extends \moodleform {
      * and then calls custom_definition();
      */
     final public function definition() {
-        global $CFG;
-
         $mform = $this->_form;
         $context = $this->_customdata['context'];
         utils::add_mform_elements($mform, $context, true);
@@ -90,63 +88,4 @@ class setupform extends \moodleform {
         $this->add_action_buttons(get_string('cancel'), get_string('savechangesanddisplay'));
     }
 
-    /**
-     * Add a filemanager element for uploading media.
-     *
-     * @param string $name The base element name.
-     * @param int $count The count of the element to add, or -1 for none.
-     * @param string|null $label The element label, null means default.
-     * @param bool $required Whether the element is required.
-     * @return void
-     */
-    final protected function add_media_upload($name, $count = -1, $label = null, $required = false) {
-        if ($count > -1) {
-            $name = $name . $count;
-        }
-
-        $this->_form->addElement(
-            'filemanager',
-            $name,
-            $label,
-            null,
-            $this->filemanageroptions
-        );
-    }
-
-    /**
-     * Add a filemanager element for uploading the audio prompt.
-     *
-     * @param string|null $label The element label, null means default.
-     * @param bool $required Whether the element is required.
-     * @return void
-     */
-    final protected function add_media_prompt_upload($label = null, $required = false) {
-        return $this->add_media_upload(constants::AUDIOPROMPT, -1, $label, $required);
-    }
-
-
-    /**
-     * Convenience function: Adds an response editor
-     *
-     * @param int $count The count of the element to add
-     * @param string $label, null means default
-     * @param bool $required
-     * @return void
-     */
-    final protected function add_editorarearesponse($count, $label = null, $required = false) {
-        if ($label === null) {
-            $label = get_string('response', constants::M_COMPONENT);
-        }
-        $this->_form->addElement(
-            'editor',
-            constants::TEXTANSWER . $count . '_editor',
-            $label,
-            ['rows' => '4', 'columns' => '80'],
-            $this->editoroptions
-        );
-        $this->_form->setDefault(constants::TEXTANSWER . $count . '_editor', ['text' => '', 'format' => FORMAT_MOODLE]);
-        if ($required) {
-            $this->_form->addRule(constants::TEXTANSWER . $count . '_editor', get_string('required'), 'required', null, 'client');
-        }
-    }
 }

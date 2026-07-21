@@ -125,7 +125,7 @@ if ($CFG->version < 2022041900) {
 $opts = ['cmid'          => $ec->cm->id,
               'moodlesesskey' => sesskey(),
               'viewajaxurl'   => $ec->get_viewajax_url(false),
-              'videoinfourl'  => $ec->get_videoinfo_url(false),
+              'videoinfourl'  => $ec->get_videoinfo_url(),
               'targetwindow'  => 'EC'];
 $PAGE->requires->js_call_amd("$ec->plugin/view", 'init', [$opts]);
 

@@ -28,13 +28,16 @@
 namespace mod_englishcentral;
 
 /**
- * Authentication class to access EnglishCentral API
- * originally used OAuth, modified to use JWT
- *
+ * Represents a single EnglishCentral activity instance: its availability,
+ * URLs, goals, attempts and progress data.
  *
  * @package    mod_englishcentral
  * @copyright  2018 Gordon Bateson
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods) A facade over the activity
+ *   instance/course/context/config, exposing many small single-purpose
+ *   accessors; splitting it would just relocate the same public surface.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class activity {
     /**
@@ -95,6 +98,11 @@ class activity {
 
     /**
      * construct English Central activity instance
+     *
+     * @param stdclass $instance a row from the englishcentral table
+     * @param stdclass $cm a row from the course_modules table
+     * @param stdclass $course a row from the course table
+     * @param \context $context the activity context
      */
     public function __construct($instance = null, $cm = null, $course = null, $context = null) {
         global $COURSE;
@@ -111,46 +119,58 @@ class activity {
             $this->cm = $cm;
         }
 
-        if ($course) {
-            $this->course = $course;
-        } else {
-            $this->course = $COURSE;
-        }
-
-        if ($context) {
-            $this->context = $context;
-        } else if ($cm) {
-            $this->context = \context_module::instance($cm->id);
-            ;
-        } else if ($course) {
-            $this->context = \context_course::instance($course->id);
-        } else {
-            $this->context = \context_system::instance();
-        }
-
+        $this->course = $course ?: $COURSE;
+        $this->context = $this->resolve_context($context, $cm, $course);
         $this->time = time();
 
-        if (has_capability('mod/englishcentral:manage', $this->context)) {
-            $this->available = true;
-        } else if ($this->activityopen && $this->activityopen > $this->time) {
-            $this->available = false;
-        } else if ($this->activityclose && $this->activityclose < $this->time) {
-            $this->available = false;
-        } else {
-            $this->available = true;
-        }
-
-        if (has_capability('mod/englishcentral:manage', $this->context)) {
-            $this->viewable = true;
-        } else if ($this->videoopen && $this->videoopen > $this->time) {
-            $this->viewable = false;
-        } else if ($this->videoclose && $this->videoclose < $this->time) {
-            $this->viewable = false;
-        } else {
-            $this->viewable = true;
-        }
+        $this->available = $this->compute_time_based_availability($this->activityopen, $this->activityclose);
+        $this->viewable = $this->compute_time_based_availability($this->videoopen, $this->videoclose);
 
         $this->config = get_config($this->plugin);
+    }
+
+    /**
+     * Resolve the activity's context from the given context, course module or course,
+     * falling back to the system context if none of those are available.
+     *
+     * @param \context|null $context The context, if already known.
+     * @param stdclass|null $cm A row from the course_modules table.
+     * @param stdclass|null $course A row from the course table.
+     * @return \context The resolved context.
+     */
+    private function resolve_context($context, $cm, $course) {
+        if ($context) {
+            return $context;
+        }
+        if ($cm) {
+            return \context_module::instance($cm->id);
+        }
+        if ($course) {
+            return \context_course::instance($course->id);
+        }
+        return \context_system::instance();
+    }
+
+    /**
+     * Determine whether the activity is currently available/viewable, given an open
+     * and close timestamp: always true for users who can manage the activity, otherwise
+     * true only between the open and close times (when set).
+     *
+     * @param int|null $opentime The open timestamp, or empty for no open restriction.
+     * @param int|null $closetime The close timestamp, or empty for no close restriction.
+     * @return bool
+     */
+    private function compute_time_based_availability($opentime, $closetime) {
+        if (has_capability('mod/englishcentral:manage', $this->context)) {
+            return true;
+        }
+        if ($opentime && $opentime > $this->time) {
+            return false;
+        }
+        if ($closetime && $closetime < $this->time) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -175,7 +195,8 @@ class activity {
      * @param stdclass $instance a row from the reader table
      * @param stdclass $cm a row from the course_modules table
      * @param stdclass $course a row from the course table
-     * @return reader the new reader object
+     * @param \context $context the activity context
+     * @return activity the new activity object
      */
     public static function create($instance = null, $cm = null, $course = null, $context = null) {
         return new activity($instance, $cm, $course, $context);
@@ -295,32 +316,25 @@ class activity {
     /**
      * Get the EnglishCentral video details URL for the current language.
      *
-     * @param bool|null $escaped Whether to output the URL escaped for HTML.
+     * This always returns a plain external URL string, not a moodle_url, so
+     * (unlike the other *_url() methods) there is no escaped/unescaped form.
+     *
      * @return string The video details URL.
      */
-    public function get_videoinfo_url($escaped = null) {
+    public function get_videoinfo_url() {
         $lang = substr(current_language(), 0, 2);
-        switch ($lang) {
-            case 'en': // English.
-                return 'https://www.englishcentral.com/videodetails';
 
-            case 'ar': // Arabic.
-            case 'es': // Spanish.
-            case 'he': // Hebrew.
-            case 'ja': // Japanese.
-            case 'pt': // Portuguese.
-            case 'ru': // Russian.
-            case 'th': // Thai.
-            case 'tr': // Turkish.
-            case 'vi': // Vietnamese.
-                return "https://$lang.englishcentral.com/videodetails";
-
-            case 'zh': // Chinese.
-                return 'https://www.englishcentralchina.com/videodetails';
-
-            default:
-                return 'https://www.englishcentral.com/videodetails';
+        // Arabic, Spanish, Hebrew, Japanese, Portuguese, Russian, Thai, Turkish, Vietnamese.
+        $localized = ['ar', 'es', 'he', 'ja', 'pt', 'ru', 'th', 'tr', 'vi'];
+        if (in_array($lang, $localized)) {
+            return "https://$lang.englishcentral.com/videodetails";
         }
+
+        if ($lang === 'zh') { // Chinese.
+            return 'https://www.englishcentralchina.com/videodetails';
+        }
+
+        return 'https://www.englishcentral.com/videodetails'; // English, and everything else.
     }
 
     /**
@@ -386,7 +400,6 @@ class activity {
      */
     public function get_accountids($groupid = 0) {
         global $DB;
-        $groupid = 0;
         if ($userids = $this->get_userids($groupid)) {
             [$select, $params] = $DB->get_in_or_equal($userids);
             return $DB->get_records_select_menu('englishcentral_accountids', "userid $select", $params, 'userid, accountid');
@@ -414,7 +427,7 @@ class activity {
                 $select = 'groupid = ?';
                 $params = [$groupid];
             } else {
-                $groups = groups_get_user_groups($course->id);
+                $groups = groups_get_user_groups($this->course->id);
                 if (empty($groups)) {
                     return false;
                 }
@@ -529,7 +542,20 @@ class activity {
      * @return array of $progress data
      */
     public function extract_progress($dialog, $attempt) {
+        $progress = $this->build_initial_progress($dialog);
+        $progress = $this->merge_attempt_progress_ids($progress, $attempt);
+        $progress = $this->apply_dialog_activities($progress, $dialog);
+        return $this->finalize_progress_counts($progress);
+    }
 
+    /**
+     * Build the initial $progress array template for extract_progress(), populated
+     * with the dialog's hash and total points, if present.
+     *
+     * @param object $dialog JSON data returned from EC REST call.
+     * @return array The initial $progress array.
+     */
+    private function build_initial_progress($dialog) {
         // Initialize totals for goals.
         $progress = [
         'dialogID' => $dialog->dialogID,
@@ -570,7 +596,18 @@ class activity {
             $progress['totalpoints']  = $dialog->totalPoints;
         }
 
-        // Populate the $progress array with values earned hitherto.
+        return $progress;
+    }
+
+    /**
+     * Populate the $progress array's *ids fields with values earned in a previous
+     * attempt, so this call's newly-earned ids can be merged in on top.
+     *
+     * @param array $progress The $progress array, as built by build_initial_progress().
+     * @param object $attempt record from "englishcentral_attempts".
+     * @return array The updated $progress array.
+     */
+    private function merge_attempt_progress_ids($progress, $attempt) {
         $names = ['watchlineids', 'learnwordids', 'speaklineids', 'chatquestionids'];
         foreach ($names as $thename) {
             if (isset($attempt->$thename) && $attempt->$thename) {
@@ -578,57 +615,82 @@ class activity {
                 $progress[$thename] = array_fill_keys($progress[$thename], 1);
             }
         }
+        return $progress;
+    }
 
+    /**
+     * Accumulate each of the dialog's activities (watch/learn/speak/chat) into the
+     * $progress array's completion flags and *ids sets.
+     *
+     * @param array $progress The $progress array, as updated by merge_attempt_progress_ids().
+     * @param object $dialog JSON data returned from EC REST call.
+     * @return array The updated $progress array.
+     */
+    private function apply_dialog_activities($progress, $dialog) {
         // Dialog activities should not be empty, but oddly occasionally it is,
         // so we try to fall back gracefully without killing it for students.
-        if (!empty($dialog->activities)) {
-            foreach ($dialog->activities as $activity) {
-                // ActivityType     : watchActivity / speakActivity.
-                // activityID       : 208814
-                // activityTypeID   : (see below)
-                // activityPoints   : 10
-                // activityProgress : 1
-                // completed        : 1
-                // Grade            : A (speakActivity only ?).
+        if (empty($dialog->activities)) {
+            return $progress;
+        }
 
-                // Extract DB fields.
-                switch ($activity->activityTypeID) {
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_WATCH: // Value 9.
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_WATCHCOMPREHENSIONCHOICE: // Value 40.
-                        $progress['watchcomplete'] = (empty($activity->completed) ? 0 : 1);
-                        foreach ($activity->watchedDialogLines as $line) {
-                            $progress['watchlineids'][$line->dialogLineID] = 1;
-                        }
-                        break;
+        foreach ($dialog->activities as $activity) {
+            // ActivityType     : watchActivity / speakActivity.
+            // activityID       : 208814
+            // activityTypeID   : (see below)
+            // activityPoints   : 10
+            // activityProgress : 1
+            // completed        : 1
+            // Grade            : A (speakActivity only ?).
 
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_LEARN: // Value 10.
-                        $progress['learncomplete'] = (empty($activity->completed) ? 0 : 1);
-                        foreach ($activity->learnedDialogLines as $line) {
-                            foreach ($line->learnedWords as $word) {
-                                if ($word->completed) {
-                                    $progress['learnwordids'][$word->wordHeadID] = 1;
-                                }
+            // Extract DB fields.
+            switch ($activity->activityTypeID) {
+                case \mod_englishcentral\auth::ACTIVITYTYPE_WATCH: // Value 9.
+                case \mod_englishcentral\auth::ACTIVITYTYPE_WATCHCOMPREHENSIONCHOICE: // Value 40.
+                    $progress['watchcomplete'] = (empty($activity->completed) ? 0 : 1);
+                    foreach ($activity->watchedDialogLines as $line) {
+                        $progress['watchlineids'][$line->dialogLineID] = 1;
+                    }
+                    break;
+
+                case \mod_englishcentral\auth::ACTIVITYTYPE_LEARN: // Value 10.
+                    $progress['learncomplete'] = (empty($activity->completed) ? 0 : 1);
+                    foreach ($activity->learnedDialogLines as $line) {
+                        foreach ($line->learnedWords as $word) {
+                            if ($word->completed) {
+                                $progress['learnwordids'][$word->wordHeadID] = 1;
                             }
                         }
-                        break;
+                    }
+                    break;
 
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_SPEAK: // Value 11.
-                        $progress['speakcomplete'] = (empty($activity->completed) ? 0 : 1);
-                        foreach ($activity->spokenDialogLines as $line) {
-                            $progress['speaklineids'][$line->dialogLineID] = 1;
-                        }
-                        break;
+                case \mod_englishcentral\auth::ACTIVITYTYPE_SPEAK: // Value 11.
+                    $progress['speakcomplete'] = (empty($activity->completed) ? 0 : 1);
+                    foreach ($activity->spokenDialogLines as $line) {
+                        $progress['speaklineids'][$line->dialogLineID] = 1;
+                    }
+                    break;
 
-                    case \mod_englishcentral\auth::ACTIVITYTYPE_CHAT: // Value 55.
-                        $progress['chatcomplete'] = (empty($activity->completed) ? 0 : 1);
-                        foreach ($activity->submittedQuestionIds as $questionid) {
-                            $progress['chatquestionids'][$questionid] = 1;
-                        }
-                        break;
-                }
+                case \mod_englishcentral\auth::ACTIVITYTYPE_CHAT: // Value 55.
+                    $progress['chatcomplete'] = (empty($activity->completed) ? 0 : 1);
+                    foreach ($activity->submittedQuestionIds as $questionid) {
+                        $progress['chatquestionids'][$questionid] = 1;
+                    }
+                    break;
             }
         }
 
+        return $progress;
+    }
+
+    /**
+     * Finalize the $progress array's counts: derive each *count from the size of its
+     * *ids set, then collapse each *ids set back into a comma-separated string for
+     * storage in the englishcentral_attempts table.
+     *
+     * @param array $progress The $progress array, as updated by apply_dialog_activities().
+     * @return array The finalized $progress array.
+     */
+    private function finalize_progress_counts($progress) {
         $progress['watchcount'] += count($progress['watchlineids']);
         $progress['learncount'] += count($progress['learnwordids']);
         $progress['speakcount'] += count($progress['speaklineids']);
@@ -647,6 +709,7 @@ class activity {
      *
      * @param bool $addvideoid Whether to include the videoid field.
      * @return string The comma-separated field list.
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function get_attempts_fields($addvideoid = true) {
         $fields = 'watchcount,watchcomplete,' .

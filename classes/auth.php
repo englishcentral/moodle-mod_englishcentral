@@ -35,6 +35,11 @@ namespace mod_englishcentral;
  * @package    englishcentral
  * @copyright  2014 Justin Hunt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods) A facade over EC's
+ *   authentication/API surface, exposing many small single-purpose
+ *   accessors and API-call wrappers; splitting it would just relocate
+ *   the same public surface.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class auth {
     // Accepted media types used by EC's API.
@@ -172,16 +177,12 @@ class auth {
         }
 
         // Check if mimichat is enabled via direct EC credentials.
-        if ($partnerid = $ec->config->partnerid) {
-            if ($consumerkey = $ec->config->consumerkey) {
-                if ($consumersecret = $ec->config->consumersecret) {
-                    if ($encryptedsecret = $ec->config->encryptedsecret) {
-                        // Verify if mimichat is enabled for this partnerid.
-                        $value = '1';
-                        $this->mimichat = ($value === '1');
-                    }
-                }
-            }
+        if (
+            $ec->config->partnerid && $ec->config->consumerkey
+            && $ec->config->consumersecret && $ec->config->encryptedsecret
+        ) {
+            // Verify if mimichat is enabled for this partnerid.
+            $this->mimichat = true;
         }
 
         return false;
@@ -573,6 +574,7 @@ class auth {
      * @param bool $post whether to perform a POST request
      * @param array $fields the request fields
      * @return mixed the API response
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
     public function docall_curl($url, $header, $jsondecode = false, $post = null, $fields = null) {
         global $CFG;

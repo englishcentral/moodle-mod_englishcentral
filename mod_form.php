@@ -80,8 +80,6 @@ class mod_englishcentral_mod_form extends moodleform_mod {
      * Defines forms elements
      */
     public function definition() {
-        global $PAGE;
-
         $mform = $this->_form;
 
         // Add this activity-specific form fields.
@@ -106,8 +104,8 @@ class mod_englishcentral_mod_form extends moodleform_mod {
      * return a field value from the original record
      * this function is useful to see if a value has changed
      *
-     * @param string the $field name
-     * @param mixed the $default value (optional, default=null)
+     * @param string $field The field name
+     * @param mixed $default The default value (optional, default=null)
      * @return mixed the field value if it exists, $default otherwise
      */
     public function get_originalvalue($field, $default = null) {
