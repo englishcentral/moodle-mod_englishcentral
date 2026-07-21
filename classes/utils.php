@@ -40,9 +40,11 @@ class utils {
      * @param \context $context The module context.
      * @param bool $setuptab Whether this is being added to the setup tab form.
      * @return void
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag) Mirrors the two form contexts
+     *   (activity settings vs. the developer setup tab) this shared builder supports.
      */
     public static function add_mform_elements($mform, $instance, $cm, $course, $context, $setuptab = false) {
-        global $CFG, $PAGE;
+        global $PAGE;
 
         $plugin = 'mod_englishcentral';
         $config = get_config($plugin);
@@ -56,16 +58,30 @@ class utils {
             $mform->setType('n', PARAM_INT);
         }
 
-        $dateoptions = ['optional' => true];
-        $textoptions = ['size' => \mod_englishcentral_mod_form::TEXT_NUM_SIZE];
-
         $PAGE->requires->js_call_amd("$plugin/form", 'init');
 
-        // -------------------------------------------------------------------------------
+        self::add_general_section($mform, $context, $plugin, $setuptab);
+        self::add_timing_section($mform, $config, $plugin);
+        self::add_goals_section($mform, $ec, $auth, $plugin);
+        self::add_display_section($mform, $config, $plugin);
+    }
+
+    /**
+     * Add the "General" section: activity name and, outside the setup tab, the
+     * standard intro/showdescription fields.
+     *
+     * @param \MoodleQuickForm $mform The form to add elements to.
+     * @param \context $context The module context.
+     * @param string $plugin The plugin component name.
+     * @param bool $setuptab Whether this is being added to the setup tab form.
+     * @return void
+     */
+    protected static function add_general_section($mform, $context, $plugin, $setuptab) {
+        global $CFG;
+
         $name = 'general';
         $label = get_string($name, 'form');
         $mform->addElement('header', $name, $label);
-        // -------------------------------------------------------------------------------
 
         // Adding the standard "name" field.
         $name = 'name';
@@ -95,45 +111,47 @@ class utils {
             $mform->addElement('advcheckbox', 'showdescription', get_string('showdescription'));
             $mform->addHelpButton('showdescription', 'showdescription');
         }
+    }
 
-        // -----------------------------------------------------------------------------
+    /**
+     * Add the "Timing" section: activity/video open and close date selectors.
+     *
+     * @param \MoodleQuickForm $mform The form to add elements to.
+     * @param object $config The plugin config object.
+     * @param string $plugin The plugin component name.
+     * @return void
+     */
+    protected static function add_timing_section($mform, $config, $plugin) {
         $name = 'timing';
         $label = get_string($name, 'form');
         $mform->addElement('header', $name, $label);
         $mform->setExpanded($name, true);
-        // -----------------------------------------------------------------------------
 
-        $name = 'activityopen';
-        $label = get_string($name, $plugin);
-        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
-        $mform->addHelpButton($name, $name, $plugin);
-        self::set_type_default_advanced($mform, $config, $name, PARAM_INT);
+        $dateoptions = ['optional' => true];
+        foreach (['activityopen', 'videoopen', 'videoclose', 'activityclose'] as $name) {
+            $label = get_string($name, $plugin);
+            $mform->addElement('date_time_selector', $name, $label, $dateoptions);
+            $mform->addHelpButton($name, $name, $plugin);
+            self::set_type_default_advanced($mform, $config, $name, PARAM_INT);
+        }
+    }
 
-        $name = 'videoopen';
-        $label = get_string($name, $plugin);
-        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
-        $mform->addHelpButton($name, $name, $plugin);
-        self::set_type_default_advanced($mform, $config, $name, PARAM_INT);
-
-        $name = 'videoclose';
-        $label = get_string($name, $plugin);
-        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
-        $mform->addHelpButton($name, $name, $plugin);
-        self::set_type_default_advanced($mform, $config, $name, PARAM_INT);
-
-        $name = 'activityclose';
-        $label = get_string($name, $plugin);
-        $mform->addElement('date_time_selector', $name, $label, $dateoptions);
-        $mform->addHelpButton($name, $name, $plugin);
-        self::set_type_default_advanced($mform, $config, $name, PARAM_INT);
-
-        // -------------------------------------------------------------------------------
+    /**
+     * Add the "Goals" section: watch/learn/speak/chat/study goal fields.
+     *
+     * @param \MoodleQuickForm $mform The form to add elements to.
+     * @param \mod_englishcentral\activity $ec The englishcentral activity.
+     * @param \mod_englishcentral\auth $auth The englishcentral auth helper.
+     * @param string $plugin The plugin component name.
+     * @return void
+     */
+    protected static function add_goals_section($mform, $ec, $auth, $plugin) {
         $name = 'goals';
         $label = get_string($name, $plugin);
         $mform->addElement('header', $name, $label);
         $mform->setExpanded($name, true);
-        // -------------------------------------------------------------------------------
 
+        $textoptions = ['size' => \mod_englishcentral_mod_form::TEXT_NUM_SIZE];
         $goals = [
             'watchgoal' => 5,
             'learngoal' => 10,
@@ -157,13 +175,21 @@ class utils {
             $mform->setDefault($goal, $default);
             $mform->addHelpButton($goal . 'group', $goal, $plugin);
         }
+    }
 
-        // -----------------------------------------------------------------------------
+    /**
+     * Add the "Display" section: duration/level/details visibility settings.
+     *
+     * @param \MoodleQuickForm $mform The form to add elements to.
+     * @param object $config The plugin config object.
+     * @param string $plugin The plugin component name.
+     * @return void
+     */
+    protected static function add_display_section($mform, $config, $plugin) {
         $name = 'display';
         $label = get_string($name, 'form');
         $mform->addElement('header', $name, $label);
         $mform->setExpanded($name, true);
-        // -----------------------------------------------------------------------------
 
         $name = 'showduration';
         $label = get_string($name, $plugin);

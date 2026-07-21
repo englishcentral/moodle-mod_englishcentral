@@ -31,6 +31,9 @@ use mod_englishcentral\utils;
 
 /**
  * Renderer for englishcentral reports.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods) A renderer class exposing one small,
+ *   focused public method per report widget; that's the standard Moodle renderer shape.
  */
 class report_renderer extends \plugin_renderer_base {
     /**
@@ -125,7 +128,6 @@ class report_renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_empty_section_html() {
-        global $CFG;
         return $this->output->heading(get_string('nodataavailable', constants::M_COMPONENT), 3);
     }
 
@@ -179,13 +181,14 @@ class report_renderer extends \plugin_renderer_base {
      * Output a report as a downloadable CSV file and terminate the script.
      *
      * @param string $sectiontitle The report section title, used as the file name.
-     * @param string $report The report identifier.
      * @param array $head The report heading fields.
      * @param array $rows The formatted report rows.
      * @param array $fields The list of fields to output for each row.
      * @return void
+     * @SuppressWarnings(PHPMD.ExitExpression) A CSV download must terminate the script
+     *   before any further page output is sent.
      */
-    public function render_report_csv($sectiontitle, $report, $head, $rows, $fields) {
+    public function render_report_csv($sectiontitle, $head, $rows, $fields) {
 
         // Use the sectiontitle as the file name. Clean it and change any non-filename characters to '_'.
         $name = clean_param($sectiontitle, PARAM_FILE);
@@ -225,7 +228,6 @@ class report_renderer extends \plugin_renderer_base {
      * @return string The rendered HTML.
      */
     public function render_report_tabular($report, $head, $rows, $fields) {
-        global $CFG;
         if (empty($rows)) {
             return $this->render_empty_section_html();
         }
@@ -247,7 +249,6 @@ class report_renderer extends \plugin_renderer_base {
         foreach ($rows as $row) {
             $htr = new \html_table_row();
             // Set up descrption cell.
-            $cells = [];
             foreach ($fields as $field) {
                 $cell = new \html_table_cell($row->{$field});
                 $cell->attributes = ['class' => constants::M_CLASS . '_cell_' . $report . '_' . $field];

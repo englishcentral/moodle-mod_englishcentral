@@ -192,7 +192,7 @@ function xmldb_englishcentral_check_structure(
     }
 
     // Parse the the structure of the XML.
-    $loaded = $file->loadXMLStructure();
+    $file->loadXMLStructure();
     $structure = $file->getStructure();
 
     // Check that the XML file could be loaded.
@@ -247,8 +247,7 @@ function xmldb_englishcentral_check_structure(
             $table = new xmldb_table($tablename);
         }
 
-        // Get current (uncached) info about columns and indexes in database.
-        $columns = $DB->get_columns($tablename, false);
+        // Get current (uncached) info about indexes in database.
         $indexes = $DB->get_indexes($tablename, false);
 
         // If we try to change any fields that are indexed, the $dbman will abort with an error.

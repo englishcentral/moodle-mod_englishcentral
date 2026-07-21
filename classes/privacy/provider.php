@@ -247,8 +247,6 @@ class provider implements
 
         $instanceid = $cm->instance;
 
-        $attempts = $DB->get_records('englishcentral_attempts', ['ecid' => $instanceid], '', 'id');
-
         // Now delete all attempts.
         $DB->delete_records('englishcentral_attempts', ['ecid' => $instanceid]);
     }
@@ -280,8 +278,6 @@ class provider implements
                 if (!$entries) {
                     continue;
                 }
-
-                [$insql, $inparams] = $DB->get_in_or_equal(array_keys($entries), SQL_PARAMS_NAMED);
 
                 // Now delete all user related entries.
                 $DB->delete_records('englishcentral_attempts', ['ecid' => $instanceid, 'userid' => $userid]);

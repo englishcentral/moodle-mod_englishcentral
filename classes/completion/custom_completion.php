@@ -38,7 +38,7 @@ class custom_completion extends activity_custom_completion {
      * @return int The completion state.
      */
     public function get_state(string $rule): int {
-        global $CFG, $DB;
+        global $DB;
 
         $this->validate_rule($rule);
 
@@ -50,54 +50,17 @@ class custom_completion extends activity_custom_completion {
 
         $course = $DB->get_record('course', ['id' => $this->cm->course], '*', MUST_EXIST);
         $ec = \mod_englishcentral\activity::create($ec, $this->cm, $course);
+        $grade = \englishcentral_get_completion_grade($course, $this->cm, $userid, $ec);
 
-        // Get grade, if necessary.
-        $grade = false;
-        if ($ec->completionmingrade > 0.0 || $ec->completionpass) {
-            require_once($CFG->dirroot . '/lib/gradelib.php');
-            $params = ['courseid'     => $course->id,
-                'itemtype'     => 'mod',
-                'itemmodule'   => 'englishcentral',
-                'iteminstance' => $this->cm->instance];
-            if ($gradeitem = \grade_item::fetch($params)) {
-                $grades = \grade_grade::fetch_users_grades($gradeitem, [$userid], false);
-                if (isset($grades[$userid])) {
-                    $grade = $grades[$userid];
-                }
-                unset($grades);
-            }
-            unset($gradeitem);
+        // Decimal (e.g. completionmingrade) fields are returned by MySQL as a string, and since
+        // empty('0.0') returns false (!!), we must use numeric comparison. A zero/unset mingrade
+        // threshold means the rule is trivially satisfied.
+        if ($rule === 'completionmingrade' && (empty($ec->completionmingrade) || floatval($ec->completionmingrade) == 0.0)) {
+            $state = true;
+        } else {
+            $state = \englishcentral_evaluate_completion_condition($rule, $ec, $grade);
         }
 
-        switch ($rule) {
-            case 'completionmingrade':
-                // Decimal (e.g. completionmingrade) fields are returned by MySQL as a string.
-                // And since empty('0.0') returns false (!!), so we must use numeric comparison.
-                if (empty($ec->completionmingrade) || floatval($ec->completionmingrade) == 0.0) {
-                    $state = true;
-                    break;
-                }
-
-                $state = ($grade && $grade->finalgrade >= $ec->completionmingrade);
-                break;
-            case 'completionpass':
-                $state = ($grade && $grade->is_passed());
-                break;
-            case 'completiongoals':
-                // If goals have been set up, calculate total percent.
-                $progress = $ec->get_progress();
-
-                if ($goals = ($ec->watchgoal + $ec->learngoal + $ec->speakgoal)) {
-                    $state = 0;
-                    $state += max(0, min($progress->watch, $ec->watchgoal));
-                    $state += max(0, min($progress->learn, $ec->learngoal));
-                    $state += max(0, min($progress->speak, $ec->speakgoal));
-                    $state = (round(100 * $state / $goals, 0) >= 100);
-                } else {
-                    $state = false; // Unusual - no goals have been set up !!
-                }
-                break;
-        }
         return $state ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
     }
 
@@ -121,8 +84,6 @@ class custom_completion extends activity_custom_completion {
      */
     public function get_custom_rule_descriptions(): array {
         $completionmingrade = $this->cm->customdata['customcompletionrules']['completionmingrade'] ?? 0;
-        $completionpass = $this->cm->customdata['customcompletionrules']['completionpass'] ?? 0;
-        $completiongoals = $this->cm->customdata['customcompletionrules']['completiongoals'] ?? 0;
 
         return [
             'completionmingrade' => get_string('completiondetail:mingrade', 'englishcentral', $completionmingrade),

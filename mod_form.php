@@ -80,8 +80,6 @@ class mod_englishcentral_mod_form extends moodleform_mod {
      * Defines forms elements
      */
     public function definition() {
-        global $PAGE;
-
         $mform = $this->_form;
 
         // Add this activity-specific form fields.
