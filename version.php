@@ -30,5 +30,5 @@ defined('MOODLE_INTERNAL') || die();
 $plugin->component = 'mod_englishcentral';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->requires  = 2022112800; // Moodle 4.1 LTS (privacy API requires 4.0+; 4.1 is the oldest maintained LTS).
-$plugin->version   = 2026072100;
-$plugin->release   = '2026-07-21 (50)';
+$plugin->version   = 2026102700;
+$plugin->release   = '2026-10-27 (51)';

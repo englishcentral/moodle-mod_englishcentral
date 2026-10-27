@@ -1,6 +1,11 @@
 ========================================
 Change log for mod_englishcentral
 ========================================
+2026-10-27 (51)
+- Added PHPUnit tests and data generator
+- Reduced code complexity flagged by phpmd; fixed an undefined-variable bug in classes/activity.php
+- Removed remaining phpcs findings
+
 2026-07-21 (50)
 - Prepared plugin for Moodle Marketplace submission
 - Coding-standards (phpcs) cleanup: file headers, docblocks, comment style, naming conventions
